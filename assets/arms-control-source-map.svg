@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" role="img" aria-labelledby="title desc">
+  <title id="title">FRUS Volume VII source map</title>
+  <desc id="desc">A diagram showing the planned FRUS volume connected to archival and public source groups.</desc>
+  <rect width="920" height="620" fill="#f4f0e7" />
+  <path d="M64 78h792v464H64z" fill="#fffefa" stroke="#d8d0c2" stroke-width="2" />
+  <path d="M134 496h652" stroke="#d8d0c2" stroke-width="2" />
+  <path d="M134 384h652" stroke="#d8d0c2" stroke-width="2" />
+  <path d="M134 272h652" stroke="#d8d0c2" stroke-width="2" />
+  <path d="M134 160h652" stroke="#d8d0c2" stroke-width="2" />
+  <path d="M194 118v392M326 118v392M458 118v392M590 118v392M722 118v392" stroke="#e5ded2" stroke-width="2" />
+
+  <circle cx="460" cy="304" r="86" fill="#20334c" />
+  <circle cx="460" cy="304" r="108" fill="none" stroke="#bd8b2e" stroke-width="5" />
+  <text x="460" y="286" text-anchor="middle" font-family="Georgia, serif" font-size="44" font-weight="700" fill="#fffefa">FRUS</text>
+  <text x="460" y="327" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="800" fill="#fffefa">Volume VII</text>
+  <text x="460" y="360" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="20" fill="#f4dca4">1993-1996</text>
+
+  <g fill="none" stroke-width="4" stroke-linecap="round">
+    <path d="M375 252 214 168" stroke="#4c6f92" />
+    <path d="M359 315 190 412" stroke="#2e6659" />
+    <path d="M545 251 707 166" stroke="#8f3f44" />
+    <path d="M561 314 728 414" stroke="#bd8b2e" />
+    <path d="M460 196V102" stroke="#20334c" />
+    <path d="M460 412v96" stroke="#20334c" />
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <g>
+      <rect x="104" y="112" width="220" height="92" rx="8" fill="#eaf0f4" stroke="#4c6f92" stroke-width="2" />
+      <text x="214" y="148" text-anchor="middle" font-size="21" font-weight="800" fill="#20334c">NSC Defense</text>
+      <text x="214" y="178" text-anchor="middle" font-size="17" fill="#394752">arms control files</text>
+    </g>
+    <g>
+      <rect x="90" y="374" width="238" height="96" rx="8" fill="#e8f1ed" stroke="#2e6659" stroke-width="2" />
+      <text x="209" y="411" text-anchor="middle" font-size="21" font-weight="800" fill="#20334c">NSC Nonproliferation</text>
+      <text x="209" y="441" text-anchor="middle" font-size="17" fill="#394752">export-control files</text>
+    </g>
+    <g>
+      <rect x="598" y="112" width="226" height="92" rx="8" fill="#f6e9e8" stroke="#8f3f44" stroke-width="2" />
+      <text x="711" y="148" text-anchor="middle" font-size="21" font-weight="800" fill="#20334c">Clinton Library</text>
+      <text x="711" y="178" text-anchor="middle" font-size="17" fill="#394752">finding aids</text>
+    </g>
+    <g>
+      <rect x="610" y="374" width="238" height="96" rx="8" fill="#f7efd9" stroke="#bd8b2e" stroke-width="2" />
+      <text x="729" y="411" text-anchor="middle" font-size="21" font-weight="800" fill="#20334c">Public Papers</text>
+      <text x="729" y="441" text-anchor="middle" font-size="17" fill="#394752">policy milestones</text>
+    </g>
+    <g>
+      <rect x="346" y="46" width="228" height="86" rx="8" fill="#fffefa" stroke="#20334c" stroke-width="2" />
+      <text x="460" y="82" text-anchor="middle" font-size="20" font-weight="800" fill="#20334c">Office of the Historian</text>
+      <text x="460" y="111" text-anchor="middle" font-size="16" fill="#394752">official status</text>
+    </g>
+    <g>
+      <rect x="346" y="488" width="228" height="86" rx="8" fill="#fffefa" stroke="#20334c" stroke-width="2" />
+      <text x="460" y="524" text-anchor="middle" font-size="20" font-weight="800" fill="#20334c">Compiler Chapters</text>
+      <text x="460" y="553" text-anchor="middle" font-size="16" fill="#394752">NPT/CTBT, START, CBW</text>
+    </g>
+  </g>
+</svg>

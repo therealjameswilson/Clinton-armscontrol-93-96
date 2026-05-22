@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FRUS 1993-2000 Volume VII Arms Control and Nonproliferation</title>
+    <meta
+      name="description"
+      content="A compiler-facing source map for FRUS 1993-2000, Volume VII, Arms Control and Nonproliferation, 1993-1996."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="data/potential-documents.js"></script>
+    <script defer src="data/clinton-public-statements.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="FRUS Volume VII arms control home">
+        <span class="brand-mark">VII</span>
+        <span>Arms Control Files</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#desk">Desk</a>
+        <a href="#chapters">Chapters</a>
+        <a href="#leads">Leads</a>
+        <a href="#documents">Documents</a>
+        <a href="#statements">Statements</a>
+        <a href="#milestones">Milestones</a>
+        <a href="#sources">Sources</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="kicker">FRUS 1993-2000, Volume VII</p>
+          <h1 id="hero-title">Arms Control and Nonproliferation, 1993-1996</h1>
+          <p class="lede">
+            A public compiler desk for the planned FRUS volume on Clinton-era arms control
+            and nonproliferation. The page gathers official volume anchors, NSC collection
+            leads, released finding aids, and public milestone records into a single
+            source map for early research triage.
+          </p>
+          <div class="hero-actions" aria-label="Primary actions">
+            <a class="button primary" href="#leads">Browse Source Leads</a>
+            <a class="button secondary" href="#milestones">Review Milestones</a>
+            <a class="button secondary" href="https://history.state.gov/historicaldocuments/frus1993-00v07" rel="noreferrer">
+              Official Volume Page
+            </a>
+          </div>
+        </div>
+
+        <aside class="volume-brief" aria-label="Volume scope">
+          <img
+            class="brief-visual"
+            src="assets/arms-control-source-map.svg"
+            alt="Source map connecting FRUS Volume VII to Clinton Library NSC files, public papers, NARA catalog records, and compiler chapters"
+          />
+          <p class="brief-label">Volume Snapshot</p>
+          <dl>
+            <div>
+              <dt>Coverage</dt>
+              <dd>1993-1996</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>Planned</dd>
+            </div>
+            <div>
+              <dt>Core Offices</dt>
+              <dd>NSC Defense Policy and Arms Control; NSC Nonproliferation and Export Controls</dd>
+            </div>
+            <div>
+              <dt>Boundary</dt>
+              <dd>Volume VIII continues the subject for 1997-2000</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="stats" aria-label="Research desk summary">
+        <div>
+          <span id="lead-count">0</span>
+          <p>source leads</p>
+        </div>
+        <div>
+          <span id="lane-count">0</span>
+          <p>compiler chapters</p>
+        </div>
+        <div>
+          <span id="milestone-count">0</span>
+          <p>public milestones</p>
+        </div>
+        <div>
+          <span id="document-count">0</span>
+          <p>potential documents</p>
+        </div>
+        <div>
+          <span id="statement-count">0</span>
+          <p>Clinton statements</p>
+        </div>
+      </section>
+
+      <section class="section desk-section" id="desk" aria-labelledby="desk-title">
+        <div class="section-heading">
+          <p class="kicker">Compiler Desk</p>
+          <h2 id="desk-title">A Planned Volume Needs A Source-First Frame</h2>
+        </div>
+        <div class="desk-grid">
+          <article class="desk-panel">
+            <h3>Volume Control</h3>
+            <p>
+              The Office of the Historian lists Volume VII as planned. This desk keeps the
+              page honest by separating official status, archival leads, released document
+              context, public statements, and inferred compiler chapters.
+            </p>
+          </article>
+          <article class="desk-panel">
+            <h3>Selection Test</h3>
+            <p>
+              Candidate material should document major policy decisions, diplomatic
+              activity, and interagency handling around nuclear testing, treaty diplomacy,
+              export controls, regional proliferation, and chemical or biological weapons.
+            </p>
+          </article>
+          <article class="desk-panel">
+            <h3>Source Note Path</h3>
+            <p>
+              Every lead carries a repository trail, collection name or identifier, and a
+              first-pass reason it belongs in the Volume VII universe before any document
+              is promoted for chronological selection.
+            </p>
+          </article>
+          <article class="desk-panel">
+            <h3>Boundary Control</h3>
+            <p>
+              Records after 1996 are treated as handoff context for Volume VIII unless
+              they document an earlier 1993-1996 decision, negotiation, or source trail.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="chapters" aria-labelledby="chapters-title">
+        <div class="section-heading">
+          <p class="kicker">Provisional Arrangement</p>
+          <h2 id="chapters-title">Compiler Chapters</h2>
+        </div>
+        <div id="lanes-root" class="lane-grid" aria-live="polite">
+          <p class="loading">Loading compiler chapters...</p>
+        </div>
+      </section>
+
+      <section class="section leads-section" id="leads" aria-labelledby="leads-title">
+        <div class="section-heading">
+          <p class="kicker">Archival Trail</p>
+          <h2 id="leads-title">Source Leads</h2>
+        </div>
+        <div class="lead-tools" aria-label="Search and filter source leads">
+          <label class="search-field">
+            <span>Search</span>
+            <input id="lead-search" type="search" placeholder="Search title, office, NAID, topic, or note" />
+          </label>
+          <label>
+            <span>Chapter</span>
+            <select id="lane-filter"></select>
+          </label>
+          <label>
+            <span>Institution</span>
+            <select id="institution-filter"></select>
+          </label>
+          <button id="clear-filters" type="button">Reset</button>
+          <p id="lead-summary" class="lead-summary">Loading source leads...</p>
+        </div>
+        <div id="leads-root" class="leads-root" aria-live="polite">
+          <p class="loading">Loading source leads...</p>
+        </div>
+      </section>
+
+      <section class="section documents-section" id="documents" aria-labelledby="documents-title">
+        <div class="section-heading">
+          <p class="kicker">NARA Scout Triage</p>
+          <h2 id="documents-title">Potential Documents</h2>
+        </div>
+        <div class="document-tools" aria-label="Search and filter potential documents">
+          <label class="search-field">
+            <span>Search</span>
+            <input id="document-search" type="search" placeholder="Search title, NAID, source, query, or note" />
+          </label>
+          <label>
+            <span>Chapter</span>
+            <select id="document-chapter-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="document-priority-filter"></select>
+          </label>
+          <button id="clear-document-filters" type="button">Reset</button>
+          <p id="document-summary" class="document-summary">Loading potential documents...</p>
+        </div>
+        <div id="documents-root" class="documents-root" aria-live="polite">
+          <p class="loading">Loading potential documents...</p>
+        </div>
+      </section>
+
+      <section class="section statements-section" id="statements" aria-labelledby="statements-title">
+        <div class="section-heading">
+          <p class="kicker">Public Papers</p>
+          <h2 id="statements-title">Clinton Public Statements</h2>
+        </div>
+        <div class="statement-tools" aria-label="Search and filter Clinton public statements">
+          <label class="search-field">
+            <span>Search</span>
+            <input id="statement-search" type="search" placeholder="Search title, chapter, access ID, or source note" />
+          </label>
+          <label>
+            <span>Chapter</span>
+            <select id="statement-chapter-filter"></select>
+          </label>
+          <label>
+            <span>Year</span>
+            <select id="statement-year-filter"></select>
+          </label>
+          <button id="clear-statement-filters" type="button">Reset</button>
+          <p id="statement-summary" class="statement-summary">Loading Clinton public statements...</p>
+        </div>
+        <div id="statements-root" class="statements-root" aria-live="polite">
+          <p class="loading">Loading Clinton public statements...</p>
+        </div>
+      </section>
+
+      <section class="section milestones-section" id="milestones" aria-labelledby="milestones-title">
+        <div class="section-heading">
+          <p class="kicker">Public Record</p>
+          <h2 id="milestones-title">Chronology Milestones</h2>
+        </div>
+        <div id="milestones-root" class="timeline" aria-live="polite">
+          <p class="loading">Loading public milestones...</p>
+        </div>
+      </section>
+
+      <section class="section source-section" id="sources" aria-labelledby="sources-title">
+        <div class="section-heading">
+          <p class="kicker">Official Anchors</p>
+          <h2 id="sources-title">Source Paths To Keep Open</h2>
+        </div>
+        <div class="source-list">
+          <a href="https://history.state.gov/historicaldocuments/frus1993-00v07" rel="noreferrer">
+            Office of the Historian: FRUS 1993-2000, Volume VII
+          </a>
+          <a href="https://history.state.gov/historicaldocuments/clinton" rel="noreferrer">
+            Office of the Historian: Clinton administration volume list
+          </a>
+          <a href="https://history.state.gov/historicaldocuments/status-of-the-series" rel="noreferrer">
+            Office of the Historian: Status of the Series
+          </a>
+          <a href="https://www.clintonlibrary.gov/sites/default/files/documents/research/clinton-library-guide-holdings-2020-no-sf-cf.pdf" rel="noreferrer">
+            Clinton Library Guide to Textual Holdings
+          </a>
+          <a href="https://catalog.archives.gov/id/7386504" rel="noreferrer">
+            NARA Catalog: NSC Defense Policy and Arms Control Office
+          </a>
+          <a href="https://catalog.archives.gov/id/7388773" rel="noreferrer">
+            NARA Catalog: NSC Nonproliferation and Export Controls Office
+          </a>
+          <a href="https://www.govinfo.gov/app/collection/ppp" rel="noreferrer">
+            GovInfo: Public Papers of the Presidents
+          </a>
+        </div>
+      </section>
+
+      <section class="section ingest-section" aria-labelledby="ingest-title">
+        <div class="section-heading">
+          <p class="kicker">Next Pass</p>
+          <h2 id="ingest-title">Research Ingest Checklist</h2>
+        </div>
+        <ol class="checklist">
+          <li>
+            <span>01</span>
+            <p>Pull NARA Catalog child series and file units for the two core NSC offices.</p>
+          </li>
+          <li>
+            <span>02</span>
+            <p>Harvest Clinton Library finding aids and public records for the NPT/CTBT chapter, North Korea, START II, CTR/HEU, CWC, BWC, missile controls, CBW reporting, and export controls.</p>
+          </li>
+          <li>
+            <span>03</span>
+            <p>Map public milestones to internal source leads, then mark which decisions need memcon, telcon, PRD, PDD, or cable support.</p>
+          </li>
+          <li>
+            <span>04</span>
+            <p>Separate Volume VII material from Volume VIII handoff items and from Volume XX former-Soviet nuclear-security overlap.</p>
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Built as a public FRUS source map for a planned Office of the Historian volume.</p>
+    </footer>
+  </body>
+</html>
