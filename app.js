@@ -1,4 +1,27 @@
-const potentialDocuments = window.ARMSCONTROL_POTENTIAL_DOCUMENTS || [];
+const generatedPotentialDocuments = window.ARMSCONTROL_POTENTIAL_DOCUMENTS || [];
+const sourceGapLeads = window.ARMSCONTROL_SOURCE_GAP_LEADS || [];
+const compilerGaps = window.ARMSCONTROL_COMPILER_GAPS || [];
+const libraryResearchPlan = window.ARMSCONTROL_LIBRARY_RESEARCH_PLAN || [];
+const chapterSequence = [
+  "ctbt",
+  "strategic-arms",
+  "start-ii",
+  "ctr-heu",
+  "nonproliferation",
+  "counterproliferation",
+  "regional",
+  "cbw-conventional",
+  "conventional-landmines"
+];
+const potentialDocuments = [...generatedPotentialDocuments, ...sourceGapLeads].sort((a, b) => {
+  const chapterOrder = chapterSequence.indexOf(a.chapterId) - chapterSequence.indexOf(b.chapterId);
+  return (
+    chapterOrder ||
+    `${a.date || "9999"}`.localeCompare(`${b.date || "9999"}`) ||
+    (b.score || 0) - (a.score || 0) ||
+    a.title.localeCompare(b.title)
+  );
+});
 const clintonPublicStatements = (window.CLINTON_PUBLIC_STATEMENTS || potentialDocuments.filter((item) => item.sourceType === "Public Papers"))
   .slice()
   .sort((a, b) => `${a.date || ""}`.localeCompare(`${b.date || ""}`) || a.title.localeCompare(b.title));
@@ -670,11 +693,14 @@ const laneCount = document.querySelector("#lane-count");
 const milestoneCount = document.querySelector("#milestone-count");
 const documentCount = document.querySelector("#document-count");
 const statementCount = document.querySelector("#statement-count");
+const gapCount = document.querySelector("#gap-count");
 const lanesRoot = document.querySelector("#lanes-root");
 const leadsRoot = document.querySelector("#leads-root");
 const documentsRoot = document.querySelector("#documents-root");
 const statementsRoot = document.querySelector("#statements-root");
 const milestonesRoot = document.querySelector("#milestones-root");
+const gapsRoot = document.querySelector("#gaps-root");
+const libraryRoot = document.querySelector("#library-root");
 const leadSearch = document.querySelector("#lead-search");
 const laneFilter = document.querySelector("#lane-filter");
 const institutionFilter = document.querySelector("#institution-filter");
@@ -734,6 +760,7 @@ function setStats() {
   milestoneCount.textContent = milestones.length.toString();
   documentCount.textContent = potentialDocuments.length.toString();
   statementCount.textContent = clintonPublicStatements.length.toString();
+  if (gapCount) gapCount.textContent = compilerGaps.length.toString();
 }
 
 function populateFilters() {
@@ -889,6 +916,8 @@ function documentSearchText(item) {
     item.level,
     item.sourceNote,
     item.summary,
+    item.confidence,
+    item.compilerRisk,
     ...(item.matchedQueries || []),
     ...(item.topics || [])
   ]
@@ -911,7 +940,7 @@ function filteredDocuments() {
 function renderDocuments() {
   const items = filteredDocuments();
 
-  documentSummary.textContent = `${items.length} of ${potentialDocuments.length} potential documents shown`;
+  documentSummary.textContent = `${items.length} of ${potentialDocuments.length} potential documents shown; ${sourceGapLeads.length} added from the compiler-gap pass`;
 
   if (!items.length) {
     const empty = document.createElement("p");
@@ -945,9 +974,18 @@ function renderDocuments() {
     const tags = document.createElement("div");
     tags.className = "lead-tags";
     tags.append(makeChip(item.chapterTitle || laneById.get(item.chapterId)?.title || item.chapterId, "priority-chip"));
+    if (item.confidence) tags.append(makeChip(`Confidence: ${item.confidence}`));
+    if (item.level) tags.append(makeChip(item.level));
     for (const query of (item.matchedQueries || []).slice(0, 3)) tags.append(makeChip(query));
 
-    main.append(type, title, summary, links, tags);
+    main.append(type, title, summary);
+    if (item.compilerRisk) {
+      const risk = document.createElement("p");
+      risk.className = "risk-note";
+      risk.textContent = `Compiler risk: ${item.compilerRisk}`;
+      main.append(risk);
+    }
+    main.append(links, tags);
 
     const side = document.createElement("div");
     side.className = "document-side";
@@ -955,6 +993,7 @@ function renderDocuments() {
     side.append(makeChip(item.date || "date not surfaced"));
     side.append(makeChip(item.identifier || item.naid || "source id pending"));
     if (item.category) side.append(makeChip(item.category));
+    if (item.confidence) side.append(makeChip(`confidence ${item.confidence}`));
     if (item.digitalObjects) side.append(makeChip(`${item.digitalObjects} digital object${item.digitalObjects === 1 ? "" : "s"}`));
 
     card.append(main, side);
@@ -1072,6 +1111,185 @@ function renderMilestones() {
   milestonesRoot.replaceChildren(...cards);
 }
 
+function gapPriorityRank(priority) {
+  return { Critical: 0, High: 1, Medium: 2, Review: 3 }[priority] ?? 4;
+}
+
+function renderGaps() {
+  if (!gapsRoot) return;
+
+  if (!compilerGaps.length) {
+    const empty = document.createElement("p");
+    empty.className = "loading";
+    empty.textContent = "No compiler gaps are currently staged.";
+    gapsRoot.replaceChildren(empty);
+    return;
+  }
+
+  const metrics = document.createElement("div");
+  metrics.className = "gap-metrics";
+  const highCount = compilerGaps.filter((gap) => ["Critical", "High"].includes(gap.priority)).length;
+  const sourcePoolCount = new Set(compilerGaps.flatMap((gap) => gap.sourcePools || [])).size;
+  for (const item of [
+    ["Open gaps", compilerGaps.length, "Tracked compiler-risk issues"],
+    ["Critical/high", highCount, "Needs source review before final selection"],
+    ["New source leads", sourceGapLeads.length, "Added document or source-path candidates"],
+    ["Source pools", sourcePoolCount, "Institutions or record groups to pursue"]
+  ]) {
+    const card = document.createElement("article");
+    card.className = "gap-metric";
+    const value = document.createElement("strong");
+    value.textContent = item[1].toString();
+    const label = document.createElement("span");
+    label.textContent = item[0];
+    const note = document.createElement("p");
+    note.textContent = item[2];
+    card.append(value, label, note);
+    metrics.append(card);
+  }
+
+  const list = document.createElement("div");
+  list.className = "gap-list";
+  for (const gap of [...compilerGaps].sort(
+    (a, b) => gapPriorityRank(a.priority) - gapPriorityRank(b.priority) || a.title.localeCompare(b.title)
+  )) {
+    const card = document.createElement("article");
+    card.className = `gap-card gap-priority-${String(gap.priority || "review").toLowerCase()}`;
+
+    const header = document.createElement("div");
+    header.className = "gap-card-header";
+    const heading = document.createElement("h3");
+    heading.textContent = gap.title;
+    const badge = makeChip(gap.priority || "Review", "gap-badge");
+    header.append(heading, badge);
+
+    const meta = document.createElement("div");
+    meta.className = "lead-tags";
+    for (const value of [gap.lane, gap.status, `${gap.targetRecords?.length || 0} target IDs`]) {
+      if (value) meta.append(makeChip(value));
+    }
+
+    const evidence = document.createElement("p");
+    evidence.className = "gap-evidence";
+    evidence.textContent = gap.evidence;
+
+    const problem = document.createElement("p");
+    problem.className = "gap-problem";
+    problem.textContent = gap.problem;
+
+    const needed = document.createElement("p");
+    needed.className = "gap-needed";
+    needed.textContent = gap.needed;
+
+    const actions = document.createElement("ul");
+    actions.className = "gap-actions";
+    for (const action of gap.nextActions || []) {
+      const item = document.createElement("li");
+      item.textContent = action;
+      actions.append(item);
+    }
+
+    const pullList = document.createElement("p");
+    pullList.className = "gap-pull-list";
+    pullList.textContent = `Pull list: ${(gap.targetRecords || []).join(", ") || "source search required"}`;
+
+    card.append(header, meta, evidence, problem, needed, actions, pullList);
+    list.append(card);
+  }
+
+  gapsRoot.replaceChildren(metrics, list);
+}
+
+function libraryPriorityRank(priority) {
+  return { Control: 0, A: 1, B: 2, C: 3 }[priority] ?? 4;
+}
+
+function renderLibraryPlan() {
+  if (!libraryRoot) return;
+
+  if (!libraryResearchPlan.length) {
+    const empty = document.createElement("p");
+    empty.className = "loading";
+    empty.textContent = "No Clinton Library research plan is currently staged.";
+    libraryRoot.replaceChildren(empty);
+    return;
+  }
+
+  const metrics = document.createElement("div");
+  metrics.className = "library-metrics";
+  const aPriority = libraryResearchPlan.filter((item) => item.priority === "A").length;
+  const oaCount = new Set(libraryResearchPlan.flatMap((item) => item.oaIds || [])).size;
+  const offices = new Set(libraryResearchPlan.map((item) => item.office).filter(Boolean)).size;
+  for (const item of [
+    ["Pull clusters", libraryResearchPlan.length, "Folder groups staged from 2013-0185-M"],
+    ["A-priority", aPriority, "First-day pulls"],
+    ["OA/ID refs", oaCount, "Call-slip identifiers to verify"],
+    ["Office lanes", offices, "NSC staff or office groupings"]
+  ]) {
+    const card = document.createElement("article");
+    card.className = "library-metric";
+    const value = document.createElement("strong");
+    value.textContent = item[1].toString();
+    const label = document.createElement("span");
+    label.textContent = item[0];
+    const note = document.createElement("p");
+    note.textContent = item[2];
+    card.append(value, label, note);
+    metrics.append(card);
+  }
+
+  const list = document.createElement("div");
+  list.className = "library-list";
+  for (const item of [...libraryResearchPlan].sort(
+    (a, b) => libraryPriorityRank(a.priority) - libraryPriorityRank(b.priority) || a.title.localeCompare(b.title)
+  )) {
+    const card = document.createElement("article");
+    card.className = `library-card library-priority-${String(item.priority || "review").toLowerCase()}`;
+
+    const header = document.createElement("div");
+    header.className = "library-card-header";
+    const heading = document.createElement("h3");
+    heading.textContent = item.title;
+    const badge = makeChip(item.priority || "Review", "library-badge");
+    header.append(heading, badge);
+
+    const meta = document.createElement("div");
+    meta.className = "lead-tags";
+    for (const value of [item.chapterTitle, item.sourcePart, item.office]) {
+      if (value) meta.append(makeChip(value));
+    }
+
+    const goal = document.createElement("p");
+    goal.className = "library-goal";
+    goal.textContent = item.visitGoal;
+
+    const reason = document.createElement("p");
+    reason.className = "library-reason";
+    reason.textContent = item.whyItMatters;
+
+    const actions = document.createElement("ul");
+    actions.className = "library-actions";
+    for (const action of item.onsiteActions || []) {
+      const actionItem = document.createElement("li");
+      actionItem.textContent = action;
+      actions.append(actionItem);
+    }
+
+    const pullList = document.createElement("p");
+    pullList.className = "library-pull-list";
+    pullList.textContent = `OA/ID pull list: ${(item.oaIds || []).join(", ")}`;
+
+    const terms = document.createElement("div");
+    terms.className = "lead-tags";
+    for (const term of item.targetTerms || []) terms.append(makeChip(term));
+
+    card.append(header, meta, goal, reason, actions, pullList, terms);
+    list.append(card);
+  }
+
+  libraryRoot.replaceChildren(metrics, list);
+}
+
 function bindEvents() {
   for (const control of [leadSearch, laneFilter, institutionFilter]) {
     control.addEventListener("input", renderLeads);
@@ -1120,4 +1338,6 @@ renderLeads();
 renderDocuments();
 renderStatements();
 renderMilestones();
+renderGaps();
+renderLibraryPlan();
 bindEvents();

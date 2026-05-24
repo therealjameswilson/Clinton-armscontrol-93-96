@@ -1,0 +1,262 @@
+window.ARMSCONTROL_LIBRARY_RESEARCH_PLAN = [
+  {
+    id: "library-2013-0185-m-overview",
+    priority: "Control",
+    chapterId: "volume-control",
+    chapterTitle: "Volume Control",
+    title: "2013-0185-M folder-title lists",
+    office: "Clinton Presidential Library / NSC Access Management",
+    sourcePart: "Parts 1-4",
+    oaIds: ["Part 1: 375 pp.", "Part 2: 376 pp.", "Part 3: 356 pp.", "Part 4: 183 pp."],
+    visitGoal:
+      "Use the four PDFs as the on-site call-slip map. They expose folder titles, OA/ID numbers, and responsible NSC offices, but not final item-level document boundaries.",
+    whyItMatters:
+      "This gives the Library visit a queue: pull high-yield folders first, capture folder covers and withdrawal sheets, then decide which folders merit item-level review.",
+    onsiteActions: [
+      "Ask staff how to cite 2013-0185-M folder-title entries in request slips.",
+      "Confirm whether OA/ID numbers map directly to boxes, folders, or accessions for same-day pulls.",
+      "Separate Volume VII 1993-1996 material from Volume VIII handoff folders before requesting large later-date runs."
+    ],
+    targetTerms: ["2013-0185-M", "OA/ID", "folder title list", "NSC Folder Titles"]
+  },
+  {
+    id: "library-ctbt-prd-19-bell-andreasen",
+    priority: "A",
+    chapterId: "ctbt",
+    chapterTitle: "NPT and CTBT",
+    title: "PRD-19, CTB negotiations, and nuclear-testing policy",
+    office: "Defense Policy / Robert Bell and Steven Andreasen",
+    sourcePart: "Part 1",
+    oaIds: ["267", "379", "380", "381", "2899", "3331", "3333", "3850"],
+    visitGoal:
+      "Pull the PRD-19 and CTB folders first. They are the best on-site path into the 1993 nuclear-testing review, CTBT negotiation strategy, P-5 diplomacy, verification, hydronuclear issues, and country-specific CTB files.",
+    whyItMatters:
+      "The public site already has CTBT statements. These folders are the likely internal decision record behind them.",
+    onsiteActions: [
+      "Prioritize OA/ID 267 PRD-19 folders and OA/ID 2899/3333 Andreasen PRD-19 folders.",
+      "Then pull OA/ID 381 CTB July-August 1993 folders and OA/ID 3331 CTB negotiations/nuclear testing/France folders.",
+      "For each folder, record exact folder title, date span, classification/restriction markings, item titles, and page ranges."
+    ],
+    targetTerms: ["PRD-19", "CTB", "Comprehensive Test Ban", "nuclear testing", "verification", "hydronuclear"]
+  },
+  {
+    id: "library-npt-briefing-book",
+    priority: "A",
+    chapterId: "ctbt",
+    chapterTitle: "NPT and CTBT",
+    title: "NPT extension briefing and rollout files",
+    office: "Defense Policy / Steven Andreasen; Staff Director / Nancy Soderberg",
+    sourcePart: "Parts 1 and 4",
+    oaIds: ["3850", "1406"],
+    visitGoal:
+      "Review the Nonproliferation Treaty briefing book folders and Soderberg NPT guidance/readiness files for internal themes, rollout, and interagency clearance.",
+    whyItMatters:
+      "This is the best visible folder-level path from public NPT extension statements to internal policy guidance.",
+    onsiteActions: [
+      "Pull OA/ID 3850 Nonproliferation Treaty Briefing Book 1995 folders [2]-[7].",
+      "Pull OA/ID 1406 NPT Guidance/Themes, NPT February 1995, and NPT Readiness/Rollout.",
+      "Flag any Egypt, South Africa, Ukraine, NAM, Article VI, or negative-security-assurance material for item-level selection."
+    ],
+    targetTerms: ["NPT", "briefing book", "readiness", "rollout", "guidance", "themes"]
+  },
+  {
+    id: "library-start-ii-ukraine-nunn-lugar",
+    priority: "A",
+    chapterId: "start-ii",
+    chapterTitle: "START II Ratification",
+    title: "START II, Ukraine START, and Nunn-Lugar certification folders",
+    office: "Defense Policy / Robert Bell and Anne Witkowsky",
+    sourcePart: "Part 1",
+    oaIds: ["380", "940", "2431"],
+    visitGoal:
+      "Pull START II ratification, Ukraine START, START entry-into-force, and Nunn-Lugar certification/foreign-assistance folders as a combined ratification-and-implementation set.",
+    whyItMatters:
+      "The START II chapter needs Senate/Duma/ABM context, while CTR/HEU needs the same former-Soviet nuclear-security implementation trail.",
+    onsiteActions: [
+      "Start with OA/ID 380 Russia START II ratification and Ukraine START folders.",
+      "Pull OA/ID 940 Nunn-Lugar Certification and Russian START II/START EIF/Ukraine START folders.",
+      "Pull OA/ID 2431 Nunn-Lugar Foreign Assistance folders [2]-[4] and compare with 2014-0644-M Nunn-Lugar MDR packet."
+    ],
+    targetTerms: ["START II", "Ukraine START", "Nunn-Lugar", "certification", "entry into force"]
+  },
+  {
+    id: "library-ctr-heu-doe-safeguards",
+    priority: "A",
+    chapterId: "ctr-heu",
+    chapterTitle: "Cooperative Threat Reduction and HEU Agreement",
+    title: "DOE safeguards, Russian nuclear control, and HEU implementation paths",
+    office: "Defense Policy / Robert Bell, Steven Andreasen, Betsy Pimentel, and Edward Bolton",
+    sourcePart: "Part 1",
+    oaIds: ["381", "3592", "2818"],
+    visitGoal:
+      "Use DOE safeguards/security and Russian nuclear-control folders to connect public HEU transparency milestones to implementation records.",
+    whyItMatters:
+      "CTR/HEU selection will be weak without DOE, safeguards, nuclear-control, and transparency records.",
+    onsiteActions: [
+      "Pull OA/ID 381 Russian Nuclear Control August 1993 and DoE 1-KT Non-Proliferation Experiment folders.",
+      "Pull OA/ID 3592 DOE Safeguards/Security folders [2]-[5].",
+      "Check OA/ID 2818 nuclear summit notification and MTCR/export-control folders for overlap with HEU or nuclear-materials security."
+    ],
+    targetTerms: ["HEU", "DOE", "safeguards", "Russian nuclear control", "nuclear security"]
+  },
+  {
+    id: "library-cbw-cwc-bwc-russia",
+    priority: "A",
+    chapterId: "cbw-conventional",
+    chapterTitle: "Chemical and Biological Weapons",
+    title: "CWC ratification, BWC, Russian BW/CW, and chemical demilitarization",
+    office: "Defense Policy, Legal Advisor, Speechwriting",
+    sourcePart: "Parts 1, 3, and 4",
+    oaIds: ["381", "844", "939", "1007", "2471", "3115", "3311", "3390", "3393", "1854", "3381"],
+    visitGoal:
+      "Pull CWC/BWC legal and NSC policy folders alongside Russian BW/CW and chemical-demilitarization files.",
+    whyItMatters:
+      "This turns the CBW chapter from public letters into a real ratification, verification, and Russian compliance source map.",
+    onsiteActions: [
+      "Pull Defense Policy CWC ratification folders in OA/ID 381, 939, and 844.",
+      "Pull Legal Advisor CWC/BWC folders: OA/ID 1007, 2471, 3115, 3311, 3390, and 3393.",
+      "Pull Speechwriting CWC folders only after internal policy folders, using them to trace public-language clearance."
+    ],
+    targetTerms: ["CWC", "BWC", "Russian BW", "Russian CW", "chemical demilitarization", "verification"]
+  },
+  {
+    id: "library-north-korea-pc-dc",
+    priority: "A",
+    chapterId: "regional",
+    chapterTitle: "Regional Proliferation Cases",
+    title: "North Korea PC/DC meeting notes and working files",
+    office: "Staff Director / Nancy Soderberg; NSC regional and speechwriting files",
+    sourcePart: "Parts 2, 3, and 4",
+    oaIds: ["1394", "1406", "278", "644", "2483", "3029"],
+    visitGoal:
+      "Pull Soderberg PC/DC notes for North Korea before broader DPRK folders. These are likely the highest-yield internal decision records for the 1993-1994 Agreed Framework sequence.",
+    whyItMatters:
+      "The existing regional chapter is DPRK-heavy but still needs actual PC/DC sequence records, not only file-unit titles.",
+    onsiteActions: [
+      "Pull OA/ID 1394 North Korea PC/DC notes from November 1993 through October 1994, plus May 28, 1996.",
+      "Pull OA/ID 1406 North Korea July 1993 and May-June 1994 folders.",
+      "Use Intelligence Programs North Korea/North Korea-Nuclear rows as a second-day source lane if access allows."
+    ],
+    targetTerms: ["North Korea", "DPRK", "PC meeting", "DC meeting", "Agreed Framework"]
+  },
+  {
+    id: "library-iran-iraq-unscom-regional",
+    priority: "A",
+    chapterId: "regional",
+    chapterTitle: "Regional Proliferation Cases",
+    title: "Iran, Iraq, UNSCOM, and regional WMD files",
+    office: "Near East and South Asian Affairs; Staff Director; Legal Advisor; Intelligence Programs",
+    sourcePart: "Parts 2, 3, and 4",
+    oaIds: ["255", "723", "724", "727", "728", "729", "1405", "1417", "3032", "3112", "3495", "3499"],
+    visitGoal:
+      "Balance the regional chapter by pulling Iran, Iraq, UNSCOM, WMD, and sanctions files after North Korea.",
+    whyItMatters:
+      "This addresses the biggest regional imbalance: North Korea currently dominates, while Iraq/UNSCOM and Iran WMD/missile issues are underbuilt.",
+    onsiteActions: [
+      "Pull NESA Iraq/UNSCOM and Iran WMD folders from OA/ID 723-729 and 255.",
+      "Pull Staff Director Iraq working files and UNSCOM rows in OA/ID 1405, 1417, and 1418 if time permits.",
+      "Pull Legal Advisor Iran missile sanctions and WMD folders only after policy folders identify decision dates."
+    ],
+    targetTerms: ["Iran", "Iraq", "UNSCOM", "WMD", "missile sanctions", "chemical weapons"]
+  },
+  {
+    id: "library-china-tech-transfer-nonproliferation",
+    priority: "A",
+    chapterId: "regional",
+    chapterTitle: "Regional Proliferation Cases",
+    title: "Technology transfers to China, ACDA, and missile proliferation",
+    office: "Access Management / William Leary; Strategic Planning; Office of the National Security Advisor",
+    sourcePart: "Parts 1 and 3",
+    oaIds: ["1797", "1808", "1809", "1810", "1812", "1813", "1822", "773", "1493"],
+    visitGoal:
+      "Use the Access Management China technology-transfer folders to build a China nonproliferation lane without getting lost in campaign-finance material.",
+    whyItMatters:
+      "The current project has only weak China proliferation coverage. These rows expose ACDA, DoD, DoS, CIA, State, redaction sets, and missile-proliferation source paths.",
+    onsiteActions: [
+      "Request 1993-1996 redacted/copy sets first: OA/ID 1797 and 1808.",
+      "Then pull OA/ID 1809-1813 State, DoD, DoS, CIA, and other third-agency documents.",
+      "Use OA/ID 1822 ACDA, Helms/Lott amendment, China Satellites, and Missile Proliferation rows as the targeted nonproliferation subset."
+    ],
+    targetTerms: ["China", "technology transfer", "ACDA", "missile proliferation", "satellites", "DoD", "DoS", "CIA"]
+  },
+  {
+    id: "library-counterproliferation-ic",
+    priority: "B",
+    chapterId: "counterproliferation",
+    chapterTitle: "Counterproliferation",
+    title: "Intelligence Programs counterproliferation and restricted-group files",
+    office: "Intelligence Programs / George Tenet, Rand Beers, Don Mitchell, Edward Appel",
+    sourcePart: "Part 2",
+    oaIds: ["2483", "2498", "2523", "2526", "2639", "3032"],
+    visitGoal:
+      "Use Intelligence Programs folders to replace generic counterproliferation chron-file hits with IC-facing policy and threat-assessment records.",
+    whyItMatters:
+      "Counterproliferation needs intelligence support, WMD threat, and regional target records, not only PDD/NSC-18 public text.",
+    onsiteActions: [
+      "Pull OA/ID 2498 Counterproliferation, 1996 and OA/ID 2523 Restricted Group Meeting (Nonproliferation), 1995.",
+      "Pull OA/ID 2483 Nonproliferation, North Korea, and North Korea-Nuclear folders.",
+      "Use OA/ID 3032 Iran/Iraq folders and OA/ID 2639 CTBT/Chemical Weapons as secondary target lanes."
+    ],
+    targetTerms: ["counterproliferation", "restricted group", "nonproliferation", "North Korea nuclear", "Iran", "Iraq"]
+  },
+  {
+    id: "library-landmines-conventional",
+    priority: "B",
+    chapterId: "conventional-landmines",
+    chapterTitle: "Conventional Arms and Landmines",
+    title: "Landmines, NSC policy papers, demining, and conventional arms transfer",
+    office: "Defense Policy, Staff Director, European Affairs, Multilateral & Humanitarian Affairs",
+    sourcePart: "Parts 1, 2, 3, and 4",
+    oaIds: ["938", "1161", "1405", "1721", "2193", "2549", "3335", "4151"],
+    visitGoal:
+      "Pull landmine policy folders after the nuclear/CBW/regional A-priority folders, with emphasis on 1995-1996 NSC policy papers and outside-agency files.",
+    whyItMatters:
+      "The conventional chapter was nearly empty; these rows expose the staff and agency lanes for PDD-48, demining, Ottawa, and allied effects.",
+    onsiteActions: [
+      "Start with OA/ID 1405 Landmines 1996, Landmines-NSC Policy Papers, and Landmines-Papers from Outside Agencies.",
+      "Pull OA/ID 3335 Landmines-Demining R&D, V. IWG meetings, Ottawa/effect on allies, demining assistance, and military alternatives.",
+      "Use OA/ID 2193 APL and CWC only if the European Affairs lane looks relevant to allied reaction."
+    ],
+    targetTerms: ["landmines", "NSC policy papers", "demining", "Ottawa", "outside agencies", "APL"]
+  },
+  {
+    id: "library-legal-advisor-treaty-stack",
+    priority: "B",
+    chapterId: "nonproliferation",
+    chapterTitle: "Nonproliferation Regimes",
+    title: "Legal Advisor treaty and sanctions stack",
+    office: "Legal Advisor / Baker, Krass, DeRosa, Sparks",
+    sourcePart: "Part 3",
+    oaIds: ["1007", "2251", "2252", "2471", "2600", "3110", "3111", "3112", "3114", "3115", "3117", "3118", "3410", "3495", "3499"],
+    visitGoal:
+      "Pull legal files after policy folders identify decision points. Use them for treaty interpretation, executive orders, sanctions, and implementation source notes.",
+    whyItMatters:
+      "The legal files can close citation gaps on CWC regulations, BWC, CTBT, START II, ABM/NMD, HEU executive orders, and Iran missile sanctions.",
+    onsiteActions: [
+      "Use Legal Advisor files to verify legal authority, implementation language, and executive-order handling.",
+      "Prioritize CWC, BWC, CTBT, START II, HEU, WMD, and Iran missile sanctions folders.",
+      "Avoid spending first-day time on broad legal files unless they connect to a known decision date."
+    ],
+    targetTerms: ["CWC", "BWC", "CTBT", "START II", "ABM", "HEU", "WMD", "Iran missile sanctions"]
+  },
+  {
+    id: "library-speechwriting-public-statement-backtrace",
+    priority: "C",
+    chapterId: "volume-control",
+    chapterTitle: "Volume Control",
+    title: "Speechwriting backtrace for public statements",
+    office: "Speechwriting / Benjamin, Blinken, Boorstin, Widmer",
+    sourcePart: "Part 4",
+    oaIds: ["1853", "1854", "1857", "1858", "2189", "3381", "3384", "3387", "415", "420", "422", "423"],
+    visitGoal:
+      "Use speechwriting folders only after internal policy folders. They are excellent for public-statement drafting, clearance, and chronology, but weak as standalone policy-decision records.",
+    whyItMatters:
+      "This keeps Clinton public statements useful without letting public language crowd out internal memoranda, cables, and meeting notes.",
+    onsiteActions: [
+      "Use OA/ID 3381 for September 1996 CTBT/CWC/Iraq public-statement cluster and OA/ID 3387 for START II fact sheets/press statement.",
+      "Use OA/ID 415/420 Boorstin folders for NPT, test ban, nonproliferation, nuclear smuggling, and North Korea speeches.",
+      "Photograph draft provenance only when it identifies a policy office, clearance chain, or attached decision paper."
+    ],
+    targetTerms: ["speechwriting", "START II", "CTBT", "CWC", "NPT", "North Korea", "public statement"]
+  }
+];

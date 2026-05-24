@@ -10,6 +10,9 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <script defer src="data/potential-documents.js"></script>
+    <script defer src="data/source-gap-leads.js"></script>
+    <script defer src="data/compiler-gaps.js"></script>
+    <script defer src="data/clinton-library-research-plan.js"></script>
     <script defer src="data/clinton-public-statements.js"></script>
     <script defer src="app.js"></script>
   </head>
@@ -22,6 +25,8 @@
       <nav aria-label="Primary navigation">
         <a href="#desk">Desk</a>
         <a href="#chapters">Chapters</a>
+        <a href="#gaps">Gaps</a>
+        <a href="#library">Library</a>
         <a href="#leads">Leads</a>
         <a href="#documents">Documents</a>
         <a href="#statements">Statements</a>
@@ -92,6 +97,10 @@
           <p>public milestones</p>
         </div>
         <div>
+          <span id="gap-count">0</span>
+          <p>compiler gaps</p>
+        </div>
+        <div>
           <span id="document-count">0</span>
           <p>potential documents</p>
         </div>
@@ -148,6 +157,40 @@
         </div>
         <div id="lanes-root" class="lane-grid" aria-live="polite">
           <p class="loading">Loading compiler chapters...</p>
+        </div>
+      </section>
+
+      <section class="section gaps-section" id="gaps" aria-labelledby="gaps-title">
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">Compiler Risk</p>
+            <h2 id="gaps-title">Open Gaps And Source Corrections</h2>
+          </div>
+          <a class="section-link" href="reports/compiler-gap-analysis.md">Gap report</a>
+        </div>
+        <p class="section-note">
+          These are not blockers to using the site. They are the pull-list and verification controls needed before
+          treating the source map as a compiler-ready document sequence.
+        </p>
+        <div id="gaps-root" class="gaps-root" aria-live="polite">
+          <p class="loading">Loading compiler gaps...</p>
+        </div>
+      </section>
+
+      <section class="section library-section" id="library" aria-labelledby="library-title">
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">Clinton Library Visit</p>
+            <h2 id="library-title">Research Plan For On-Site Time</h2>
+          </div>
+          <a class="section-link" href="reports/clinton-library-research-plan.md">Visit report</a>
+        </div>
+        <p class="section-note">
+          The four local `2013-0185-M` PDFs are folder-title lists, not finished document selections.
+          This section turns them into a pull sequence for a Clinton Library visit.
+        </p>
+        <div id="library-root" class="library-root" aria-live="polite">
+          <p class="loading">Loading Clinton Library research plan...</p>
         </div>
       </section>
 
@@ -262,6 +305,18 @@
           </a>
           <a href="https://catalog.archives.gov/id/7388773" rel="noreferrer">
             NARA Catalog: NSC Nonproliferation and Export Controls Office
+          </a>
+          <a href="https://clinton.presidentiallibraries.us/collections/show/36" rel="noreferrer">
+            Clinton Digital Library: Declassified Documents
+          </a>
+          <a href="https://www.congress.gov/" rel="noreferrer">
+            Congress.gov: treaty documents, executive reports, and Congressional Record
+          </a>
+          <a href="https://history.defense.gov/Historical-Sources/Secretary-of-Defense-Annual-Reports/" rel="noreferrer">
+            DOD Historical Office: Annual Defense Reports
+          </a>
+          <a href="https://www.nrc.gov/reading-rm/doc-collections/nuregs/brochures/br0117/961.html" rel="noreferrer">
+            NRC: HEU transparency implementation notice
           </a>
           <a href="https://www.govinfo.gov/app/collection/ppp" rel="noreferrer">
             GovInfo: Public Papers of the Presidents

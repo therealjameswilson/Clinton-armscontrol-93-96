@@ -53,7 +53,13 @@ const QUERY_PACKS = [
       "nuclear testing",
       "CTBT",
       "NPT extension",
-      "Nuclear Non-Proliferation Treaty"
+      "Nuclear Non-Proliferation Treaty",
+      "zero yield",
+      "stockpile stewardship",
+      "Article VI",
+      "South Africa NPT",
+      "Egypt NPT",
+      "Non-Aligned Movement NPT"
     ],
     scopeIds: ["7386504", "7585449", "7388773", "7585685", "7388842"]
   },
@@ -70,7 +76,16 @@ const QUERY_PACKS = [
   },
   {
     chapterId: "start-ii",
-    queries: ["START II", "START ratification", "Senate ratification START", "nuclear arms reduction treaty"],
+    queries: [
+      "START II",
+      "START ratification",
+      "Senate ratification START",
+      "nuclear arms reduction treaty",
+      "START II Duma",
+      "START II ABM",
+      "START II theater missile defense",
+      "START II resolution of ratification"
+    ],
     scopeIds: ["7386504", "7585451", "7386739", "7388808"]
   },
   {
@@ -82,7 +97,14 @@ const QUERY_PACKS = [
       "HEU Agreement",
       "nuclear materials security",
       "Ukraine warheads",
-      "P-8 Nuclear Safety"
+      "P-8 Nuclear Safety",
+      "USEC",
+      "Minatom",
+      "HEU transparency",
+      "Megatons to Megawatts",
+      "Ukraine denuclearization",
+      "Kazakhstan nuclear weapons",
+      "Belarus nuclear weapons"
     ],
     scopeIds: ["7388808", "7388835", "7388773", "7585685", "7585686", "7386739"]
   },
@@ -102,13 +124,30 @@ const QUERY_PACKS = [
       "weapons of mass destruction military planning",
       "theater missile defense proliferation",
       "biological defense program",
-      "NBC terrorism"
+      "NBC terrorism",
+      "Defense Planning Guidance WMD",
+      "ballistic missile defense proliferation",
+      "JCS counterproliferation",
+      "intelligence support counterproliferation",
+      "chemical biological defense"
     ],
     scopeIds: ["7386504", "7585451", "7388773", "7585677", "7585685", "7585686", "7386739", "7388808"]
   },
   {
     chapterId: "regional",
-    queries: ["North Korea nuclear", "Agreed Framework", "DPRK", "Iran proliferation", "Iraq WMD", "South Asia nuclear"],
+    queries: [
+      "North Korea nuclear",
+      "Agreed Framework",
+      "DPRK",
+      "Iran proliferation",
+      "Iraq WMD",
+      "UNSCOM",
+      "Libya proliferation",
+      "China missile transfer",
+      "South Asia nuclear",
+      "India Pakistan nuclear",
+      "Russian arms sales Iran"
+    ],
     scopeIds: ["7388773", "7585677", "7585685", "7585686", "7388808"]
   },
   {
@@ -119,13 +158,30 @@ const QUERY_PACKS = [
       "Biological Weapons Convention",
       "BWC protocol",
       "Australia Group",
-      "chemical biological weapons"
+      "chemical biological weapons",
+      "CWC ratification",
+      "CWC Senate",
+      "BWC Ad Hoc Group",
+      "Aum Shinrikyo",
+      "CBW terrorism",
+      "UNSCOM chemical weapons"
     ],
     scopeIds: ["7388773", "7585677", "7585685", "7585686", "7388842"]
   },
   {
     chapterId: "conventional-landmines",
-    queries: ["landmines", "conventional arms", "arms transfers", "export controls conventional"],
+    queries: [
+      "landmines",
+      "landmine control regime",
+      "anti-personnel landmine",
+      "PDD-34",
+      "PDD-48",
+      "Convention on Certain Conventional Weapons",
+      "Protocol II",
+      "conventional arms",
+      "arms transfers",
+      "export controls conventional"
+    ],
     scopeIds: ["7386504", "7585451", "7388773", "7585677"]
   }
 ];
@@ -133,11 +189,31 @@ const QUERY_PACKS = [
 const CHAPTER_RULES = [
   {
     id: "ctbt",
-    terms: ["NPT", "NUCLEAR NON-PROLIFERATION TREATY", "CTBT", "COMPREHENSIVE TEST BAN", "TEST BAN", "NUCLEAR TESTING"]
+    terms: [
+      "NPT",
+      "NUCLEAR NON-PROLIFERATION TREATY",
+      "CTBT",
+      "COMPREHENSIVE TEST BAN",
+      "TEST BAN",
+      "NUCLEAR TESTING",
+      "ZERO YIELD",
+      "STOCKPILE STEWARDSHIP",
+      "ARTICLE VI",
+      "NON-ALIGNED MOVEMENT"
+    ]
   },
   {
     id: "start-ii",
-    terms: ["START II", "START RATIFICATION", "SENATE RATIFICATION", "ARMS REDUCTION TREATY"]
+    terms: [
+      "START II",
+      "START RATIFICATION",
+      "SENATE RATIFICATION",
+      "ARMS REDUCTION TREATY",
+      "DUMA",
+      "RESOLUTION OF RATIFICATION",
+      "ABM",
+      "THEATER MISSILE DEFENSE"
+    ]
   },
   {
     id: "ctr-heu",
@@ -152,10 +228,16 @@ const CHAPTER_RULES = [
       "NUCLEAR MATERIALS SECURITY",
       "ARMS REDUCTION AGREEMENTS WITH RUSSIA AND UKRAINE",
       "UKRAINE WARHEADS",
+      "UKRAINE DENUCLEARIZATION",
+      "BELARUS NUCLEAR",
+      "KAZAKHSTAN NUCLEAR",
       "STANDING COMMITTEE NUCLEAR MATERIALS",
       "DENUCLEARIZATION OF UKRAINE",
       "TRILATERAL STATEMENT",
-      "P-8 NUCLEAR SAFETY"
+      "P-8 NUCLEAR SAFETY",
+      "USEC",
+      "MINATOM",
+      "TRANSPARENCY MEASURES"
     ]
   },
   {
@@ -175,7 +257,9 @@ const CHAPTER_RULES = [
       "DEFENSE PLANNING GUIDANCE",
       "MILITARY PLANNING",
       "NONPROLIFERATION AND COUNTERPROLIFERATION",
-      "NBC TERRORISM"
+      "NBC TERRORISM",
+      "JCS",
+      "INTELLIGENCE SUPPORT"
     ]
   },
   {
@@ -187,7 +271,10 @@ const CHAPTER_RULES = [
       "BWC",
       "AUSTRALIA GROUP",
       "CHEMICAL AND BIOLOGICAL",
-      "CBW"
+      "CBW",
+      "AD HOC GROUP",
+      "AUM SHINRIKYO",
+      "UNSCOM"
     ]
   },
   {
@@ -198,10 +285,13 @@ const CHAPTER_RULES = [
       "AGREED FRAMEWORK",
       "IRAN",
       "IRAQ",
+      "UNSCOM",
+      "LIBYA",
       "SOUTH ASIA",
       "INDIA",
       "PAKISTAN",
-      "CHINA"
+      "CHINA",
+      "MISSILE TRANSFER"
     ]
   },
   {
@@ -218,7 +308,18 @@ const CHAPTER_RULES = [
   },
   {
     id: "conventional-landmines",
-    terms: ["LANDMINES", "LAND MINES", "CONVENTIONAL ARMS", "ARMS TRANSFERS", "CONVENTIONAL WEAPONS"]
+    terms: [
+      "LANDMINES",
+      "LAND MINES",
+      "ANTI-PERSONNEL LANDMINE",
+      "PDD-34",
+      "PDD-48",
+      "CONVENTION ON CERTAIN CONVENTIONAL WEAPONS",
+      "PROTOCOL II",
+      "CONVENTIONAL ARMS",
+      "ARMS TRANSFERS",
+      "CONVENTIONAL WEAPONS"
+    ]
   },
   {
     id: "nonproliferation",
