@@ -135,9 +135,9 @@
           <article class="desk-panel">
             <h3>Source Note Path</h3>
             <p>
-              Every lead carries a repository trail, collection name or identifier, and a
-              first-pass reason it belongs in the Volume VII universe before any document
-              is promoted for chronological selection.
+              Every document lead now renders a FRUS-style source note: repository,
+              collection or identifier, title trail, and a verification status for
+              folder-level or packet-level material.
             </p>
           </article>
           <article class="desk-panel">
@@ -221,9 +221,12 @@
       </section>
 
       <section class="section documents-section" id="documents" aria-labelledby="documents-title">
-        <div class="section-heading">
-          <p class="kicker">NARA Scout Triage</p>
-          <h2 id="documents-title">Potential Documents</h2>
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">NARA Scout Triage</p>
+            <h2 id="documents-title">Potential Documents</h2>
+          </div>
+          <a class="section-link" href="reports/frus-source-note-audit.md">Source-note audit</a>
         </div>
         <div class="document-tools" aria-label="Search and filter potential documents">
           <label class="search-field">
@@ -241,6 +244,12 @@
           <button id="clear-document-filters" type="button">Reset</button>
           <p id="document-summary" class="document-summary">Loading potential documents...</p>
         </div>
+        <p class="section-note">
+          Source notes follow the FRUS pattern of <code>Source:</code> plus repository, collection,
+          identifier, and document-status details. File-unit, packet, and source-path
+          leads are marked pending until item-level review confirms title, markings, date,
+          and pagination.
+        </p>
         <div id="documents-root" class="documents-root" aria-live="polite">
           <p class="loading">Loading potential documents...</p>
         </div>

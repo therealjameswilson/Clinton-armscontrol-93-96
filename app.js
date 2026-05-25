@@ -754,6 +754,92 @@ function makeLink(url, label) {
   return link;
 }
 
+function publicPapersBook(identifier = "", date = "") {
+  const match = identifier.match(/PPP-(\d{4})-book(\d)/);
+  if (!match) return date ? date.slice(0, 4) : "year not surfaced";
+  const roman = { 1: "I", 2: "II", 3: "III" };
+  return `${match[1]}, Book ${roman[match[2]] || match[2]}`;
+}
+
+function cleanSourceCollection(item) {
+  const collection = item.sourceCollection || "";
+  if (!collection || collection === "NARA Scout cached result") return "";
+  return collection;
+}
+
+function leadTitleLabel(item) {
+  const level = `${item.level || ""}`.toLowerCase();
+  if (level.includes("fileunit")) return "File-unit title";
+  if (level.includes("packet")) return "Packet title";
+  if (level.includes("collection") || item.sourceType?.includes("finding aid")) return "Collection title";
+  return "Title";
+}
+
+function sourceNoteStatus(item) {
+  const level = `${item.level || ""}`.toLowerCase();
+  const type = `${item.sourceType || ""}`.toLowerCase();
+  const category = `${item.category || ""}`.toLowerCase();
+
+  if (type.includes("public papers") || item.sourceRepository === "GovInfo") {
+    return "Published primary source.";
+  }
+  if (type.includes("congressional") || type.includes("senate")) {
+    return "Published primary-source record; use with internal policy files before final document selection.";
+  }
+  if (type.includes("nara scout") || level.includes("fileunit")) {
+    return "File-unit lead surfaced for research triage; item-level document text, classification, date, and pagination pending.";
+  }
+  if (level.includes("packet")) {
+    return "Packet lead; exact item title, classification, and pagination pending.";
+  }
+  if (level.includes("collection") || type.includes("finding aid") || category.includes("finding aid")) {
+    return "Collection-level lead; exact folder, item title, classification, and pagination pending.";
+  }
+  if (level.includes("source-path") || category.includes("source path")) {
+    return "Source-path lead; replace with an item-level archival citation before final FRUS selection.";
+  }
+  if (level.includes("published")) {
+    return "Published primary source.";
+  }
+  return "Research lead; verify item-level source details before final FRUS selection.";
+}
+
+function formatFrusSourceNote(item) {
+  const existing = `${item.sourceNote || ""}`.trim();
+  if (existing.startsWith("Source:") && !existing.includes("NARA Scout harvest")) return existing;
+
+  if (item.sourceType === "Public Papers" || item.sourceRepository === "GovInfo") {
+    const book = publicPapersBook(item.identifier, item.date);
+    const pages = item.pages ? `, ${item.pages}` : "";
+    return `Source: Public Papers of the Presidents of the United States: William J. Clinton, ${book}${pages}, "${item.title}"; GovInfo. Published primary source.`;
+  }
+
+  const repository =
+    item.sourceRepository === "Clinton-Russia-High-Level"
+      ? cleanSourceCollection(item) || "Clinton Library release packet"
+      : item.sourceRepository || item.sourceType || "Repository pending";
+  const collection =
+    item.sourceRepository === "Clinton-Russia-High-Level" ? "" : cleanSourceCollection(item);
+  const identifier = item.identifier || (item.naid ? `NAID ${item.naid}` : "");
+  const path = [repository, collection, identifier].filter(Boolean).join(", ");
+  const title = item.title ? ` ${leadTitleLabel(item)}: "${item.title}".` : "";
+  const reviewCopy =
+    item.sourceRepository === "Clinton-Russia-High-Level"
+      ? " Review copy available through the companion Clinton-Russia page; verify the final citation against the owning release packet."
+      : "";
+
+  return `Source: ${path || "source path pending"}.${title} ${sourceNoteStatus(item)}${reviewCopy}`.replace(/\s+/g, " ");
+}
+
+function formatLibrarySourceNote(item) {
+  const ids = (item.oaIds || []).map((id) => id.replace(/\.$/, ""));
+  const idLabel = ids.some((id) => id.startsWith("Part ")) ? "references" : "OA/ID";
+  const shownIds = ids.slice(0, 6).join(", ");
+  const extra = ids.length > 6 ? `, plus ${ids.length - 6} more` : "";
+  const oaText = ids.length ? `, ${idLabel} ${shownIds}${extra}` : "";
+  return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${item.sourcePart || "part pending"}${oaText}. Folder-title lead; verify exact box, folder title, item date, classification, and pagination on site.`;
+}
+
 function setStats() {
   leadCount.textContent = sourceLeads.length.toString();
   laneCount.textContent = lanes.length.toString();
@@ -915,6 +1001,7 @@ function documentSearchText(item) {
     item.category,
     item.level,
     item.sourceNote,
+    formatFrusSourceNote(item),
     item.summary,
     item.confidence,
     item.compilerRisk,
@@ -965,6 +1052,10 @@ function renderDocuments() {
     const summary = document.createElement("p");
     summary.textContent = item.summary || item.sourceNote || "Candidate record for chapter review.";
 
+    const sourceNote = document.createElement("p");
+    sourceNote.className = "source-note";
+    sourceNote.textContent = formatFrusSourceNote(item);
+
     const links = document.createElement("div");
     links.className = "document-links";
     if (item.sourceUrl) links.append(makeLink(item.sourceUrl, "Open source"));
@@ -985,7 +1076,7 @@ function renderDocuments() {
       risk.textContent = `Compiler risk: ${item.compilerRisk}`;
       main.append(risk);
     }
-    main.append(links, tags);
+    main.append(sourceNote, links, tags);
 
     const side = document.createElement("div");
     side.className = "document-side";
@@ -1012,6 +1103,7 @@ function statementSearchText(item) {
     item.identifier,
     item.pages,
     item.sourceNote,
+    formatFrusSourceNote(item),
     item.summary,
     ...(item.topics || [])
   ]
@@ -1061,7 +1153,8 @@ function renderStatements() {
     title.textContent = item.title;
 
     const note = document.createElement("p");
-    note.textContent = item.sourceNote || item.summary || "Public Papers statement for chapter review.";
+    note.className = "source-note";
+    note.textContent = formatFrusSourceNote(item);
 
     const links = document.createElement("div");
     links.className = "document-links";
@@ -1267,6 +1360,10 @@ function renderLibraryPlan() {
     reason.className = "library-reason";
     reason.textContent = item.whyItMatters;
 
+    const sourceNote = document.createElement("p");
+    sourceNote.className = "source-note";
+    sourceNote.textContent = formatLibrarySourceNote(item);
+
     const actions = document.createElement("ul");
     actions.className = "library-actions";
     for (const action of item.onsiteActions || []) {
@@ -1283,7 +1380,7 @@ function renderLibraryPlan() {
     terms.className = "lead-tags";
     for (const term of item.targetTerms || []) terms.append(makeChip(term));
 
-    card.append(header, meta, goal, reason, actions, pullList, terms);
+    card.append(header, meta, goal, reason, sourceNote, actions, pullList, terms);
     list.append(card);
   }
 

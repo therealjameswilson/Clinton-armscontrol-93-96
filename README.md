@@ -31,6 +31,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
+- `reports/frus-source-note-audit.md`: check of source-note formatting against FRUS conventions
 - `scripts/harvest-nara-scout-documents.js`: repeatable NARA Scout/Public Papers harvest script
 - `assets/arms-control-source-map.svg`: first-pass source map visual
 
@@ -85,6 +86,15 @@ CBW/CWC/BWC depth, regional balance, conventional arms/landmines, and public
 statements as locators. The added source-gap leads address these weak areas
 without pretending every packet or source path is already an item-level FRUS
 candidate.
+
+## Source-note pass
+
+The rendered source notes now follow the FRUS pattern: `Source:` plus
+repository, collection or identifier, title trail, and a clear status note.
+Existing published-source notes are preserved; generic NARA Scout recovery
+notes and prose summaries are converted on the page into source notes that
+flag file-unit, packet, collection, and source-path leads as pending item-level
+verification.
 
 ## Clinton Library visit plan
 
