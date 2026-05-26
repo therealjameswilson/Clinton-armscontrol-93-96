@@ -2,6 +2,7 @@ const generatedPotentialDocuments = window.ARMSCONTROL_POTENTIAL_DOCUMENTS || []
 const sourceGapLeads = window.ARMSCONTROL_SOURCE_GAP_LEADS || [];
 const compilerGaps = window.ARMSCONTROL_COMPILER_GAPS || [];
 const libraryResearchPlan = window.ARMSCONTROL_LIBRARY_RESEARCH_PLAN || [];
+const dailyDiaryReferences = window.ARMSCONTROL_DAILY_DIARY_REFERENCES || [];
 const chapterSequence = [
   "ctbt",
   "strategic-arms",
@@ -694,6 +695,7 @@ const milestoneCount = document.querySelector("#milestone-count");
 const documentCount = document.querySelector("#document-count");
 const statementCount = document.querySelector("#statement-count");
 const gapCount = document.querySelector("#gap-count");
+const diaryCount = document.querySelector("#diary-count");
 const lanesRoot = document.querySelector("#lanes-root");
 const leadsRoot = document.querySelector("#leads-root");
 const documentsRoot = document.querySelector("#documents-root");
@@ -701,6 +703,7 @@ const statementsRoot = document.querySelector("#statements-root");
 const milestonesRoot = document.querySelector("#milestones-root");
 const gapsRoot = document.querySelector("#gaps-root");
 const libraryRoot = document.querySelector("#library-root");
+const diaryRoot = document.querySelector("#diary-root");
 const leadSearch = document.querySelector("#lead-search");
 const laneFilter = document.querySelector("#lane-filter");
 const institutionFilter = document.querySelector("#institution-filter");
@@ -847,6 +850,7 @@ function setStats() {
   documentCount.textContent = potentialDocuments.length.toString();
   statementCount.textContent = clintonPublicStatements.length.toString();
   if (gapCount) gapCount.textContent = compilerGaps.length.toString();
+  if (diaryCount) diaryCount.textContent = dailyDiaryReferences.length.toString();
 }
 
 function populateFilters() {
@@ -1387,6 +1391,97 @@ function renderLibraryPlan() {
   libraryRoot.replaceChildren(metrics, list);
 }
 
+function diaryPriorityRank(priority) {
+  return { High: 0, Medium: 1, Review: 2 }[priority] ?? 3;
+}
+
+function renderDailyDiaryReferences() {
+  if (!diaryRoot) return;
+
+  if (!dailyDiaryReferences.length) {
+    const empty = document.createElement("p");
+    empty.className = "loading";
+    empty.textContent = "No Presidential Daily Diary references are currently staged.";
+    diaryRoot.replaceChildren(empty);
+    return;
+  }
+
+  const metrics = document.createElement("div");
+  metrics.className = "diary-metrics";
+  const hardcopyCount = dailyDiaryReferences.filter((item) => item.sourcePath === "2010-0083-F hardcopy scan").length;
+  const highCount = dailyDiaryReferences.filter((item) => item.priority === "High").length;
+  const chapterCount = new Set(dailyDiaryReferences.map((item) => item.chapterId).filter(Boolean)).size;
+  for (const item of [
+    ["Diary refs", dailyDiaryReferences.length, "Calls or meetings staged for follow-up"],
+    ["Hardcopy hits", hardcopyCount, "Confirmed in 2010-0083-F scans"],
+    ["High priority", highCount, "Likely worth telcon, memcon, or PC/DC follow-up"],
+    ["Chapters", chapterCount, "Volume VII chapters touched"]
+  ]) {
+    const card = document.createElement("article");
+    card.className = "diary-metric";
+    const value = document.createElement("strong");
+    value.textContent = item[1].toString();
+    const label = document.createElement("span");
+    label.textContent = item[0];
+    const note = document.createElement("p");
+    note.textContent = item[2];
+    card.append(value, label, note);
+    metrics.append(card);
+  }
+
+  const list = document.createElement("div");
+  list.className = "diary-list";
+  for (const item of [...dailyDiaryReferences].sort(
+    (a, b) =>
+      `${a.date || "9999"}`.localeCompare(`${b.date || "9999"}`) ||
+      diaryPriorityRank(a.priority) - diaryPriorityRank(b.priority) ||
+      a.title.localeCompare(b.title)
+  )) {
+    const card = document.createElement("article");
+    card.className = `diary-card diary-priority-${String(item.priority || "review").toLowerCase()}`;
+
+    const header = document.createElement("div");
+    header.className = "diary-card-header";
+    const heading = document.createElement("h3");
+    heading.textContent = item.title;
+    const badge = makeChip(item.priority || "Review", "diary-badge");
+    header.append(heading, badge);
+
+    const meta = document.createElement("div");
+    meta.className = "lead-tags";
+    for (const value of [formatDate(item.date), item.eventType, item.chapterTitle, item.sourcePath]) {
+      if (value) meta.append(makeChip(value));
+    }
+
+    const participants = document.createElement("p");
+    participants.className = "diary-participants";
+    participants.textContent = `Participants: ${(item.participants || []).join(", ") || "pending"}`;
+
+    const relevance = document.createElement("p");
+    relevance.className = "diary-relevance";
+    relevance.textContent = item.relevance;
+
+    const verification = document.createElement("p");
+    verification.className = "risk-note";
+    verification.textContent = `Verification: ${item.verification}`;
+
+    const sourceNote = document.createElement("p");
+    sourceNote.className = "source-note";
+    sourceNote.textContent = item.sourceNote;
+
+    const links = document.createElement("div");
+    links.className = "document-links";
+    if (item.sourceUrl) links.append(makeLink(item.sourceUrl, "Open source"));
+    if (item.digitalObjectUrl) links.append(makeLink(item.digitalObjectUrl, "Open diary scan"));
+    if (item.catalogSearchUrl) links.append(makeLink(item.catalogSearchUrl, "Open Catalog search"));
+
+    card.append(header, meta, participants, relevance, verification, sourceNote, links);
+    list.append(card);
+  }
+
+  diaryRoot.replaceChildren(metrics, list);
+}
+
 function bindEvents() {
   for (const control of [leadSearch, laneFilter, institutionFilter]) {
     control.addEventListener("input", renderLeads);
@@ -1437,4 +1532,5 @@ renderStatements();
 renderMilestones();
 renderGaps();
 renderLibraryPlan();
+renderDailyDiaryReferences();
 bindEvents();

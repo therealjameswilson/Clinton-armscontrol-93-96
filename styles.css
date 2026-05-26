@@ -270,7 +270,7 @@ dd {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
   gap: 14px;
   margin: 0 0 42px;
 }
@@ -574,13 +574,15 @@ dd {
 }
 
 .gaps-root,
-.library-root {
+.library-root,
+.diary-root {
   display: grid;
   gap: 20px;
 }
 
 .gap-metrics,
-.library-metrics {
+.library-metrics,
+.diary-metrics {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
@@ -589,7 +591,9 @@ dd {
 .gap-metric,
 .gap-card,
 .library-metric,
-.library-card {
+.library-card,
+.diary-metric,
+.diary-card {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -597,13 +601,15 @@ dd {
 }
 
 .gap-metric,
-.library-metric {
+.library-metric,
+.diary-metric {
   min-height: 126px;
   padding: 18px;
 }
 
 .gap-metric strong,
-.library-metric strong {
+.library-metric strong,
+.diary-metric strong {
   display: block;
   margin-bottom: 4px;
   color: var(--green);
@@ -613,7 +619,8 @@ dd {
 }
 
 .gap-metric span,
-.library-metric span {
+.library-metric span,
+.diary-metric span {
   display: block;
   margin-bottom: 8px;
   color: var(--navy);
@@ -621,20 +628,23 @@ dd {
 }
 
 .gap-metric p,
-.library-metric p {
+.library-metric p,
+.diary-metric p {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
 }
 
 .gap-list,
-.library-list {
+.library-list,
+.diary-list {
   display: grid;
   gap: 14px;
 }
 
 .gap-card,
-.library-card {
+.library-card,
+.diary-card {
   display: grid;
   gap: 12px;
   padding: 20px;
@@ -642,12 +652,14 @@ dd {
 
 .gap-priority-critical,
 .gap-priority-high,
-.library-priority-a {
+.library-priority-a,
+.diary-priority-high {
   border-left: 5px solid var(--red);
 }
 
 .gap-card-header,
-.library-card-header {
+.library-card-header,
+.diary-card-header {
   display: flex;
   gap: 14px;
   align-items: start;
@@ -655,12 +667,14 @@ dd {
 }
 
 .gap-card h3,
-.library-card h3 {
+.library-card h3,
+.diary-card h3 {
   margin-bottom: 0;
 }
 
 .gap-badge,
-.library-badge {
+.library-badge,
+.diary-badge {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -679,14 +693,17 @@ dd {
 .gap-pull-list,
 .library-goal,
 .library-reason,
-.library-pull-list {
+.library-pull-list,
+.diary-participants,
+.diary-relevance {
   margin: 0;
   color: #46525d;
   line-height: 1.54;
 }
 
 .gap-problem,
-.library-reason {
+.library-reason,
+.diary-relevance {
   color: var(--ink);
 }
 
@@ -825,7 +842,8 @@ dd {
   .desk-grid,
   .lane-grid,
   .gap-metrics,
-  .library-metrics {
+  .library-metrics,
+  .diary-metrics {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -877,6 +895,7 @@ dd {
     .statement-tools,
   .gap-metrics,
   .library-metrics,
+  .diary-metrics,
   .source-list {
     grid-template-columns: 1fr;
   }

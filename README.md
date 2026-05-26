@@ -14,6 +14,7 @@ currently lists the volume as planned rather than published. It gathers:
 - GovInfo and archived White House public milestones from 1993-1996
 - NARA Scout candidate records and Public Papers anchors mapped to each chapter
 - source-gap leads from Congress.gov, Clinton Digital Library, DOD, NRC, archived White House records, and the companion Clinton-Russia page
+- Presidential Daily Diary call and meeting references from the 2010-0083-F hardcopy scans and Clinton Library foreign-leader index
 - structured compiler-risk gaps with pull lists and verification actions
 - a Clinton Library on-site research plan built from the local `2013-0185-M` folder-title PDFs
 - a dedicated Clinton Public Papers statement index for arms-control and nonproliferation items
@@ -27,11 +28,13 @@ currently lists the volume as planned rather than published. It gathers:
 - `data/source-gap-leads.js`: manual source-gap leads added after compiler-risk review
 - `data/compiler-gaps.js`: structured gap analysis rendered on the page
 - `data/clinton-library-research-plan.js`: on-site Clinton Library pull plan from `2013-0185-M` folder-title lists
+- `data/presidential-daily-diary-references.js`: calls and meetings to check against telcon, memcon, PC/DC, and NSC records
 - `data/clinton-public-statements.js`: generated Clinton Public Papers statement data
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
 - `reports/frus-source-note-audit.md`: check of source-note formatting against FRUS conventions
+- `reports/presidential-daily-diary-references.md`: diary search method and calls/meetings added to the page
 - `scripts/harvest-nara-scout-documents.js`: repeatable NARA Scout/Public Papers harvest script
 - `assets/arms-control-source-map.svg`: first-pass source map visual
 
@@ -95,6 +98,16 @@ Existing published-source notes are preserved; generic NARA Scout recovery
 notes and prose summaries are converted on the page into source notes that
 flag file-unit, packet, collection, and source-path leads as pending item-level
 verification.
+
+## Presidential Daily Diary pass
+
+The page now includes a dedicated Diary section. It distinguishes hardcopy
+2010-0083-F hits from the Clinton Library foreign-leader call/meeting index,
+and marks each reference as a chronology or pull-list anchor rather than a
+finished document candidate. High-value entries include Yeltsin, Kravchuk,
+Shushkevich, Nazarbayev, Kuchma, and Kim Young-sam calls or meetings that map
+to START II, CTR/HEU, Ukraine denuclearization, nuclear-materials security,
+and North Korea proliferation files.
 
 ## Clinton Library visit plan
 

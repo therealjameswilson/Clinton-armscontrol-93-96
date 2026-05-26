@@ -13,6 +13,7 @@
     <script defer src="data/source-gap-leads.js"></script>
     <script defer src="data/compiler-gaps.js"></script>
     <script defer src="data/clinton-library-research-plan.js"></script>
+    <script defer src="data/presidential-daily-diary-references.js"></script>
     <script defer src="data/clinton-public-statements.js"></script>
     <script defer src="app.js"></script>
   </head>
@@ -27,6 +28,7 @@
         <a href="#chapters">Chapters</a>
         <a href="#gaps">Gaps</a>
         <a href="#library">Library</a>
+        <a href="#diary">Diary</a>
         <a href="#leads">Leads</a>
         <a href="#documents">Documents</a>
         <a href="#statements">Statements</a>
@@ -107,6 +109,10 @@
         <div>
           <span id="statement-count">0</span>
           <p>Clinton statements</p>
+        </div>
+        <div>
+          <span id="diary-count">0</span>
+          <p>diary references</p>
         </div>
       </section>
 
@@ -191,6 +197,25 @@
         </p>
         <div id="library-root" class="library-root" aria-live="polite">
           <p class="loading">Loading Clinton Library research plan...</p>
+        </div>
+      </section>
+
+      <section class="section diary-section" id="diary" aria-labelledby="diary-title">
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">Presidential Daily Diary</p>
+            <h2 id="diary-title">Calls And Meetings To Check</h2>
+          </div>
+          <a class="section-link" href="reports/presidential-daily-diary-references.md">Diary report</a>
+        </div>
+        <p class="section-note">
+          These references come from the 2010-0083-F hardcopy diary scans and the
+          Clinton Library foreign-leader call/meeting index. Diary entries prove that a
+          call or meeting occurred; they still need telcon, memcon, PC/DC, or NSC file
+          records for substantive selection.
+        </p>
+        <div id="diary-root" class="diary-root" aria-live="polite">
+          <p class="loading">Loading Presidential Daily Diary references...</p>
         </div>
       </section>
 
@@ -317,6 +342,12 @@
           </a>
           <a href="https://clinton.presidentiallibraries.us/collections/show/36" rel="noreferrer">
             Clinton Digital Library: Declassified Documents
+          </a>
+          <a href="https://catalog.archives.gov/search?q=%222010-0083-F%22&collectionIdentifier=WJC*" rel="noreferrer">
+            NARA Catalog: Presidential Daily Diary hardcopy scans, 2010-0083-F
+          </a>
+          <a href="https://www.clintonlibrary.gov/sites/default/files/documents//copy-clinton-foreign-meetingsdocx.pdf" rel="noreferrer">
+            Clinton Library: foreign-leader meetings and calls index
           </a>
           <a href="https://www.congress.gov/" rel="noreferrer">
             Congress.gov: treaty documents, executive reports, and Congressional Record
