@@ -24,6 +24,7 @@
         <span>Arms Control Files</span>
       </a>
       <nav aria-label="Primary navigation">
+        <a href="#chronology">Chronology</a>
         <a href="#desk">Desk</a>
         <a href="#chapters">Chapters</a>
         <a href="#gaps">Gaps</a>
@@ -44,13 +45,13 @@
           <h1 id="hero-title">Arms Control and Nonproliferation, 1993-1996</h1>
           <p class="lede">
             A public compiler desk for the planned FRUS volume on Clinton-era arms control
-            and nonproliferation. The page gathers official volume anchors, NSC collection
-            leads, released finding aids, and public milestone records into a single
-            source map for early research triage.
+            and nonproliferation. The page now opens with a chronology of dated
+            released or declassified archival leads, then keeps source gaps, diary
+            controls, and public statements available for verification.
           </p>
           <div class="hero-actions" aria-label="Primary actions">
-            <a class="button primary" href="#leads">Browse Source Leads</a>
-            <a class="button secondary" href="#milestones">Review Milestones</a>
+            <a class="button primary" href="#chronology">Review Chronology</a>
+            <a class="button secondary" href="#documents">Browse Documents</a>
             <a class="button secondary" href="https://history.state.gov/historicaldocuments/frus1993-00v07" rel="noreferrer">
               Official Volume Page
             </a>
@@ -85,7 +86,30 @@
         </aside>
       </section>
 
+      <section class="section chronology-section" id="chronology" aria-labelledby="chronology-title">
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">Declassified Document Chronology</p>
+            <h2 id="chronology-title">Released Records First</h2>
+          </div>
+          <a class="section-link" href="reports/declassified-document-chronology.md">Chronology report</a>
+        </div>
+        <p class="section-note">
+          The opening sequence now starts with dated released or declassified archival
+          leads. Public statements, broad finding aids, diary-only references, and
+          undated Scout hits stay in their own sections until they can support a
+          specific document.
+        </p>
+        <div id="chronology-root" class="chronology-root" aria-live="polite">
+          <p class="loading">Loading declassified document chronology...</p>
+        </div>
+      </section>
+
       <section class="stats" aria-label="Research desk summary">
+        <div>
+          <span id="chronology-count">0</span>
+          <p>declassified chronology</p>
+        </div>
         <div>
           <span id="lead-count">0</span>
           <p>source leads</p>

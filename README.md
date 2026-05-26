@@ -8,6 +8,7 @@ The site is intentionally source-first because the Office of the Historian
 currently lists the volume as planned rather than published. It gathers:
 
 - official FRUS status and volume-boundary links
+- an opening chronology of dated released or declassified document leads
 - Clinton Library guide entries for the relevant NSC offices
 - NARA Catalog collection and series leads
 - Clinton Library finding aids for NPT/CTBT and speechwriting/source context
@@ -31,6 +32,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `data/presidential-daily-diary-references.js`: calls and meetings to check against telcon, memcon, PC/DC, and NSC records
 - `data/clinton-public-statements.js`: generated Clinton Public Papers statement data
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
+- `reports/declassified-document-chronology.md`: dated released/declassified leads promoted to the first page section
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
 - `reports/frus-source-note-audit.md`: check of source-note formatting against FRUS conventions
@@ -79,6 +81,14 @@ to correct the largest compiler-risk gaps. The Clinton Public Statements
 section isolates the GovInfo/Public Papers records so they can be used as a
 chapter-by-chapter public chronology without mixing them into archival
 file-unit candidates.
+
+## Declassified-document chronology
+
+The first section of the page is now a dated chronology of released or
+declassified archival leads. It excludes public statements, broad finding aids,
+diary-only references, and undated Scout hits so the opening read-through starts
+with document candidates that can plausibly become FRUS-style selections after
+item-level verification.
 
 ## Compiler-risk pass
 

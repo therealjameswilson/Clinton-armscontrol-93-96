@@ -23,6 +23,14 @@ const potentialDocuments = [...generatedPotentialDocuments, ...sourceGapLeads].s
     a.title.localeCompare(b.title)
   );
 });
+const declassifiedChronology = potentialDocuments
+  .filter(isDeclassifiedChronologyItem)
+  .sort(
+    (a, b) =>
+      chronologySortKey(a.date).localeCompare(chronologySortKey(b.date)) ||
+      (b.score || 0) - (a.score || 0) ||
+      a.title.localeCompare(b.title)
+  );
 const clintonPublicStatements = (window.CLINTON_PUBLIC_STATEMENTS || potentialDocuments.filter((item) => item.sourceType === "Public Papers"))
   .slice()
   .sort((a, b) => `${a.date || ""}`.localeCompare(`${b.date || ""}`) || a.title.localeCompare(b.title));
@@ -692,11 +700,13 @@ const laneById = new Map(lanes.map((lane) => [lane.id, lane]));
 const leadCount = document.querySelector("#lead-count");
 const laneCount = document.querySelector("#lane-count");
 const milestoneCount = document.querySelector("#milestone-count");
+const chronologyCount = document.querySelector("#chronology-count");
 const documentCount = document.querySelector("#document-count");
 const statementCount = document.querySelector("#statement-count");
 const gapCount = document.querySelector("#gap-count");
 const diaryCount = document.querySelector("#diary-count");
 const lanesRoot = document.querySelector("#lanes-root");
+const chronologyRoot = document.querySelector("#chronology-root");
 const leadsRoot = document.querySelector("#leads-root");
 const documentsRoot = document.querySelector("#documents-root");
 const statementsRoot = document.querySelector("#statements-root");
@@ -740,6 +750,43 @@ function option(label, value = "") {
   item.value = value;
   item.textContent = label;
   return item;
+}
+
+function startYear(value = "") {
+  const match = String(value).match(/\d{4}/);
+  return match ? Number(match[0]) : 9999;
+}
+
+function chronologySortKey(value = "") {
+  const text = String(value);
+  const exact = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (exact) return text;
+  const month = text.match(/^(\d{4})-(\d{2})$/);
+  if (month) return `${month[1]}-${month[2]}-99`;
+  const year = text.match(/^(\d{4})/);
+  return year ? `${year[1]}-99-99` : "9999-99-99";
+}
+
+function isDeclassifiedChronologyItem(item) {
+  if (!item.date || startYear(item.date) > 1996) return false;
+
+  const sourceBlob = [
+    item.sourceType,
+    item.sourceRepository,
+    item.sourceCollection,
+    item.category,
+    item.level
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const publicBlob = [item.sourceType, item.sourceRepository].filter(Boolean).join(" ");
+
+  if (/finding aid/i.test(sourceBlob)) return false;
+  if (/Public Papers|Archived White House|Congress|DOD|NRC|OSTI|FAS|Argonne/i.test(publicBlob)) return false;
+
+  return /(declassified|released|MDR|Clinton Digital Library|Clinton-Russia|Presidential decision directive|directive)/i.test(
+    sourceBlob
+  );
 }
 
 function makeChip(text, className = "chip") {
@@ -847,6 +894,7 @@ function setStats() {
   leadCount.textContent = sourceLeads.length.toString();
   laneCount.textContent = lanes.length.toString();
   milestoneCount.textContent = milestones.length.toString();
+  if (chronologyCount) chronologyCount.textContent = declassifiedChronology.length.toString();
   documentCount.textContent = potentialDocuments.length.toString();
   statementCount.textContent = clintonPublicStatements.length.toString();
   if (gapCount) gapCount.textContent = compilerGaps.length.toString();
@@ -910,6 +958,71 @@ function renderLanes() {
   });
 
   lanesRoot.replaceChildren(...cards);
+}
+
+function renderDeclassifiedChronology() {
+  if (!chronologyRoot) return;
+
+  if (!declassifiedChronology.length) {
+    const empty = document.createElement("p");
+    empty.className = "loading";
+    empty.textContent = "No dated declassified document leads are currently staged.";
+    chronologyRoot.replaceChildren(empty);
+    return;
+  }
+
+  const cards = declassifiedChronology.map((item) => {
+    const card = document.createElement("article");
+    card.className = "document-card chronology-card";
+
+    const main = document.createElement("div");
+    const type = document.createElement("p");
+    type.className = "record-type";
+    type.textContent = `${item.sourceType} / ${item.sourceRepository || item.sourceCollection || "Source"}`;
+
+    const title = document.createElement("h3");
+    title.textContent = item.title;
+
+    const summary = document.createElement("p");
+    summary.textContent = item.summary || "Released or declassified archival lead for chronological review.";
+
+    const sourceNote = document.createElement("p");
+    sourceNote.className = "source-note";
+    sourceNote.textContent = formatFrusSourceNote(item);
+
+    const links = document.createElement("div");
+    links.className = "document-links";
+    if (item.sourceUrl) links.append(makeLink(item.sourceUrl, "Open source"));
+    if (item.digitalObjectUrl) links.append(makeLink(item.digitalObjectUrl, "Open review copy"));
+    if (item.scoutSearchUrl) links.append(makeLink(item.scoutSearchUrl, "Open Scout search"));
+
+    const tags = document.createElement("div");
+    tags.className = "lead-tags";
+    tags.append(makeChip(item.chapterTitle || laneById.get(item.chapterId)?.title || item.chapterId, "priority-chip"));
+    if (item.level) tags.append(makeChip(item.level));
+    if (item.confidence) tags.append(makeChip(`Confidence: ${item.confidence}`));
+
+    main.append(type, title, summary);
+    if (item.compilerRisk) {
+      const risk = document.createElement("p");
+      risk.className = "risk-note";
+      risk.textContent = `Compiler risk: ${item.compilerRisk}`;
+      main.append(risk);
+    }
+    main.append(sourceNote, links, tags);
+
+    const side = document.createElement("div");
+    side.className = "document-side chronology-side";
+    side.append(makeChip(formatDate(item.date), "priority-chip"));
+    side.append(makeChip(item.priority || "Review"));
+    side.append(makeChip(item.identifier || item.naid || "source id pending"));
+    if (item.category) side.append(makeChip(item.category));
+
+    card.append(main, side);
+    return card;
+  });
+
+  chronologyRoot.replaceChildren(...cards);
 }
 
 function leadSearchText(lead) {
@@ -1526,6 +1639,7 @@ function bindEvents() {
 setStats();
 populateFilters();
 renderLanes();
+renderDeclassifiedChronology();
 renderLeads();
 renderDocuments();
 renderStatements();
