@@ -6,6 +6,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const exportDir = path.join(repoRoot, "exports");
 const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
+const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
 
 const dataFiles = [
   "data/potential-documents.js",
@@ -73,11 +74,15 @@ const declassifiedChronology = potentialDocuments
       (b.score || 0) - (a.score || 0) ||
       a.title.localeCompare(b.title)
   );
+const selectionReadinessQueue = potentialDocuments
+  .map((item) => ({ ...item, readiness: classifySelectionReadiness(item) }))
+  .sort(compareReadinessRows);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 
 fs.mkdirSync(exportDir, { recursive: true });
 
 writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potentialDocuments);
+writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
 writeCsv("declassified-chronology.csv", chronologyColumns(), declassifiedChronology);
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
 writeCsv("presidential-daily-diary-follow-up.csv", diaryColumns(), dailyDiaryReferences.slice().sort(compareDiaryRows));
@@ -86,10 +91,12 @@ writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicState
 writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
 writeReport();
 writeDossierReport();
+writeReadinessReport();
 
 console.log(
   [
     `Generated ${path.relative(repoRoot, path.join(exportDir, "potential-documents-triage.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "declassified-chronology.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "presidential-daily-diary-follow-up.csv"))}`,
@@ -97,7 +104,8 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-public-statements.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
     `Generated ${path.relative(repoRoot, workingTablesReportPath)}`,
-    `Generated ${path.relative(repoRoot, dossierReportPath)}`
+    `Generated ${path.relative(repoRoot, dossierReportPath)}`,
+    `Generated ${path.relative(repoRoot, readinessReportPath)}`
   ].join("\n")
 );
 
@@ -130,6 +138,31 @@ function potentialDocumentColumns() {
     column("scout_search_url", (row) => row.scoutSearchUrl),
     column("matched_queries", (row) => row.matchedQueries),
     column("topics", (row) => row.topics),
+    column("summary", (row) => row.summary || row.sourceNote)
+  ];
+}
+
+function readinessColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("queue", (row) => row.readiness.queue),
+    column("readiness", (row) => row.readiness.readiness),
+    column("next_action", (row) => row.readiness.nextAction),
+    column("required_verification", (row) => row.readiness.requiredVerification),
+    column("date", (row) => row.date),
+    column("chapter", (row) => row.chapterTitle || row.chapterId),
+    column("priority", (row) => row.priority),
+    column("title", (row) => row.title),
+    column("source_type", (row) => row.sourceType),
+    column("repository", (row) => row.sourceRepository),
+    column("collection", (row) => cleanSourceCollection(row)),
+    column("identifier", (row) => row.identifier || (row.naid ? `NAID ${row.naid}` : "")),
+    column("level", (row) => row.level),
+    column("confidence", (row) => row.confidence),
+    column("compiler_risk", (row) => row.compilerRisk),
+    column("source_note", (row) => formatFrusSourceNote(row)),
+    column("source_url", (row) => row.sourceUrl),
+    column("digital_object_url", (row) => row.digitalObjectUrl),
     column("summary", (row) => row.summary || row.sourceNote)
   ];
 }
@@ -260,6 +293,7 @@ function writeReport() {
     "## Tables",
     "",
     `- \`exports/potential-documents-triage.csv\`: ${potentialDocuments.length} staged document or source-path leads with FRUS-style source notes and risk fields.`,
+    `- \`exports/selection-readiness-queue.csv\`: ${selectionReadinessQueue.length} staged leads normalized into readiness gates, next actions, and verification fields.`,
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
     `- \`exports/presidential-daily-diary-follow-up.csv\`: ${dailyDiaryReferences.length} calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.`,
@@ -270,11 +304,12 @@ function writeReport() {
     "## Compiler Use",
     "",
     "1. Start with `declassified-chronology.csv` for the first read-through of available or released records.",
-    "2. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
-    "3. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "4. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.",
-    "5. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
-    "6. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
+    "3. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "4. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "5. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.",
+    "6. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
+    "7. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -331,6 +366,167 @@ function writeDossierReport() {
   }
 
   fs.writeFileSync(dossierReportPath, lines.join("\n"));
+}
+
+function writeReadinessReport() {
+  const groups = [...new Set(selectionReadinessQueue.map((item) => item.readiness.queue))].sort(
+    (a, b) => readinessQueueRank(a) - readinessQueueRank(b)
+  );
+  const lines = [
+    "# Selection Readiness Queue",
+    "",
+    "Generated from the potential-document table. This report normalizes each staged lead into the immediate work it is ready for: close-read, packet screening, file-unit resolution, source-path pulling, public/date control, or hold-for-review.",
+    "",
+    "## Queue Counts",
+    ""
+  ];
+
+  for (const queue of groups) {
+    const items = selectionReadinessQueue.filter((item) => item.readiness.queue === queue);
+    lines.push(`- ${queue}: ${items.length}`);
+  }
+
+  lines.push("", "## Queues", "");
+
+  for (const queue of groups) {
+    const items = selectionReadinessQueue.filter((item) => item.readiness.queue === queue);
+    const first = items[0];
+    lines.push(
+      `### ${queue}`,
+      "",
+      `- Leads: ${items.length}`,
+      `- Readiness: ${first?.readiness.readiness || "pending"}`,
+      `- Next action: ${first?.readiness.nextAction || "pending"}`,
+      `- Verify: ${(first?.readiness.requiredVerification || []).join("; ") || "source details"}`,
+      "",
+      "Top leads:"
+    );
+    appendBulletList(
+      lines,
+      items.slice(0, 8),
+      (item) => `${item.chapterTitle || item.chapterId} / ${item.date || "date pending"} / ${item.title}`,
+      "No leads staged."
+    );
+    lines.push("");
+  }
+
+  fs.writeFileSync(readinessReportPath, lines.join("\n"));
+}
+
+function classifySelectionReadiness(item) {
+  const level = `${item.level || ""}`.toLowerCase();
+  const type = `${item.sourceType || ""}`.toLowerCase();
+  const repo = `${item.sourceRepository || ""}`.toLowerCase();
+  const category = `${item.category || ""}`.toLowerCase();
+  const sourceBlob = [level, type, repo, category, item.sourceCollection || ""].join(" ");
+
+  if (
+    /public papers|govinfo|archived white house|congress|senate|osti|dod|nrc|fas|argonne|nuclear regulatory commission|department of defense text/i.test(
+      sourceBlob
+    )
+  ) {
+    return {
+      queue: "Date/control anchor",
+      readiness: "Published or public primary-source locator",
+      nextAction:
+        "Use the date, public claim, or treaty-text endpoint; pair with internal policy, clearance, or implementation records before final selection.",
+      requiredVerification: ["published citation", "policy claim to match", "internal counterpart", "chapter placement"]
+    };
+  }
+
+  if (isDeclassifiedChronologyItem(item) && (item.digitalObjectUrl || repo.includes("clinton-russia") || type.includes("directive"))) {
+    return {
+      queue: "Close-read now",
+      readiness: "Document-level or review-copy candidate",
+      nextAction:
+        "Close-read the text and record final citation fields before deciding whether it belongs in the chronology.",
+      requiredVerification: [
+        "owning repository",
+        "folder path",
+        "item date",
+        "author/recipient",
+        "classification markings",
+        "pagination"
+      ]
+    };
+  }
+
+  if (type.includes("nara scout") || level.includes("fileunit")) {
+    return {
+      queue: "Resolve file unit",
+      readiness: "File-unit lead",
+      nextAction:
+        "Open the Catalog or Scout trail, identify item boundaries, and replace the row with an item-level document candidate.",
+      requiredVerification: [
+        "box/folder path",
+        "item title",
+        "item date",
+        "classification markings",
+        "page range",
+        "digital-object status"
+      ]
+    };
+  }
+
+  if (level.includes("packet") || type.includes("mdr") || repo.includes("clinton digital library")) {
+    return {
+      queue: "Screen packet",
+      readiness: "MDR or release-packet lead",
+      nextAction: "Screen the packet for discrete memoranda, cables, telcons, memcons, directives, or action papers.",
+      requiredVerification: [
+        "packet page range",
+        "exact item title",
+        "item date",
+        "classification markings",
+        "attachments",
+        "final source note"
+      ]
+    };
+  }
+
+  if (level.includes("source-path") || level.includes("collection") || type.includes("finding aid") || category.includes("source path")) {
+    return {
+      queue: "Pull source path",
+      readiness: "Collection, finding-aid, or source-path lead",
+      nextAction: "Use as a call-slip or search-path lead until a specific item-level record is located.",
+      requiredVerification: [
+        "requestable identifier",
+        "box/folder title",
+        "item boundaries",
+        "date span",
+        "classification markings",
+        "selection relevance"
+      ]
+    };
+  }
+
+  return {
+    queue: "Hold for review",
+    readiness: "Unclassified research lead",
+    nextAction: "Keep as a locator until stronger source details or a document image are found.",
+    requiredVerification: ["source class", "exact item", "date", "source note", "compiler relevance"]
+  };
+}
+
+function readinessQueueRank(queue) {
+  return {
+    "Close-read now": 0,
+    "Screen packet": 1,
+    "Resolve file unit": 2,
+    "Pull source path": 3,
+    "Date/control anchor": 4,
+    "Hold for review": 5
+  }[queue] ?? 6;
+}
+
+function compareReadinessRows(a, b) {
+  return (
+    readinessQueueRank(a.readiness.queue) - readinessQueueRank(b.readiness.queue) ||
+    chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
+    a.title.localeCompare(b.title)
+  );
 }
 
 function buildChapterDossier(chapter) {

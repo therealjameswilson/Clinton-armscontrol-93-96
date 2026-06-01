@@ -707,6 +707,7 @@ const gapCount = document.querySelector("#gap-count");
 const diaryCount = document.querySelector("#diary-count");
 const lanesRoot = document.querySelector("#lanes-root");
 const chronologyRoot = document.querySelector("#chronology-root");
+const readinessRoot = document.querySelector("#readiness-root");
 const leadsRoot = document.querySelector("#leads-root");
 const documentsRoot = document.querySelector("#documents-root");
 const statementsRoot = document.querySelector("#statements-root");
@@ -1065,6 +1066,168 @@ function renderChapterDossiers() {
   });
 
   dossiersRoot.replaceChildren(...cards);
+}
+
+function classifySelectionReadiness(item) {
+  const level = `${item.level || ""}`.toLowerCase();
+  const type = `${item.sourceType || ""}`.toLowerCase();
+  const repo = `${item.sourceRepository || ""}`.toLowerCase();
+  const category = `${item.category || ""}`.toLowerCase();
+  const sourceBlob = [level, type, repo, category, item.sourceCollection || ""].join(" ");
+
+  if (
+    /public papers|govinfo|archived white house|congress|senate|osti|dod|nrc|fas|argonne|nuclear regulatory commission|department of defense text/i.test(
+      sourceBlob
+    )
+  ) {
+    return {
+      queue: "Date/control anchor",
+      readiness: "Published or public primary-source locator",
+      nextAction: "Use the date, public claim, or treaty-text endpoint; pair with internal policy, clearance, or implementation records before final selection.",
+      requiredVerification: [
+        "published citation",
+        "policy claim to match",
+        "internal counterpart",
+        "chapter placement"
+      ]
+    };
+  }
+
+  if (isDeclassifiedChronologyItem(item) && (item.digitalObjectUrl || repo.includes("clinton-russia") || type.includes("directive"))) {
+    return {
+      queue: "Close-read now",
+      readiness: "Document-level or review-copy candidate",
+      nextAction: "Close-read the text and record final citation fields before deciding whether it belongs in the chronology.",
+      requiredVerification: [
+        "owning repository",
+        "folder path",
+        "item date",
+        "author/recipient",
+        "classification markings",
+        "pagination"
+      ]
+    };
+  }
+
+  if (type.includes("nara scout") || level.includes("fileunit")) {
+    return {
+      queue: "Resolve file unit",
+      readiness: "File-unit lead",
+      nextAction: "Open the Catalog or Scout trail, identify item boundaries, and replace the row with an item-level document candidate.",
+      requiredVerification: [
+        "box/folder path",
+        "item title",
+        "item date",
+        "classification markings",
+        "page range",
+        "digital-object status"
+      ]
+    };
+  }
+
+  if (level.includes("packet") || type.includes("mdr") || repo.includes("clinton digital library")) {
+    return {
+      queue: "Screen packet",
+      readiness: "MDR or release-packet lead",
+      nextAction: "Screen the packet for discrete memoranda, cables, telcons, memcons, directives, or action papers.",
+      requiredVerification: [
+        "packet page range",
+        "exact item title",
+        "item date",
+        "classification markings",
+        "attachments",
+        "final source note"
+      ]
+    };
+  }
+
+  if (level.includes("source-path") || level.includes("collection") || type.includes("finding aid") || category.includes("source path")) {
+    return {
+      queue: "Pull source path",
+      readiness: "Collection, finding-aid, or source-path lead",
+      nextAction: "Use as a call-slip or search-path lead until a specific item-level record is located.",
+      requiredVerification: [
+        "requestable identifier",
+        "box/folder title",
+        "item boundaries",
+        "date span",
+        "classification markings",
+        "selection relevance"
+      ]
+    };
+  }
+
+  return {
+    queue: "Hold for review",
+    readiness: "Unclassified research lead",
+    nextAction: "Keep as a locator until stronger source details or a document image are found.",
+    requiredVerification: ["source class", "exact item", "date", "source note", "compiler relevance"]
+  };
+}
+
+const selectionReadinessQueue = potentialDocuments.map((item) => ({
+  ...item,
+  readiness: classifySelectionReadiness(item)
+}));
+
+function readinessQueueRank(queue) {
+  return {
+    "Close-read now": 0,
+    "Screen packet": 1,
+    "Resolve file unit": 2,
+    "Pull source path": 3,
+    "Date/control anchor": 4,
+    "Hold for review": 5
+  }[queue] ?? 6;
+}
+
+function renderSelectionReadiness() {
+  if (!readinessRoot) return;
+
+  const groups = [...new Set(selectionReadinessQueue.map((item) => item.readiness.queue))].sort(
+    (a, b) => readinessQueueRank(a) - readinessQueueRank(b)
+  );
+  const cards = groups.map((queue) => {
+    const items = selectionReadinessQueue
+      .filter((item) => item.readiness.queue === queue)
+      .sort(compareDossierRows);
+    const card = document.createElement("article");
+    card.className = "readiness-card";
+
+    const header = document.createElement("div");
+    header.className = "readiness-card-header";
+    const title = document.createElement("h3");
+    title.textContent = queue;
+    const count = makeChip(`${items.length} leads`, "priority-chip");
+    header.append(title, count);
+
+    const note = document.createElement("p");
+    note.className = "readiness-note";
+    note.textContent = items[0]?.readiness.nextAction || "No staged action.";
+
+    const list = document.createElement("ul");
+    list.className = "readiness-list";
+    for (const item of items.slice(0, 5)) {
+      const row = document.createElement("li");
+      const title = document.createElement("strong");
+      title.textContent = item.title;
+      const meta = document.createElement("span");
+      meta.textContent = `${item.chapterTitle || laneById.get(item.chapterId)?.title || item.chapterId} / ${
+        item.date || "date pending"
+      } / ${item.priority || "Review"}`;
+      row.append(title, meta);
+      list.append(row);
+    }
+
+    const fields = document.createElement("p");
+    fields.className = "readiness-fields";
+    fields.textContent = `Verify: ${(items[0]?.readiness.requiredVerification || []).join(", ") || "source details"}`;
+
+    card.append(header, note, list, fields);
+    return card;
+  });
+
+  readinessRoot.replaceChildren(...cards);
 }
 
 function setStats() {
@@ -1817,6 +1980,7 @@ setStats();
 populateFilters();
 renderLanes();
 renderDeclassifiedChronology();
+renderSelectionReadiness();
 renderLeads();
 renderDocuments();
 renderStatements();

@@ -27,6 +27,7 @@
       <nav aria-label="Primary navigation">
         <a href="#chronology">Chronology</a>
         <a href="#workbench">Workbench</a>
+        <a href="#readiness">Readiness</a>
         <a href="#tables">Tables</a>
         <a href="#dossiers">Dossiers</a>
         <a href="#desk">Desk</a>
@@ -124,6 +125,24 @@
         </div>
       </section>
 
+      <section class="section readiness-section" id="readiness" aria-labelledby="readiness-title">
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">Selection Readiness</p>
+            <h2 id="readiness-title">What Each Lead Is Ready For</h2>
+          </div>
+          <a class="section-link" href="reports/selection-readiness-queue.md">Readiness report</a>
+        </div>
+        <p class="section-note">
+          This queue translates every staged potential-document row into an immediate
+          compiler action: close-read, screen packet, resolve file unit, use as a
+          date control, pull a source path, or hold for review.
+        </p>
+        <div id="readiness-root" class="readiness-root" aria-live="polite">
+          <p class="loading">Loading selection readiness queue...</p>
+        </div>
+      </section>
+
       <section class="section tables-section" id="tables" aria-labelledby="tables-title">
         <div class="section-heading with-link">
           <div>
@@ -143,6 +162,12 @@
             <h3>Potential Documents Triage</h3>
             <p>All staged document and source-path leads with priority, source level, risk, URLs, and FRUS-style source notes.</p>
             <a href="exports/potential-documents-triage.csv">Download CSV</a>
+          </article>
+          <article class="export-card">
+            <span class="export-meta">95 rows</span>
+            <h3>Selection Readiness Queue</h3>
+            <p>Every potential-document lead normalized into a readiness gate, next action, and required verification fields.</p>
+            <a href="exports/selection-readiness-queue.csv">Download CSV</a>
           </article>
           <article class="export-card">
             <span class="export-meta">13 rows</span>

@@ -5,6 +5,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 ## Tables
 
 - `exports/potential-documents-triage.csv`: 95 staged document or source-path leads with FRUS-style source notes and risk fields.
+- `exports/selection-readiness-queue.csv`: 95 staged leads normalized into readiness gates, next actions, and verification fields.
 - `exports/declassified-chronology.csv`: 13 dated released/declassified archival leads promoted to the first page section.
 - `exports/clinton-library-call-slips.csv`: 13 Clinton Library pull clusters from the 2013-0185-M folder-title lists.
 - `exports/presidential-daily-diary-follow-up.csv`: 22 calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.
@@ -15,11 +16,12 @@ Generated from the site's staged data files. These CSVs are meant as working she
 ## Compiler Use
 
 1. Start with `declassified-chronology.csv` for the first read-through of available or released records.
-2. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
-3. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
-4. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.
-5. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.
-6. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
+2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.
+3. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
+4. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
+5. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.
+6. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.
+7. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 
 Regenerate with:
 

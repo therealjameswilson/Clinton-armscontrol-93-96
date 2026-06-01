@@ -10,6 +10,7 @@ currently lists the volume as planned rather than published. It gathers:
 - official FRUS status and volume-boundary links
 - an opening chronology of dated released or declassified document leads
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
+- a selection-readiness queue that assigns every potential-document lead to an immediate verification action
 - CSV working tables for sorting potential documents, chronology items, archive pulls, diary follow-up, public statements, and source risks
 - chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
@@ -39,6 +40,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
 - `reports/declassified-document-chronology.md`: dated released/declassified leads promoted to the first page section
 - `reports/compiler-working-tables.md`: explanation of the CSV exports and suggested compiler workflow
+- `reports/selection-readiness-queue.md`: generated readiness gates and verification fields for every staged document lead
 - `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
@@ -112,9 +114,18 @@ need item screening, which Clinton Library folders to pull first, and which
 source-risk controls must stay visible before a sequence is treated as
 compiler-ready.
 
+## Selection readiness
+
+The third compiler-facing section normalizes every potential-document lead into
+a readiness queue: close-read now, screen packet, resolve file unit, pull source
+path, date/control anchor, or hold for review. The matching
+`exports/selection-readiness-queue.csv` gives the next action and verification
+fields for each row so broad locators do not get mistaken for finished document
+candidates.
+
 ## Chapter dossiers
 
-The fourth compiler-facing section is a chapter dossier board. It gives each
+The chapter dossier board gives each
 provisional chapter one card with first-read leads, packet or Clinton Library
 pulls, Presidential Daily Diary/Public Papers date controls, source risks, and a
 single next move. The matching `exports/chapter-dossiers.csv` and
@@ -123,12 +134,13 @@ the page.
 
 ## Compiler working tables
 
-The third section links generated CSV packets for offline use: the full
-potential-document triage sheet, the declassified chronology, Clinton Library
-call-slip clusters, Presidential Daily Diary follow-up, the risk register,
-Clinton public statements, and chapter dossiers. The tables are regenerated from
-the same staged data files as the page, so a compiler can sort and annotate them
-without creating a separate hand-maintained index.
+The tables section links generated CSV packets for offline use: the full
+potential-document triage sheet, the selection-readiness queue, the
+declassified chronology, Clinton Library call-slip clusters, Presidential Daily
+Diary follow-up, the risk register, Clinton public statements, and chapter
+dossiers. The tables are regenerated from the same staged data files as the
+page, so a compiler can sort and annotate them without creating a separate
+hand-maintained index.
 
 ## Compiler-risk pass
 
