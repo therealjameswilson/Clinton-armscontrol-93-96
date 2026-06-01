@@ -12,6 +12,7 @@ currently lists the volume as planned rather than published. It gathers:
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
 - a selection-readiness queue that assigns every potential-document lead to an immediate verification action
 - a FRUS selection capture worksheet for final document decisions, citation fields, and source-note completion
+- a NARA file-unit resolver that isolates Scout hits needing item-boundary verification
 - CSV working tables for sorting potential documents, chronology items, archive pulls, OA/ID requests, diary follow-up, public statements, and source risks
 - chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
@@ -44,6 +45,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/compiler-working-tables.md`: explanation of the CSV exports and suggested compiler workflow
 - `reports/selection-readiness-queue.md`: generated readiness gates and verification fields for every staged document lead
 - `reports/frus-selection-capture-worksheet.md`: generated capture guide for final selection and source-note fields
+- `reports/nara-file-unit-resolution-queue.md`: generated resolver for NARA Scout/file-unit leads
 - `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
@@ -140,10 +142,10 @@ the page.
 
 The tables section links generated CSV packets for offline use: the full
 potential-document triage sheet, the selection-readiness queue, the FRUS
-selection capture worksheet, the declassified chronology, Clinton Library
-call-slip clusters, the exploded Clinton Library OA/ID request queue,
-Presidential Daily Diary follow-up, the risk register, Clinton public
-statements, and chapter
+selection capture worksheet, the NARA file-unit resolver, the declassified
+chronology, Clinton Library call-slip clusters, the exploded Clinton Library
+OA/ID request queue, Presidential Daily Diary follow-up, the risk register,
+Clinton public statements, and chapter
 dossiers. The tables are regenerated from the same staged data files as the
 page, so a compiler can sort and annotate them without creating a separate
 hand-maintained index.
@@ -155,6 +157,13 @@ document number, selection decision, final title/date, document type,
 author/recipient, repository path, markings, pagination, attachments,
 declassification notes, final source note, and compiler notes.
 
+The generated `exports/nara-file-unit-resolution-queue.csv` pulls the 42 NARA
+Scout/file-unit rows out of the general candidate list. It gives the compiler
+NAID, Catalog URL, chapter, current source note, first action, and blank fields
+for child item URL, box/folder path, item title/date, author/recipient,
+classification markings, page range, digital-object status, replacement
+candidate, disposition, final source note, and compiler notes.
+
 ## Compiler-risk pass
 
 The gap dashboard now tracks ten open or partly addressed compiler risks:
@@ -163,7 +172,8 @@ negotiating records, CTR/HEU implementation, counterproliferation provenance,
 CBW/CWC/BWC depth, regional balance, conventional arms/landmines, and public
 statements as locators. The added source-gap leads address these weak areas
 without pretending every packet or source path is already an item-level FRUS
-candidate.
+candidate. The NARA file-unit resolver now turns the largest remaining open
+risk into a sortable item-boundary worksheet.
 
 ## Source-note pass
 

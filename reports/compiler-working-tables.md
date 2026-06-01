@@ -7,6 +7,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 - `exports/potential-documents-triage.csv`: 95 staged document or source-path leads with FRUS-style source notes and risk fields.
 - `exports/selection-readiness-queue.csv`: 95 staged leads normalized into readiness gates, next actions, and verification fields.
 - `exports/frus-selection-capture-worksheet.csv`: 95 staged leads with final-selection, citation, document-description, and source-note capture fields.
+- `exports/nara-file-unit-resolution-queue.csv`: 42 NARA Scout or file-unit leads isolated for item-boundary resolution.
 - `exports/declassified-chronology.csv`: 13 dated released/declassified archival leads promoted to the first page section.
 - `exports/clinton-library-call-slips.csv`: 13 Clinton Library pull clusters from the 2013-0185-M folder-title lists.
 - `exports/clinton-library-oaid-request-queue.csv`: 99 exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.
@@ -19,12 +20,13 @@ Generated from the site's staged data files. These CSVs are meant as working she
 
 1. Start with `declassified-chronology.csv` for the first read-through of available or released records.
 2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.
-3. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.
-4. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
-5. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
-6. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.
-7. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.
-8. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
+3. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.
+4. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.
+5. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
+6. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
+7. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.
+8. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.
+9. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 
 Regenerate with:
 

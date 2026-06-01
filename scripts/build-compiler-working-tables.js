@@ -8,6 +8,7 @@ const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
 const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
 const selectionCaptureReportPath = path.join(repoRoot, "reports", "frus-selection-capture-worksheet.md");
+const naraFileUnitReportPath = path.join(repoRoot, "reports", "nara-file-unit-resolution-queue.md");
 const libraryRequestReportPath = path.join(repoRoot, "reports", "clinton-library-oaid-request-queue.md");
 
 const dataFiles = [
@@ -83,6 +84,7 @@ const selectionCaptureWorksheet = selectionReadinessQueue.map((item) => ({
   ...item,
   selectionGate: classifySelectionGate(item)
 }));
+const naraFileUnitResolutionQueue = potentialDocuments.filter(isNaraFileUnitLead).sort(compareNaraFileUnitRows);
 const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows).sort(compareLibraryRequestRows);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 
@@ -91,6 +93,7 @@ fs.mkdirSync(exportDir, { recursive: true });
 writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potentialDocuments);
 writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
 writeCsv("frus-selection-capture-worksheet.csv", selectionCaptureColumns(), selectionCaptureWorksheet);
+writeCsv("nara-file-unit-resolution-queue.csv", naraFileUnitColumns(), naraFileUnitResolutionQueue);
 writeCsv("declassified-chronology.csv", chronologyColumns(), declassifiedChronology);
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
 writeCsv("clinton-library-oaid-request-queue.csv", libraryRequestColumns(), libraryRequestQueue);
@@ -102,6 +105,7 @@ writeReport();
 writeDossierReport();
 writeReadinessReport();
 writeSelectionCaptureReport();
+writeNaraFileUnitReport();
 writeLibraryRequestReport();
 
 console.log(
@@ -109,6 +113,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "potential-documents-triage.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "frus-selection-capture-worksheet.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "nara-file-unit-resolution-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "declassified-chronology.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-oaid-request-queue.csv"))}`,
@@ -120,6 +125,7 @@ console.log(
     `Generated ${path.relative(repoRoot, dossierReportPath)}`,
     `Generated ${path.relative(repoRoot, readinessReportPath)}`,
     `Generated ${path.relative(repoRoot, selectionCaptureReportPath)}`,
+    `Generated ${path.relative(repoRoot, naraFileUnitReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestReportPath)}`
   ].join("\n")
 );
@@ -221,6 +227,44 @@ function selectionCaptureColumns() {
     column("editorial_note_needed", () => ""),
     column("cross_references", () => ""),
     column("declassification_or_withholding_notes", () => ""),
+    column("final_source_note", () => ""),
+    column("compiler_notes", () => "")
+  ];
+}
+
+function naraFileUnitColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("resolution_priority", (row) => naraResolutionPriority(row)),
+    column("chapter", (row) => row.chapterTitle || row.chapterId),
+    column("priority", (row) => row.priority),
+    column("title", (row) => row.title),
+    column("naid", (row) => row.naid || naidFromIdentifier(row.identifier)),
+    column("identifier", (row) => row.identifier || (row.naid ? `NAID ${row.naid}` : "")),
+    column("catalog_url", (row) => row.sourceUrl || catalogUrl(row)),
+    column("catalog_search_url", (row) => catalogSearchUrl(row)),
+    column("source_type", (row) => row.sourceType),
+    column("repository", (row) => row.sourceRepository),
+    column("collection", (row) => cleanSourceCollection(row)),
+    column("level", (row) => row.level),
+    column("confidence", (row) => row.confidence),
+    column("matched_queries", (row) => row.matchedQueries),
+    column("topics", (row) => row.topics),
+    column("current_source_note", (row) => formatFrusSourceNote(row)),
+    column("resolution_goal", () => "Replace file-unit lead with item-level document candidate or mark as context-only."),
+    column("first_action", (row) => naraFirstAction(row)),
+    column("verify_box_folder_path", () => ""),
+    column("verify_child_item_url", () => ""),
+    column("verify_item_title", () => ""),
+    column("verify_item_date", () => ""),
+    column("verify_author_recipient", () => ""),
+    column("verify_document_type", () => ""),
+    column("verify_classification_markings", () => ""),
+    column("verify_page_range", () => ""),
+    column("verify_digital_object_status", () => ""),
+    column("replacement_candidate_title", () => ""),
+    column("replacement_candidate_date", () => ""),
+    column("disposition", () => ""),
     column("final_source_note", () => ""),
     column("compiler_notes", () => "")
   ];
@@ -388,6 +432,7 @@ function writeReport() {
     `- \`exports/potential-documents-triage.csv\`: ${potentialDocuments.length} staged document or source-path leads with FRUS-style source notes and risk fields.`,
     `- \`exports/selection-readiness-queue.csv\`: ${selectionReadinessQueue.length} staged leads normalized into readiness gates, next actions, and verification fields.`,
     `- \`exports/frus-selection-capture-worksheet.csv\`: ${selectionCaptureWorksheet.length} staged leads with final-selection, citation, document-description, and source-note capture fields.`,
+    `- \`exports/nara-file-unit-resolution-queue.csv\`: ${naraFileUnitResolutionQueue.length} NARA Scout or file-unit leads isolated for item-boundary resolution.`,
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
     `- \`exports/clinton-library-oaid-request-queue.csv\`: ${libraryRequestQueue.length} exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.`,
@@ -400,12 +445,13 @@ function writeReport() {
     "",
     "1. Start with `declassified-chronology.csv` for the first read-through of available or released records.",
     "2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
-    "3. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
-    "4. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
-    "5. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "6. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
-    "7. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
-    "8. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "3. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.",
+    "4. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
+    "5. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "6. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "7. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
+    "8. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
+    "9. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -549,6 +595,43 @@ function writeSelectionCaptureReport() {
   fs.writeFileSync(selectionCaptureReportPath, lines.join("\n"));
 }
 
+function writeNaraFileUnitReport() {
+  const chapters = [...new Set(naraFileUnitResolutionQueue.map((item) => item.chapterTitle || item.chapterId))];
+  const lines = [
+    "# NARA File-Unit Resolution Queue",
+    "",
+    "Generated from the potential-document table. This report isolates NARA Scout and file-unit leads that cannot become FRUS selections until item boundaries, dates, markings, and page ranges are verified.",
+    "",
+    "## Use Rule",
+    "",
+    "Open each Catalog record, look for child item records or digital objects, and either replace the file-unit lead with an item-level candidate or mark it context-only. Do not move a file-unit row into the final chronology without item title, date, author/recipient, classification markings, folder path, and page range.",
+    "",
+    "## Queue Counts",
+    "",
+    `- Total file-unit leads: ${naraFileUnitResolutionQueue.length}`,
+    `- High priority: ${naraFileUnitResolutionQueue.filter((item) => item.priority === "High").length}`,
+    `- With NAID: ${naraFileUnitResolutionQueue.filter((item) => item.naid || naidFromIdentifier(item.identifier)).length}`,
+    `- With any identifier: ${naraFileUnitResolutionQueue.filter((item) => item.naid || item.identifier).length}`,
+    "",
+    "## By Chapter",
+    ""
+  ];
+
+  for (const chapter of chapters) {
+    const rows = naraFileUnitResolutionQueue.filter((item) => (item.chapterTitle || item.chapterId) === chapter);
+    lines.push(`### ${chapter}`, "", `- Leads: ${rows.length}`, "", "Rows:");
+    appendBulletList(
+      lines,
+      rows,
+      (item) => `${item.priority || "Review"} / ${naraDisplayIdentifier(item)} / ${item.title}`,
+      "No file-unit rows staged."
+    );
+    lines.push("");
+  }
+
+  fs.writeFileSync(naraFileUnitReportPath, lines.join("\n"));
+}
+
 function writeLibraryRequestReport() {
   const visitDays = [...new Set(libraryRequestQueue.map((item) => item.visitDay))].sort(
     (a, b) => libraryVisitDayRank(a) - libraryVisitDayRank(b)
@@ -665,6 +748,48 @@ function selectionGateRank(gate) {
   }[gate] ?? 6;
 }
 
+function isNaraFileUnitLead(item) {
+  const type = `${item.sourceType || ""}`.toLowerCase();
+  const level = `${item.level || ""}`.toLowerCase();
+  return type.includes("nara scout") || level.includes("fileunit");
+}
+
+function naraResolutionPriority(item) {
+  if (item.priority === "High") return "Resolve first";
+  if (item.priority === "Medium") return "Resolve after high";
+  return "Review if chapter needs depth";
+}
+
+function naraFirstAction(item) {
+  const naid = item.naid || naidFromIdentifier(item.identifier);
+  if (naid) return `Open Catalog NAID ${naid}; check for child item records, digital objects, folder path, and item dates.`;
+  const identifier = normalizeIdentifier(item.identifier);
+  if (identifier) return `Open ${identifier}; record requestable identifier, child item records, folder path, and item dates.`;
+  return "Open the Catalog lead; record requestable identifier, child item records, folder path, and item dates.";
+}
+
+function catalogUrl(item) {
+  const naid = item.naid || naidFromIdentifier(item.identifier);
+  return naid ? `https://catalog.archives.gov/id/${naid}` : "";
+}
+
+function catalogSearchUrl(item) {
+  const query = [item.title, item.naid ? `NAID ${item.naid}` : item.identifier, item.chapterTitle]
+    .filter(Boolean)
+    .join(" ");
+  return query ? `https://catalog.archives.gov/search?q=${encodeURIComponent(query)}&collectionIdentifier=WJC*` : "";
+}
+
+function naidFromIdentifier(value) {
+  const match = normalizeIdentifier(value).match(/^NAID\s+(\d+)$/i);
+  return match ? match[1] : "";
+}
+
+function naraDisplayIdentifier(item) {
+  if (item.naid) return `NAID ${item.naid}`;
+  return normalizeIdentifier(item.identifier) || "identifier pending";
+}
+
 function classifySelectionReadiness(item) {
   const level = `${item.level || ""}`.toLowerCase();
   const type = `${item.sourceType || ""}`.toLowerCase();
@@ -777,6 +902,15 @@ function compareReadinessRows(a, b) {
     chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
     priorityRank(a.priority) - priorityRank(b.priority) ||
     chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
+    a.title.localeCompare(b.title)
+  );
+}
+
+function compareNaraFileUnitRows(a, b) {
+  return (
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
+    requestIdentifierRank(a.naid || a.identifier) - requestIdentifierRank(b.naid || b.identifier) ||
     a.title.localeCompare(b.title)
   );
 }
@@ -898,6 +1032,10 @@ function normalizeCell(value) {
   if (Array.isArray(value)) return value.map(normalizeCell).filter(Boolean).join("; ");
   if (typeof value === "object") return JSON.stringify(value);
   return String(value).replace(/\s+/g, " ").trim();
+}
+
+function normalizeIdentifier(value) {
+  return normalizeCell(value);
 }
 
 function compareByDateThenTitle(a, b) {
