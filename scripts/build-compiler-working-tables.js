@@ -7,6 +7,7 @@ const exportDir = path.join(repoRoot, "exports");
 const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
 const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
+const libraryRequestReportPath = path.join(repoRoot, "reports", "clinton-library-oaid-request-queue.md");
 
 const dataFiles = [
   "data/potential-documents.js",
@@ -77,6 +78,7 @@ const declassifiedChronology = potentialDocuments
 const selectionReadinessQueue = potentialDocuments
   .map((item) => ({ ...item, readiness: classifySelectionReadiness(item) }))
   .sort(compareReadinessRows);
+const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows).sort(compareLibraryRequestRows);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 
 fs.mkdirSync(exportDir, { recursive: true });
@@ -85,6 +87,7 @@ writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potential
 writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
 writeCsv("declassified-chronology.csv", chronologyColumns(), declassifiedChronology);
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
+writeCsv("clinton-library-oaid-request-queue.csv", libraryRequestColumns(), libraryRequestQueue);
 writeCsv("presidential-daily-diary-follow-up.csv", diaryColumns(), dailyDiaryReferences.slice().sort(compareDiaryRows));
 writeCsv("compiler-risk-register.csv", gapColumns(), compilerGaps.slice().sort(compareGapRows));
 writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicStatements);
@@ -92,6 +95,7 @@ writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
 writeReport();
 writeDossierReport();
 writeReadinessReport();
+writeLibraryRequestReport();
 
 console.log(
   [
@@ -99,13 +103,15 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "declassified-chronology.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-oaid-request-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "presidential-daily-diary-follow-up.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-risk-register.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-public-statements.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
     `Generated ${path.relative(repoRoot, workingTablesReportPath)}`,
     `Generated ${path.relative(repoRoot, dossierReportPath)}`,
-    `Generated ${path.relative(repoRoot, readinessReportPath)}`
+    `Generated ${path.relative(repoRoot, readinessReportPath)}`,
+    `Generated ${path.relative(repoRoot, libraryRequestReportPath)}`
   ].join("\n")
 );
 
@@ -204,6 +210,40 @@ function libraryColumns() {
   ];
 }
 
+function libraryRequestColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("visit_day", (row) => row.visitDay),
+    column("request_wave", (row) => row.requestWave),
+    column("priority", (row) => row.priority),
+    column("chapter", (row) => row.chapterTitle || row.chapterId),
+    column("cluster_title", (row) => row.clusterTitle),
+    column("request_identifier", (row) => row.requestIdentifier),
+    column("request_type", (row) => row.requestType),
+    column("source_part", (row) => row.sourcePart),
+    column("office", (row) => row.office),
+    column("visit_goal", (row) => row.visitGoal),
+    column("why_it_matters", (row) => row.whyItMatters),
+    column("first_onsite_action", (row) => row.firstOnsiteAction),
+    column("onsite_actions", (row) => row.onsiteActions),
+    column("target_terms", (row) => row.targetTerms),
+    column("capture_folder_title", () => ""),
+    column("capture_box_or_container", () => ""),
+    column("capture_item_title", () => ""),
+    column("capture_item_date", () => ""),
+    column("capture_sender_recipient", () => ""),
+    column("capture_document_type", () => ""),
+    column("capture_classification_markings", () => ""),
+    column("capture_page_range", () => ""),
+    column("capture_attachments", () => ""),
+    column("capture_withdrawal_or_redaction_notes", () => ""),
+    column("capture_volume_boundary", () => ""),
+    column("candidate_disposition", () => ""),
+    column("final_source_note", () => ""),
+    column("source_note", (row) => formatLibraryRequestSourceNote(row))
+  ];
+}
+
 function diaryColumns() {
   return [
     column("sequence", (_row, index) => index + 1),
@@ -296,6 +336,7 @@ function writeReport() {
     `- \`exports/selection-readiness-queue.csv\`: ${selectionReadinessQueue.length} staged leads normalized into readiness gates, next actions, and verification fields.`,
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
+    `- \`exports/clinton-library-oaid-request-queue.csv\`: ${libraryRequestQueue.length} exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.`,
     `- \`exports/presidential-daily-diary-follow-up.csv\`: ${dailyDiaryReferences.length} calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.`,
     `- \`exports/compiler-risk-register.csv\`: ${compilerGaps.length} source-risk controls with next actions, target records, and source pools.`,
     `- \`exports/clinton-public-statements.csv\`: ${clintonPublicStatements.length} Clinton Public Papers anchors for public chronology and speech-clearance backtracking.`,
@@ -307,7 +348,7 @@ function writeReport() {
     "2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
     "3. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
     "4. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "5. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.",
+    "5. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
     "6. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
     "7. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
@@ -411,6 +452,99 @@ function writeReadinessReport() {
   }
 
   fs.writeFileSync(readinessReportPath, lines.join("\n"));
+}
+
+function writeLibraryRequestReport() {
+  const visitDays = [...new Set(libraryRequestQueue.map((item) => item.visitDay))].sort(
+    (a, b) => libraryVisitDayRank(a) - libraryVisitDayRank(b)
+  );
+  const lines = [
+    "# Clinton Library OA/ID Request Queue",
+    "",
+    "Generated from the 2013-0185-M folder-title research plan. This report explodes the cluster-level visit plan into one row per staged OA/ID or folder-list control reference so the compiler can move from chapter strategy to request slips and capture fields.",
+    "",
+    "## Use Rule",
+    "",
+    "Use the CSV as an on-site worksheet. Request folders from the Day 1 rows first, then fill the blank capture columns for exact folder title, box or container, item title, date, sender/recipient, document type, classification markings, page range, attachments, withdrawal notes, volume boundary, disposition, and final source note.",
+    "",
+    "## Queue Counts",
+    ""
+  ];
+
+  for (const day of visitDays) {
+    const rows = libraryRequestQueue.filter((item) => item.visitDay === day);
+    lines.push(`- ${day}: ${rows.length}`);
+  }
+
+  lines.push("", "## Requests", "");
+
+  for (const day of visitDays) {
+    const rows = libraryRequestQueue.filter((item) => item.visitDay === day);
+    lines.push(`### ${day}`, "");
+    for (const row of rows) {
+      lines.push(
+        `- ${row.requestWave} / ${row.requestIdentifier} / ${row.chapterTitle || row.chapterId} / ${row.clusterTitle}`
+      );
+    }
+    lines.push("");
+  }
+
+  fs.writeFileSync(libraryRequestReportPath, lines.join("\n"));
+}
+
+function expandLibraryRequestRows(item, clusterIndex) {
+  const ids = item.oaIds?.length ? item.oaIds : ["request identifier pending"];
+  return ids.map((rawIdentifier, idIndex) => {
+    const cleanedIdentifier = cleanOaIdentifier(rawIdentifier);
+    const requestIdentifier = formatRequestIdentifier(cleanedIdentifier);
+    return {
+      id: `${item.id || "library"}-${idIndex}-${cleanedIdentifier}`,
+      clusterId: item.id,
+      clusterOrder: clusterIndex,
+      identifierOrder: idIndex,
+      priority: item.priority,
+      chapterId: item.chapterId,
+      chapterTitle: item.chapterTitle,
+      clusterTitle: item.title,
+      office: item.office,
+      sourcePart: item.sourcePart,
+      rawIdentifier: cleanedIdentifier,
+      requestIdentifier,
+      requestType: /^Part\s+\d/i.test(cleanedIdentifier) ? "Folder-list control reference" : "OA/ID request",
+      visitDay: libraryVisitDay(item.priority),
+      requestWave: `${libraryVisitDay(item.priority)} / ${String(clusterIndex + 1).padStart(2, "0")}.${String(
+        idIndex + 1
+      ).padStart(2, "0")}`,
+      visitGoal: item.visitGoal,
+      whyItMatters: item.whyItMatters,
+      onsiteActions: item.onsiteActions || [],
+      firstOnsiteAction: item.onsiteActions?.[0] || item.visitGoal,
+      targetTerms: item.targetTerms || []
+    };
+  });
+}
+
+function libraryVisitDay(priority) {
+  return { Control: "Pre-visit", A: "Day 1", B: "Day 2", C: "Defer" }[priority] || "Review";
+}
+
+function libraryVisitDayRank(day) {
+  return { "Pre-visit": 0, "Day 1": 1, "Day 2": 2, Defer: 3, Review: 4 }[day] ?? 5;
+}
+
+function cleanOaIdentifier(value) {
+  return String(value || "identifier pending").replace(/\.$/, "").trim();
+}
+
+function formatRequestIdentifier(value) {
+  if (/^Part\s+\d/i.test(value) || /^request identifier pending$/i.test(value)) return value;
+  return `OA/ID ${value}`;
+}
+
+function formatLibraryRequestSourceNote(row) {
+  return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${
+    row.sourcePart || "part pending"
+  }, ${row.requestIdentifier}. Folder-title request lead; verify exact box, folder title, item date, classification, and pagination on site.`;
 }
 
 function classifySelectionReadiness(item) {
@@ -666,6 +800,20 @@ function compareLibraryRows(a, b) {
     chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
     a.title.localeCompare(b.title)
   );
+}
+
+function compareLibraryRequestRows(a, b) {
+  return (
+    libraryPriorityRank(a.priority) - libraryPriorityRank(b.priority) ||
+    a.clusterOrder - b.clusterOrder ||
+    a.identifierOrder - b.identifierOrder ||
+    requestIdentifierRank(a.rawIdentifier) - requestIdentifierRank(b.rawIdentifier)
+  );
+}
+
+function requestIdentifierRank(value) {
+  const match = String(value || "").match(/\d+/);
+  return match ? Number(match[0]) : 999999;
 }
 
 function compareGapRows(a, b) {

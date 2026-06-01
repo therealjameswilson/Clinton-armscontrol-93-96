@@ -6,6 +6,8 @@ Source finding aids: local PDFs `2013-0185-M_Part1.pdf` through `2013-0185-M_Par
 
 The four PDFs are OCR-readable folder-title lists for Clinton Library NSC records. They are best used as an on-site pull map, not as final document selections. The new site section translates the folder-title lists into a practical visit plan: pull the highest-yield OA/ID clusters first, capture item-level metadata, and defer public-language/speechwriting files until the core policy files are reviewed.
 
+The generated `exports/clinton-library-oaid-request-queue.csv` and `reports/clinton-library-oaid-request-queue.md` now turn these clusters into one row per staged OA/ID or folder-list control reference. Use that queue at the table for request slips and item-level capture.
+
 ## First-Day Pulls
 
 | Priority | Cluster | OA/ID focus | Why first |
@@ -36,6 +38,10 @@ Speechwriting folders are useful for public-statement backtracing, but they shou
 3. For each candidate item, capture title, date, sender/recipient, document type, page count, attachments, and markings.
 4. Separate item-level candidate documents from folder-level context, public-language drafting, and duplicate copies.
 5. Mark Volume VIII handoff material when folders run past 1996.
+
+## OA/ID Request Queue
+
+Use the request queue as the working capture sheet. It carries the visit day, request wave, chapter, cluster title, OA/ID or folder-list reference, source part, office, first on-site action, target terms, and blank capture columns for exact folder title, box/container, item title, item date, sender/recipient, document type, classification markings, page range, attachments, withdrawal/redaction notes, volume boundary, disposition, and final source note.
 
 ## Immediate Gaps This Plan Addresses
 

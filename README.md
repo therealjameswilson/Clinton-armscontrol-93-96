@@ -11,7 +11,7 @@ currently lists the volume as planned rather than published. It gathers:
 - an opening chronology of dated released or declassified document leads
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
 - a selection-readiness queue that assigns every potential-document lead to an immediate verification action
-- CSV working tables for sorting potential documents, chronology items, archive pulls, diary follow-up, public statements, and source risks
+- CSV working tables for sorting potential documents, chronology items, archive pulls, OA/ID requests, diary follow-up, public statements, and source risks
 - chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
 - NARA Catalog collection and series leads
@@ -22,6 +22,7 @@ currently lists the volume as planned rather than published. It gathers:
 - Presidential Daily Diary call and meeting references from the 2010-0083-F hardcopy scans and Clinton Library foreign-leader index
 - structured compiler-risk gaps with pull lists and verification actions
 - a Clinton Library on-site research plan built from the local `2013-0185-M` folder-title PDFs
+- an exploded Clinton Library OA/ID request queue with item-level capture columns for on-site review
 - a dedicated Clinton Public Papers statement index for arms-control and nonproliferation items
 
 ## Files
@@ -44,6 +45,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
+- `reports/clinton-library-oaid-request-queue.md`: generated request-slip queue from the Clinton Library OA/ID clusters
 - `reports/frus-source-note-audit.md`: check of source-note formatting against FRUS conventions
 - `reports/presidential-daily-diary-references.md`: diary search method and calls/meetings added to the page
 - `scripts/harvest-nara-scout-documents.js`: repeatable NARA Scout/Public Papers harvest script
@@ -136,8 +138,9 @@ the page.
 
 The tables section links generated CSV packets for offline use: the full
 potential-document triage sheet, the selection-readiness queue, the
-declassified chronology, Clinton Library call-slip clusters, Presidential Daily
-Diary follow-up, the risk register, Clinton public statements, and chapter
+declassified chronology, Clinton Library call-slip clusters, the exploded
+Clinton Library OA/ID request queue, Presidential Daily Diary follow-up, the
+risk register, Clinton public statements, and chapter
 dossiers. The tables are regenerated from the same staged data files as the
 page, so a compiler can sort and annotate them without creating a separate
 hand-maintained index.
@@ -181,3 +184,10 @@ Iran/Iraq/UNSCOM, China technology-transfer/missile-proliferation files,
 counterproliferation intelligence files, landmines, and Legal Advisor treaty
 folders. Speechwriting folders are staged as public-statement backtrace
 material after policy files are reviewed.
+
+The generated `exports/clinton-library-oaid-request-queue.csv` explodes those
+clusters into one row per staged OA/ID or folder-list control reference. Its
+blank capture columns are meant for the archive table: exact folder title, box
+or container, item title, date, sender/recipient, document type,
+classification markings, page range, attachments, withdrawal/redaction notes,
+volume boundary, disposition, and final source note.
