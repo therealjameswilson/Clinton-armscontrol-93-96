@@ -10,6 +10,7 @@ currently lists the volume as planned rather than published. It gathers:
 - official FRUS status and volume-boundary links
 - an opening chronology of dated released or declassified document leads
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
+- CSV working tables for sorting potential documents, chronology items, archive pulls, diary follow-up, public statements, and source risks
 - Clinton Library guide entries for the relevant NSC offices
 - NARA Catalog collection and series leads
 - Clinton Library finding aids for NPT/CTBT and speechwriting/source context
@@ -27,6 +28,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `styles.css`: responsive visual system
 - `app.js`: data model, filters, chapter cards, source leads, public statements, and milestones
 - `compiler-workbench.js`: second-section decision board for close reads, packet screening, pulls, and risks
+- `exports/*.csv`: generated compiler working tables for archive and source-note workflows
 - `data/potential-documents.js`: generated potential-document data loaded by the page
 - `data/source-gap-leads.js`: manual source-gap leads added after compiler-risk review
 - `data/compiler-gaps.js`: structured gap analysis rendered on the page
@@ -35,17 +37,25 @@ currently lists the volume as planned rather than published. It gathers:
 - `data/clinton-public-statements.js`: generated Clinton Public Papers statement data
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
 - `reports/declassified-document-chronology.md`: dated released/declassified leads promoted to the first page section
+- `reports/compiler-working-tables.md`: explanation of the CSV exports and suggested compiler workflow
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
 - `reports/frus-source-note-audit.md`: check of source-note formatting against FRUS conventions
 - `reports/presidential-daily-diary-references.md`: diary search method and calls/meetings added to the page
 - `scripts/harvest-nara-scout-documents.js`: repeatable NARA Scout/Public Papers harvest script
+- `scripts/build-compiler-working-tables.js`: repeatable export builder for compiler CSV packets
 - `assets/arms-control-source-map.svg`: first-pass source map visual
 
 Regenerate the potential-document list with:
 
 ```bash
 NARA_SCOUT_API_KEY=... node scripts/harvest-nara-scout-documents.js --limit=18 --per-chapter=12
+```
+
+Regenerate the compiler working tables with:
+
+```bash
+node scripts/build-compiler-working-tables.js
 ```
 
 ## Primary anchors
@@ -99,6 +109,15 @@ chronology items are ready for close reading, which MDR packets or folder leads
 need item screening, which Clinton Library folders to pull first, and which
 source-risk controls must stay visible before a sequence is treated as
 compiler-ready.
+
+## Compiler working tables
+
+The third section links generated CSV packets for offline use: the full
+potential-document triage sheet, the declassified chronology, Clinton Library
+call-slip clusters, Presidential Daily Diary follow-up, the risk register, and
+Clinton public statements. The tables are regenerated from the same staged data
+files as the page, so a compiler can sort and annotate them without creating a
+separate hand-maintained index.
 
 ## Compiler-risk pass
 
