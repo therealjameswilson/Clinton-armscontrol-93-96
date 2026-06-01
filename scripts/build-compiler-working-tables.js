@@ -7,6 +7,7 @@ const exportDir = path.join(repoRoot, "exports");
 const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
 const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
+const selectionCaptureReportPath = path.join(repoRoot, "reports", "frus-selection-capture-worksheet.md");
 const libraryRequestReportPath = path.join(repoRoot, "reports", "clinton-library-oaid-request-queue.md");
 
 const dataFiles = [
@@ -78,6 +79,10 @@ const declassifiedChronology = potentialDocuments
 const selectionReadinessQueue = potentialDocuments
   .map((item) => ({ ...item, readiness: classifySelectionReadiness(item) }))
   .sort(compareReadinessRows);
+const selectionCaptureWorksheet = selectionReadinessQueue.map((item) => ({
+  ...item,
+  selectionGate: classifySelectionGate(item)
+}));
 const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows).sort(compareLibraryRequestRows);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 
@@ -85,6 +90,7 @@ fs.mkdirSync(exportDir, { recursive: true });
 
 writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potentialDocuments);
 writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
+writeCsv("frus-selection-capture-worksheet.csv", selectionCaptureColumns(), selectionCaptureWorksheet);
 writeCsv("declassified-chronology.csv", chronologyColumns(), declassifiedChronology);
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
 writeCsv("clinton-library-oaid-request-queue.csv", libraryRequestColumns(), libraryRequestQueue);
@@ -95,12 +101,14 @@ writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
 writeReport();
 writeDossierReport();
 writeReadinessReport();
+writeSelectionCaptureReport();
 writeLibraryRequestReport();
 
 console.log(
   [
     `Generated ${path.relative(repoRoot, path.join(exportDir, "potential-documents-triage.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "frus-selection-capture-worksheet.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "declassified-chronology.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-oaid-request-queue.csv"))}`,
@@ -111,6 +119,7 @@ console.log(
     `Generated ${path.relative(repoRoot, workingTablesReportPath)}`,
     `Generated ${path.relative(repoRoot, dossierReportPath)}`,
     `Generated ${path.relative(repoRoot, readinessReportPath)}`,
+    `Generated ${path.relative(repoRoot, selectionCaptureReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestReportPath)}`
   ].join("\n")
 );
@@ -170,6 +179,50 @@ function readinessColumns() {
     column("source_url", (row) => row.sourceUrl),
     column("digital_object_url", (row) => row.digitalObjectUrl),
     column("summary", (row) => row.summary || row.sourceNote)
+  ];
+}
+
+function selectionCaptureColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("selection_gate", (row) => row.selectionGate),
+    column("readiness_queue", (row) => row.readiness.queue),
+    column("next_action", (row) => row.readiness.nextAction),
+    column("required_verification", (row) => row.readiness.requiredVerification),
+    column("date_or_span", (row) => row.date),
+    column("chapter", (row) => row.chapterTitle || row.chapterId),
+    column("priority", (row) => row.priority),
+    column("title", (row) => row.title),
+    column("source_type", (row) => row.sourceType),
+    column("repository", (row) => row.sourceRepository),
+    column("collection", (row) => cleanSourceCollection(row)),
+    column("identifier", (row) => row.identifier || (row.naid ? `NAID ${row.naid}` : "")),
+    column("level", (row) => row.level),
+    column("confidence", (row) => row.confidence),
+    column("compiler_risk", (row) => row.compilerRisk),
+    column("current_source_note", (row) => formatFrusSourceNote(row)),
+    column("current_citation_status", (row) => sourceNoteStatus(row)),
+    column("source_url", (row) => row.sourceUrl),
+    column("digital_object_url", (row) => row.digitalObjectUrl),
+    column("proposed_document_number", () => ""),
+    column("selection_decision", () => ""),
+    column("final_document_date", () => ""),
+    column("final_document_title", () => ""),
+    column("document_type", () => ""),
+    column("author_or_origin", () => ""),
+    column("recipient_or_audience", () => ""),
+    column("final_repository", () => ""),
+    column("final_collection_or_file_path", () => ""),
+    column("final_box_folder_or_identifier", () => ""),
+    column("classification_markings", () => ""),
+    column("draft_final_action_status", () => ""),
+    column("pagination", () => ""),
+    column("attachments_enclosures", () => ""),
+    column("editorial_note_needed", () => ""),
+    column("cross_references", () => ""),
+    column("declassification_or_withholding_notes", () => ""),
+    column("final_source_note", () => ""),
+    column("compiler_notes", () => "")
   ];
 }
 
@@ -334,6 +387,7 @@ function writeReport() {
     "",
     `- \`exports/potential-documents-triage.csv\`: ${potentialDocuments.length} staged document or source-path leads with FRUS-style source notes and risk fields.`,
     `- \`exports/selection-readiness-queue.csv\`: ${selectionReadinessQueue.length} staged leads normalized into readiness gates, next actions, and verification fields.`,
+    `- \`exports/frus-selection-capture-worksheet.csv\`: ${selectionCaptureWorksheet.length} staged leads with final-selection, citation, document-description, and source-note capture fields.`,
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
     `- \`exports/clinton-library-oaid-request-queue.csv\`: ${libraryRequestQueue.length} exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.`,
@@ -346,11 +400,12 @@ function writeReport() {
     "",
     "1. Start with `declassified-chronology.csv` for the first read-through of available or released records.",
     "2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
-    "3. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
-    "4. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "5. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
-    "6. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
-    "7. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "3. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
+    "4. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "5. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "6. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
+    "7. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
+    "8. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -454,6 +509,46 @@ function writeReadinessReport() {
   fs.writeFileSync(readinessReportPath, lines.join("\n"));
 }
 
+function writeSelectionCaptureReport() {
+  const gates = [...new Set(selectionCaptureWorksheet.map((item) => item.selectionGate))].sort(
+    (a, b) => selectionGateRank(a) - selectionGateRank(b)
+  );
+  const lines = [
+    "# FRUS Selection Capture Worksheet",
+    "",
+    "Generated from the selection-readiness queue. This worksheet is the handoff from source discovery to compilation: one row per staged lead, with current source-note context plus blank fields for final document description, selection disposition, and completed FRUS source note.",
+    "",
+    "## Use Rule",
+    "",
+    "Do not treat a row as selected until the final document fields are filled: document date, title, type, author/origin, recipient/audience, repository, collection or file path, box/folder or identifier, classification markings, page range, attachments, declassification notes, and final source note.",
+    "",
+    "## Selection Gate Counts",
+    ""
+  ];
+
+  for (const gate of gates) {
+    const rows = selectionCaptureWorksheet.filter((item) => item.selectionGate === gate);
+    lines.push(`- ${gate}: ${rows.length}`);
+  }
+
+  lines.push("", "## Gates", "");
+
+  for (const gate of gates) {
+    const rows = selectionCaptureWorksheet.filter((item) => item.selectionGate === gate);
+    lines.push(`### ${gate}`, "", `- Leads: ${rows.length}`, "", "Top rows:");
+    appendBulletList(
+      lines,
+      rows.slice(0, 8),
+      (item) =>
+        `${item.readiness.queue} / ${item.chapterTitle || item.chapterId} / ${item.date || "date pending"} / ${item.title}`,
+      "No leads staged."
+    );
+    lines.push("");
+  }
+
+  fs.writeFileSync(selectionCaptureReportPath, lines.join("\n"));
+}
+
 function writeLibraryRequestReport() {
   const visitDays = [...new Set(libraryRequestQueue.map((item) => item.visitDay))].sort(
     (a, b) => libraryVisitDayRank(a) - libraryVisitDayRank(b)
@@ -545,6 +640,29 @@ function formatLibraryRequestSourceNote(row) {
   return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${
     row.sourcePart || "part pending"
   }, ${row.requestIdentifier}. Folder-title request lead; verify exact box, folder title, item date, classification, and pagination on site.`;
+}
+
+function classifySelectionGate(item) {
+  const queue = item.readiness?.queue || "Hold for review";
+  return {
+    "Close-read now": "Candidate for close read",
+    "Screen packet": "Packet screening required",
+    "Resolve file unit": "Resolve file unit before selection",
+    "Pull source path": "Pull source path before selection",
+    "Date/control anchor": "Locator or date control only",
+    "Hold for review": "Hold for source upgrade"
+  }[queue] || "Hold for source upgrade";
+}
+
+function selectionGateRank(gate) {
+  return {
+    "Candidate for close read": 0,
+    "Packet screening required": 1,
+    "Resolve file unit before selection": 2,
+    "Pull source path before selection": 3,
+    "Locator or date control only": 4,
+    "Hold for source upgrade": 5
+  }[gate] ?? 6;
 }
 
 function classifySelectionReadiness(item) {

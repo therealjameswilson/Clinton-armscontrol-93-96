@@ -37,3 +37,5 @@ The page now renders a generated FRUS-style note for every potential document, p
 ## Remaining rule
 
 Do not promote any file-unit, packet, or folder-title lead into a final FRUS chronological document until the archive visit or digital release confirms exact item title, date, classification markings, folder path, and page range.
+
+Use `exports/frus-selection-capture-worksheet.csv` as the promotion worksheet. It preserves the generated source note, then leaves final-source-note and document-description fields blank until item-level verification is complete.
