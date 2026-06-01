@@ -482,6 +482,77 @@ dd {
   border-left: 5px solid var(--green);
 }
 
+.workbench-root {
+  display: grid;
+  gap: 18px;
+}
+
+.workbench-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.workbench-panel {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(23, 33, 43, 0.07);
+}
+
+.workbench-panel h3,
+.workbench-panel p {
+  margin: 0;
+}
+
+.workbench-panel p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.workbench-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workbench-list li {
+  display: grid;
+  gap: 4px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(216, 208, 194, 0.82);
+}
+
+.workbench-list strong {
+  color: var(--ink);
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.workbench-list span {
+  color: #5a6570;
+  font-size: 0.88rem;
+  line-height: 1.38;
+}
+
+.workbench-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.workbench-links a {
+  color: var(--navy);
+  font-weight: 850;
+  text-underline-offset: 3px;
+}
+
 .lead-card h3,
 .document-card h3 {
   margin-bottom: 8px;
@@ -846,6 +917,7 @@ dd {
 
   .desk-grid,
   .lane-grid,
+  .workbench-grid,
   .gap-metrics,
   .library-metrics,
   .diary-metrics {
@@ -895,6 +967,7 @@ dd {
   .stats,
   .desk-grid,
   .lane-grid,
+  .workbench-grid,
   .lead-tools,
   .document-tools,
     .statement-tools,

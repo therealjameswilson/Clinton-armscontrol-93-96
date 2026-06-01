@@ -16,6 +16,7 @@
     <script defer src="data/presidential-daily-diary-references.js"></script>
     <script defer src="data/clinton-public-statements.js"></script>
     <script defer src="app.js"></script>
+    <script defer src="compiler-workbench.js"></script>
   </head>
   <body>
     <header class="site-header">
@@ -25,6 +26,7 @@
       </a>
       <nav aria-label="Primary navigation">
         <a href="#chronology">Chronology</a>
+        <a href="#workbench">Workbench</a>
         <a href="#desk">Desk</a>
         <a href="#chapters">Chapters</a>
         <a href="#gaps">Gaps</a>
@@ -51,7 +53,7 @@
           </p>
           <div class="hero-actions" aria-label="Primary actions">
             <a class="button primary" href="#chronology">Review Chronology</a>
-            <a class="button secondary" href="#documents">Browse Documents</a>
+            <a class="button secondary" href="#workbench">Open Workbench</a>
             <a class="button secondary" href="https://history.state.gov/historicaldocuments/frus1993-00v07" rel="noreferrer">
               Official Volume Page
             </a>
@@ -102,6 +104,21 @@
         </p>
         <div id="chronology-root" class="chronology-root" aria-live="polite">
           <p class="loading">Loading declassified document chronology...</p>
+        </div>
+      </section>
+
+      <section class="section workbench-section" id="workbench" aria-labelledby="workbench-title">
+        <div class="section-heading">
+          <p class="kicker">Compiler Workbench</p>
+          <h2 id="workbench-title">What To Do Next</h2>
+        </div>
+        <p class="section-note">
+          This board turns the chronology into a working sequence: close-read available
+          texts first, screen packet leads next, pull the highest-yield Clinton Library
+          folders, and keep the hardest source risks visible.
+        </p>
+        <div id="workbench-root" class="workbench-root" aria-live="polite">
+          <p class="loading">Loading compiler workbench...</p>
         </div>
       </section>
 

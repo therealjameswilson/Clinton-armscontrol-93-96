@@ -9,6 +9,7 @@ currently lists the volume as planned rather than published. It gathers:
 
 - official FRUS status and volume-boundary links
 - an opening chronology of dated released or declassified document leads
+- a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
 - Clinton Library guide entries for the relevant NSC offices
 - NARA Catalog collection and series leads
 - Clinton Library finding aids for NPT/CTBT and speechwriting/source context
@@ -25,6 +26,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `index.html`: page structure and source sections
 - `styles.css`: responsive visual system
 - `app.js`: data model, filters, chapter cards, source leads, public statements, and milestones
+- `compiler-workbench.js`: second-section decision board for close reads, packet screening, pulls, and risks
 - `data/potential-documents.js`: generated potential-document data loaded by the page
 - `data/source-gap-leads.js`: manual source-gap leads added after compiler-risk review
 - `data/compiler-gaps.js`: structured gap analysis rendered on the page
@@ -89,6 +91,14 @@ declassified archival leads. It excludes public statements, broad finding aids,
 diary-only references, and undated Scout hits so the opening read-through starts
 with document candidates that can plausibly become FRUS-style selections after
 item-level verification.
+
+## Compiler workbench
+
+The second section is a practical decision board. It tells the compiler which
+chronology items are ready for close reading, which MDR packets or folder leads
+need item screening, which Clinton Library folders to pull first, and which
+source-risk controls must stay visible before a sequence is treated as
+compiler-ready.
 
 ## Compiler-risk pass
 
