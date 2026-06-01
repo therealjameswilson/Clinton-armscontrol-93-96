@@ -10,14 +10,16 @@ Generated from the site's staged data files. These CSVs are meant as working she
 - `exports/presidential-daily-diary-follow-up.csv`: 22 calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.
 - `exports/compiler-risk-register.csv`: 10 source-risk controls with next actions, target records, and source pools.
 - `exports/clinton-public-statements.csv`: 15 Clinton Public Papers anchors for public chronology and speech-clearance backtracking.
+- `exports/chapter-dossiers.csv`: 9 chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.
 
 ## Compiler Use
 
 1. Start with `declassified-chronology.csv` for the first read-through of available or released records.
-2. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
-3. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.
-4. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.
-5. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
+2. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
+3. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
+4. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.
+5. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.
+6. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 
 Regenerate with:
 

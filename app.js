@@ -714,6 +714,7 @@ const milestonesRoot = document.querySelector("#milestones-root");
 const gapsRoot = document.querySelector("#gaps-root");
 const libraryRoot = document.querySelector("#library-root");
 const diaryRoot = document.querySelector("#diary-root");
+const dossiersRoot = document.querySelector("#dossiers-root");
 const leadSearch = document.querySelector("#lead-search");
 const laneFilter = document.querySelector("#lane-filter");
 const institutionFilter = document.querySelector("#institution-filter");
@@ -888,6 +889,182 @@ function formatLibrarySourceNote(item) {
   const extra = ids.length > 6 ? `, plus ${ids.length - 6} more` : "";
   const oaText = ids.length ? `, ${idLabel} ${shownIds}${extra}` : "";
   return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${item.sourcePart || "part pending"}${oaText}. Folder-title lead; verify exact box, folder title, item date, classification, and pagination on site.`;
+}
+
+function priorityRank(priority) {
+  return { Critical: 0, High: 1, A: 1, Medium: 2, B: 2, Low: 3, C: 3, Review: 4, Control: 4 }[priority] ?? 5;
+}
+
+function compareDossierRows(a, b) {
+  return (
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
+    (b.score || 0) - (a.score || 0) ||
+    a.title.localeCompare(b.title)
+  );
+}
+
+function isImmediateDossierRead(item) {
+  const level = `${item.level || ""}`.toLowerCase();
+  const type = `${item.sourceType || ""}`.toLowerCase();
+  return level.includes("item-level review copy") || level.includes("published primary source") || type.includes("directive");
+}
+
+function uniqueDossierRows(rows) {
+  const seen = new Set();
+  return rows.filter((row) => {
+    const key = [row.date, row.title, row.identifier || row.naid || row.sourceUrl || ""].join("|");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function gapMatchesChapter(gap, lane) {
+  const blob = [gap.id, gap.lane, gap.title, gap.needed, ...(gap.targetTerms || [])]
+    .join(" ")
+    .toLowerCase();
+  const aliases = {
+    ctbt: ["npt", "ctbt", "test ban"],
+    "strategic-arms": ["strategic", "nuclear security", "missile systems"],
+    "start-ii": ["start ii", "start-ii", "duma"],
+    "ctr-heu": ["ctr", "heu", "nunn-lugar", "cooperative threat reduction"],
+    nonproliferation: ["nonproliferation regime", "mtcr", "fissile", "nuclear smuggling"],
+    counterproliferation: ["counterproliferation", "pdd-18", "wmd planning"],
+    regional: ["regional", "north korea", "iran", "iraq", "china", "south asia"],
+    "cbw-conventional": ["cbw", "cwc", "bwc", "chemical weapons", "chemical and biological", "elisa harris", "australia group"],
+    "conventional-landmines": ["conventional", "landmine", "ccw", "arms transfer"]
+  };
+  return (aliases[lane.id] || [lane.title.toLowerCase()]).some((term) => blob.includes(term));
+}
+
+function buildChapterDossier(lane) {
+  const documents = potentialDocuments.filter((item) => item.chapterId === lane.id).sort(compareDossierRows);
+  const chronology = declassifiedChronology.filter((item) => item.chapterId === lane.id).sort(compareDossierRows);
+  const firstReads = uniqueDossierRows([...chronology, ...documents.filter(isImmediateDossierRead)])
+    .sort(compareDossierRows)
+    .slice(0, 3);
+  const packetScreens = uniqueDossierRows(documents.filter((item) => !isImmediateDossierRead(item)))
+    .sort(compareDossierRows)
+    .slice(0, 3);
+  const pulls = libraryResearchPlan
+    .filter((item) => item.chapterId === lane.id)
+    .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority) || a.title.localeCompare(b.title));
+  const diaries = dailyDiaryReferences
+    .filter((item) => item.chapterId === lane.id)
+    .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority) || chronologySortKey(a.date).localeCompare(chronologySortKey(b.date)));
+  const statements = clintonPublicStatements
+    .filter((item) => item.chapterId === lane.id)
+    .sort((a, b) => chronologySortKey(a.date).localeCompare(chronologySortKey(b.date)) || a.title.localeCompare(b.title));
+  const specificRisks = compilerGaps.filter((gap) => gapMatchesChapter(gap, lane));
+  const globalRisks = compilerGaps.filter((gap) =>
+    ["gap-source-base-diversity", "gap-nara-file-unit-quality", "gap-public-statements-as-locators"].includes(gap.id)
+  );
+  const risks = uniqueDossierRows([
+    ...specificRisks.sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority) || a.title.localeCompare(b.title)),
+    ...globalRisks.sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority) || a.title.localeCompare(b.title))
+  ]).slice(0, 3);
+
+  const nextMove =
+    specificRisks.sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority) || a.title.localeCompare(b.title))[0]
+      ?.nextActions?.[0] ||
+    pulls[0]?.onsiteActions?.[0] ||
+    (packetScreens[0] ? `Screen packet lead: ${packetScreens[0].title}` : "") ||
+    (firstReads[0] ? `Close-read: ${firstReads[0].title}` : "Hold for additional source discovery.");
+
+  return { lane, documents, chronology, firstReads, packetScreens, pulls, diaries, statements, risks, nextMove };
+}
+
+function makeDossierList(title, items, emptyText, renderItem) {
+  const block = document.createElement("div");
+  block.className = "dossier-block";
+  const heading = document.createElement("h4");
+  heading.textContent = title;
+  const list = document.createElement("ul");
+  list.className = "dossier-list";
+
+  if (!items.length) {
+    const empty = document.createElement("li");
+    empty.textContent = emptyText;
+    list.append(empty);
+  } else {
+    for (const item of items) {
+      const row = document.createElement("li");
+      row.textContent = renderItem(item);
+      list.append(row);
+    }
+  }
+
+  block.append(heading, list);
+  return block;
+}
+
+function renderChapterDossiers() {
+  if (!dossiersRoot) return;
+
+  const dossiers = lanes.filter((lane) => lane.id !== "volume-control").map(buildChapterDossier);
+  const cards = dossiers.map((dossier) => {
+    const { lane, documents, chronology, firstReads, packetScreens, pulls, diaries, statements, risks, nextMove } = dossier;
+    const card = document.createElement("article");
+    card.className = "dossier-card";
+
+    const header = document.createElement("div");
+    header.className = "dossier-card-header";
+    const title = document.createElement("h3");
+    title.textContent = lane.title;
+    const number = makeChip(lane.number, "priority-chip");
+    header.append(title, number);
+
+    const metrics = document.createElement("div");
+    metrics.className = "dossier-metrics";
+    for (const metric of [
+      ["Docs", documents.length],
+      ["Chronology", chronology.length],
+      ["Pulls", pulls.length],
+      ["Diary", diaries.length]
+    ]) {
+      const item = document.createElement("span");
+      item.textContent = `${metric[1]} ${metric[0]}`;
+      metrics.append(item);
+    }
+
+    const action = document.createElement("p");
+    action.className = "dossier-next";
+    action.textContent = `Next move: ${nextMove}`;
+
+    const firstReadList = makeDossierList(
+      "First Read",
+      firstReads,
+      "No item-level or released leads staged yet.",
+      (item) => `${formatDate(item.date || "date pending")}: ${item.title}`
+    );
+    const packetList = makeDossierList(
+      "Packet Or Pull",
+      pulls.length ? pulls.slice(0, 3) : packetScreens,
+      "No packet or library pull staged yet.",
+      (item) =>
+        item.oaIds
+          ? `${item.priority}: ${item.title} (${(item.oaIds || []).slice(0, 4).join(", ")})`
+          : `${item.priority || "Review"}: ${item.title}`
+    );
+    const publicList = makeDossierList(
+      "Date Controls",
+      [...diaries.filter((item) => item.priority === "High").slice(0, 2), ...statements.slice(0, 2)].slice(0, 3),
+      "No diary or public-statement date control staged yet.",
+      (item) => `${formatDate(item.date || "date pending")}: ${item.title}`
+    );
+    const riskList = makeDossierList(
+      "Risk Controls",
+      risks,
+      "No specific source risk staged.",
+      (gap) => `${gap.priority}: ${gap.title}`
+    );
+
+    card.append(header, metrics, action, firstReadList, packetList, publicList, riskList);
+    return card;
+  });
+
+  dossiersRoot.replaceChildren(...cards);
 }
 
 function setStats() {
@@ -1644,6 +1821,7 @@ renderLeads();
 renderDocuments();
 renderStatements();
 renderMilestones();
+renderChapterDossiers();
 renderGaps();
 renderLibraryPlan();
 renderDailyDiaryReferences();

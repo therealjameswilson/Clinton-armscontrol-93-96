@@ -4,7 +4,8 @@ const vm = require("vm");
 
 const repoRoot = path.resolve(__dirname, "..");
 const exportDir = path.join(repoRoot, "exports");
-const reportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
+const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
+const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
 
 const dataFiles = [
   "data/potential-documents.js",
@@ -35,6 +36,18 @@ const chapterSequence = [
   "conventional-landmines"
 ];
 
+const chapterDefinitions = [
+  { id: "ctbt", number: "Chapter 1", title: "NPT and CTBT" },
+  { id: "strategic-arms", number: "Chapter 2", title: "Strategic Arms and Nuclear Security" },
+  { id: "start-ii", number: "Chapter 3", title: "START II Ratification" },
+  { id: "ctr-heu", number: "Chapter 4", title: "Cooperative Threat Reduction and HEU Agreement" },
+  { id: "nonproliferation", number: "Chapter 5", title: "Nonproliferation Regimes" },
+  { id: "counterproliferation", number: "Chapter 6", title: "Counterproliferation" },
+  { id: "regional", number: "Chapter 7", title: "Regional Proliferation Cases" },
+  { id: "cbw-conventional", number: "Chapter 8", title: "Chemical and Biological Weapons" },
+  { id: "conventional-landmines", number: "Chapter 9", title: "Conventional Arms and Landmines" }
+];
+
 const generatedPotentialDocuments = context.window.ARMSCONTROL_POTENTIAL_DOCUMENTS || [];
 const sourceGapLeads = context.window.ARMSCONTROL_SOURCE_GAP_LEADS || [];
 const compilerGaps = context.window.ARMSCONTROL_COMPILER_GAPS || [];
@@ -60,6 +73,7 @@ const declassifiedChronology = potentialDocuments
       (b.score || 0) - (a.score || 0) ||
       a.title.localeCompare(b.title)
   );
+const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 
 fs.mkdirSync(exportDir, { recursive: true });
 
@@ -69,7 +83,9 @@ writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan
 writeCsv("presidential-daily-diary-follow-up.csv", diaryColumns(), dailyDiaryReferences.slice().sort(compareDiaryRows));
 writeCsv("compiler-risk-register.csv", gapColumns(), compilerGaps.slice().sort(compareGapRows));
 writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicStatements);
+writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
 writeReport();
+writeDossierReport();
 
 console.log(
   [
@@ -79,7 +95,9 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "presidential-daily-diary-follow-up.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-risk-register.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-public-statements.csv"))}`,
-    `Generated ${path.relative(repoRoot, reportPath)}`
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
+    `Generated ${path.relative(repoRoot, workingTablesReportPath)}`,
+    `Generated ${path.relative(repoRoot, dossierReportPath)}`
   ].join("\n")
 );
 
@@ -206,6 +224,33 @@ function statementColumns() {
   ];
 }
 
+function dossierColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("chapter_number", (row) => row.chapter.number),
+    column("chapter", (row) => row.chapter.title),
+    column("candidate_leads", (row) => row.documents.length),
+    column("declassified_chronology_leads", (row) => row.chronology.length),
+    column("first_read_count", (row) => row.firstReads.length),
+    column("packet_screen_count", (row) => row.packetScreens.length),
+    column("clinton_library_pull_count", (row) => row.pulls.length),
+    column("a_priority_pull_count", (row) => row.pulls.filter((item) => item.priority === "A").length),
+    column("diary_reference_count", (row) => row.diaries.length),
+    column("high_diary_reference_count", (row) => row.diaries.filter((item) => item.priority === "High").length),
+    column("public_statement_count", (row) => row.statements.length),
+    column("active_risk_count", (row) => row.risks.length),
+    column("next_move", (row) => row.nextMove),
+    column("first_reads", (row) => titleList(row.firstReads, documentLabel)),
+    column("packet_or_pull_leads", (row) => titleList(row.pulls.length ? row.pulls : row.packetScreens, pullOrPacketLabel)),
+    column("date_controls", (row) =>
+      titleList([...row.diaries.filter((item) => item.priority === "High"), ...row.statements], documentLabel)
+    ),
+    column("risk_controls", (row) => titleList(row.risks, (gap) => `${gap.priority}: ${gap.title}`)),
+    column("target_records", (row) => uniqueFlat(row.risks.map((gap) => gap.targetRecords))),
+    column("target_terms", (row) => uniqueFlat(row.risks.map((gap) => gap.targetTerms)))
+  ];
+}
+
 function writeReport() {
   const lines = [
     "# Compiler Working Tables",
@@ -220,14 +265,16 @@ function writeReport() {
     `- \`exports/presidential-daily-diary-follow-up.csv\`: ${dailyDiaryReferences.length} calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.`,
     `- \`exports/compiler-risk-register.csv\`: ${compilerGaps.length} source-risk controls with next actions, target records, and source pools.`,
     `- \`exports/clinton-public-statements.csv\`: ${clintonPublicStatements.length} Clinton Public Papers anchors for public chronology and speech-clearance backtracking.`,
+    `- \`exports/chapter-dossiers.csv\`: ${chapterDossiers.length} chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.`,
     "",
     "## Compiler Use",
     "",
     "1. Start with `declassified-chronology.csv` for the first read-through of available or released records.",
-    "2. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "3. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.",
-    "4. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
-    "5. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "2. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "3. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "4. Use `clinton-library-call-slips.csv` on site to request high-yield OA/ID clusters and record exact box, folder, item, markings, and pagination.",
+    "5. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
+    "6. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -236,7 +283,157 @@ function writeReport() {
     "```",
     ""
   ];
-  fs.writeFileSync(reportPath, lines.join("\n"));
+  fs.writeFileSync(workingTablesReportPath, lines.join("\n"));
+}
+
+function writeDossierReport() {
+  const lines = [
+    "# Chapter Dossiers",
+    "",
+    "Generated from the site's staged chronology, potential-document, Clinton Library, Presidential Daily Diary, public-statement, and risk-register data. Each dossier is a chapter-level launch pad rather than a final FRUS selection.",
+    "",
+    "## Use Rule",
+    "",
+    "Start each chapter from its first-read list, use packet or pull leads to get item boundaries, use diary and public-statement rows as date controls, and keep the risk controls open until the source base is strong enough for final selection.",
+    "",
+    "## Dossiers",
+    ""
+  ];
+
+  for (const dossier of chapterDossiers) {
+    lines.push(
+      `### ${dossier.chapter.number}: ${dossier.chapter.title}`,
+      "",
+      `- Candidate leads: ${dossier.documents.length}`,
+      `- Declassified chronology leads: ${dossier.chronology.length}`,
+      `- Clinton Library pull clusters: ${dossier.pulls.length}`,
+      `- Diary references: ${dossier.diaries.length}`,
+      `- Clinton public statements: ${dossier.statements.length}`,
+      `- Active risk controls: ${dossier.risks.length}`,
+      `- Next move: ${dossier.nextMove}`,
+      ""
+    );
+
+    lines.push("First reads:");
+    appendBulletList(lines, dossier.firstReads, documentLabel, "No item-level or released leads staged yet.");
+    lines.push("", "Packet or pull leads:");
+    appendBulletList(lines, dossier.pulls.length ? dossier.pulls : dossier.packetScreens, pullOrPacketLabel, "No packet or library pull staged yet.");
+    lines.push("", "Date controls:");
+    appendBulletList(
+      lines,
+      [...dossier.diaries.filter((item) => item.priority === "High"), ...dossier.statements].slice(0, 4),
+      documentLabel,
+      "No diary or public-statement date control staged yet."
+    );
+    lines.push("", "Risk controls:");
+    appendBulletList(lines, dossier.risks, (gap) => `${gap.priority}: ${gap.title}`, "No specific source risk staged.");
+    lines.push("");
+  }
+
+  fs.writeFileSync(dossierReportPath, lines.join("\n"));
+}
+
+function buildChapterDossier(chapter) {
+  const documents = potentialDocuments.filter((item) => item.chapterId === chapter.id).sort(compareDossierRows);
+  const chronology = declassifiedChronology.filter((item) => item.chapterId === chapter.id).sort(compareDossierRows);
+  const firstReads = uniqueDossierRows([...chronology, ...documents.filter(isImmediateDossierRead)])
+    .sort(compareDossierRows)
+    .slice(0, 3);
+  const packetScreens = uniqueDossierRows(documents.filter((item) => !isImmediateDossierRead(item)))
+    .sort(compareDossierRows)
+    .slice(0, 3);
+  const pulls = libraryResearchPlan
+    .filter((item) => item.chapterId === chapter.id)
+    .sort((a, b) => libraryPriorityRank(a.priority) - libraryPriorityRank(b.priority) || a.title.localeCompare(b.title));
+  const diaries = dailyDiaryReferences
+    .filter((item) => item.chapterId === chapter.id)
+    .sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority) || chronologySortKey(a.date).localeCompare(chronologySortKey(b.date)));
+  const statements = clintonPublicStatements
+    .filter((item) => item.chapterId === chapter.id)
+    .sort(compareByDateThenTitle);
+  const specificRisks = compilerGaps.filter((gap) => gapMatchesChapter(gap, chapter));
+  const globalRisks = compilerGaps.filter((gap) =>
+    ["gap-source-base-diversity", "gap-nara-file-unit-quality", "gap-public-statements-as-locators"].includes(gap.id)
+  );
+  const risks = uniqueDossierRows([...specificRisks.sort(compareGapRows), ...globalRisks.sort(compareGapRows)]).slice(0, 3);
+  const nextMove =
+    specificRisks.sort(compareGapRows)[0]?.nextActions?.[0] ||
+    pulls[0]?.onsiteActions?.[0] ||
+    (packetScreens[0] ? `Screen packet lead: ${packetScreens[0].title}` : "") ||
+    (firstReads[0] ? `Close-read: ${firstReads[0].title}` : "Hold for additional source discovery.");
+
+  return { chapter, documents, chronology, firstReads, packetScreens, pulls, diaries, statements, risks, nextMove };
+}
+
+function compareDossierRows(a, b) {
+  return (
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
+    (b.score || 0) - (a.score || 0) ||
+    a.title.localeCompare(b.title)
+  );
+}
+
+function isImmediateDossierRead(item) {
+  const level = `${item.level || ""}`.toLowerCase();
+  const type = `${item.sourceType || ""}`.toLowerCase();
+  return level.includes("item-level review copy") || level.includes("published primary source") || type.includes("directive");
+}
+
+function uniqueDossierRows(rows) {
+  const seen = new Set();
+  return rows.filter((row) => {
+    const key = [row.date, row.title, row.identifier || row.id || row.naid || row.sourceUrl || ""].join("|");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function gapMatchesChapter(gap, chapter) {
+  const blob = [gap.id, gap.lane, gap.title, gap.needed, ...(gap.targetTerms || [])]
+    .join(" ")
+    .toLowerCase();
+  const aliases = {
+    ctbt: ["npt", "ctbt", "test ban"],
+    "strategic-arms": ["strategic", "nuclear security", "missile systems"],
+    "start-ii": ["start ii", "start-ii", "duma"],
+    "ctr-heu": ["ctr", "heu", "nunn-lugar", "cooperative threat reduction"],
+    nonproliferation: ["nonproliferation regime", "mtcr", "fissile", "nuclear smuggling"],
+    counterproliferation: ["counterproliferation", "pdd-18", "wmd planning"],
+    regional: ["regional", "north korea", "iran", "iraq", "china", "south asia"],
+    "cbw-conventional": ["cbw", "cwc", "bwc", "chemical weapons", "chemical and biological", "elisa harris", "australia group"],
+    "conventional-landmines": ["conventional", "landmine", "ccw", "arms transfer"]
+  };
+  return (aliases[chapter.id] || [chapter.title.toLowerCase()]).some((term) => blob.includes(term));
+}
+
+function documentLabel(item) {
+  return `${item.date || "date pending"}: ${item.title}`;
+}
+
+function pullOrPacketLabel(item) {
+  if (item.oaIds) {
+    const ids = (item.oaIds || []).slice(0, 4).join(", ");
+    return `${item.priority || "Review"}: ${item.title}${ids ? ` (${ids})` : ""}`;
+  }
+  return `${item.priority || "Review"}: ${item.title}`;
+}
+
+function titleList(rows, mapper, limit = 4) {
+  return rows.slice(0, limit).map(mapper);
+}
+
+function uniqueFlat(groups) {
+  return [...new Set(groups.flat().filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function appendBulletList(lines, rows, mapper, emptyText) {
+  if (!rows.length) {
+    lines.push(`- ${emptyText}`);
+    return;
+  }
+  for (const row of rows) lines.push(`- ${mapper(row)}`);
 }
 
 function column(label, value) {
@@ -280,7 +477,7 @@ function compareGapRows(a, b) {
 }
 
 function priorityRank(priority) {
-  return { Critical: 0, High: 1, Medium: 2, Low: 3, Review: 4 }[priority] ?? 5;
+  return { Critical: 0, High: 1, A: 1, Medium: 2, B: 2, Low: 3, C: 3, Review: 4, Control: 4 }[priority] ?? 5;
 }
 
 function libraryPriorityRank(priority) {

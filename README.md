@@ -11,6 +11,7 @@ currently lists the volume as planned rather than published. It gathers:
 - an opening chronology of dated released or declassified document leads
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
 - CSV working tables for sorting potential documents, chronology items, archive pulls, diary follow-up, public statements, and source risks
+- chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
 - NARA Catalog collection and series leads
 - Clinton Library finding aids for NPT/CTBT and speechwriting/source context
@@ -38,6 +39,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
 - `reports/declassified-document-chronology.md`: dated released/declassified leads promoted to the first page section
 - `reports/compiler-working-tables.md`: explanation of the CSV exports and suggested compiler workflow
+- `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
 - `reports/frus-source-note-audit.md`: check of source-note formatting against FRUS conventions
@@ -110,14 +112,23 @@ need item screening, which Clinton Library folders to pull first, and which
 source-risk controls must stay visible before a sequence is treated as
 compiler-ready.
 
+## Chapter dossiers
+
+The fourth compiler-facing section is a chapter dossier board. It gives each
+provisional chapter one card with first-read leads, packet or Clinton Library
+pulls, Presidential Daily Diary/Public Papers date controls, source risks, and a
+single next move. The matching `exports/chapter-dossiers.csv` and
+`reports/chapter-dossiers.md` files are regenerated from the same staged data as
+the page.
+
 ## Compiler working tables
 
 The third section links generated CSV packets for offline use: the full
 potential-document triage sheet, the declassified chronology, Clinton Library
-call-slip clusters, Presidential Daily Diary follow-up, the risk register, and
-Clinton public statements. The tables are regenerated from the same staged data
-files as the page, so a compiler can sort and annotate them without creating a
-separate hand-maintained index.
+call-slip clusters, Presidential Daily Diary follow-up, the risk register,
+Clinton public statements, and chapter dossiers. The tables are regenerated from
+the same staged data files as the page, so a compiler can sort and annotate them
+without creating a separate hand-maintained index.
 
 ## Compiler-risk pass
 
