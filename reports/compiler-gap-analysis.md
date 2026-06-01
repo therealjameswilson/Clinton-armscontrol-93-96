@@ -22,7 +22,7 @@ Generated for the public FRUS 1993-2000, Volume VII source map.
 | CBW underdeveloped | Addressed | CWC Treaty Document 103-21, Senate Executive Report 104-33, Elisa Harris CWC files, BWC review-conference locator, Clinton-Yeltsin CW/BW memcon |
 | Regional chapter North Korea-heavy | Addressed with balancing leads | North Korea MDR packets retained; added Iran, China, and South Asia source paths |
 | Conventional arms/landmines placeholder | Addressed | PDD/NSC-34, PDD/NSC-48 source path, White House landmine-control fact sheet, Congressional Record landmine debate, CCW Executive Report 104-1 |
-| Public statements overframing | Addressed in UI | Public statements now sit beside confidence/risk metadata and internal-source pull lists |
+| Public statements overframing | Addressed with backtrace queue | Public statements now sit beside confidence/risk metadata, internal-source pull lists, and `exports/public-statement-backtrace-queue.csv` counterpart-search rows |
 
 ## Remaining risks
 
@@ -30,6 +30,7 @@ Generated for the public FRUS 1993-2000, Volume VII source map.
 - Some Congress.gov pre-1995 treaty pages provide authoritative metadata and action trails but not full document text.
 - The DCI counterproliferation lead currently uses a non-official mirror as a locator and should be replaced before final use.
 - The NARA Scout generated data still contains cached, undated file-unit rows from the earlier API-limited run. These now have a dedicated resolution worksheet but still require Catalog child-item or on-site verification.
+- Clinton public statements still need internal counterparts unless the statement text itself is deliberately selected; the backtrace queue stages the counterpart search but does not complete it.
 
 ## Next pull list
 

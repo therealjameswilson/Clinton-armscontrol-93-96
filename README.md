@@ -13,6 +13,7 @@ currently lists the volume as planned rather than published. It gathers:
 - a selection-readiness queue that assigns every potential-document lead to an immediate verification action
 - a FRUS selection capture worksheet for final document decisions, citation fields, and source-note completion
 - a NARA file-unit resolver that isolates Scout hits needing item-boundary verification
+- a public-statement backtrace queue that pairs Clinton statements with internal-counterpart search paths
 - CSV working tables for sorting potential documents, chronology items, archive pulls, OA/ID requests, diary follow-up, public statements, and source risks
 - chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
@@ -46,6 +47,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/selection-readiness-queue.md`: generated readiness gates and verification fields for every staged document lead
 - `reports/frus-selection-capture-worksheet.md`: generated capture guide for final selection and source-note fields
 - `reports/nara-file-unit-resolution-queue.md`: generated resolver for NARA Scout/file-unit leads
+- `reports/public-statement-backtrace-queue.md`: generated queue for pairing public statements with internal records
 - `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
@@ -145,7 +147,7 @@ potential-document triage sheet, the selection-readiness queue, the FRUS
 selection capture worksheet, the NARA file-unit resolver, the declassified
 chronology, Clinton Library call-slip clusters, the exploded Clinton Library
 OA/ID request queue, Presidential Daily Diary follow-up, the risk register,
-Clinton public statements, and chapter
+Clinton public statements, the public-statement backtrace queue, and chapter
 dossiers. The tables are regenerated from the same staged data files as the
 page, so a compiler can sort and annotate them without creating a separate
 hand-maintained index.
@@ -163,6 +165,12 @@ NAID, Catalog URL, chapter, current source note, first action, and blank fields
 for child item URL, box/folder path, item title/date, author/recipient,
 classification markings, page range, digital-object status, replacement
 candidate, disposition, final source note, and compiler notes.
+
+The generated `exports/public-statement-backtrace-queue.csv` keeps the 15
+Clinton Public Papers anchors from overframing the volume. Each row lists likely
+internal record types, nearest diary controls, Clinton Library pull clusters,
+related candidate leads, target terms, and blank fields for the internal
+counterpart that should carry the substantive FRUS sequence.
 
 ## Compiler-risk pass
 
@@ -184,7 +192,8 @@ notes and prose summaries are converted on the page into source notes that
 flag file-unit, packet, collection, and source-path leads as pending item-level
 verification. The selection capture worksheet gives those generated notes a
 place to become final FRUS source notes only after the compiler verifies the
-item-level fields.
+item-level fields, and the public-statement backtrace queue keeps published
+statements paired with internal records before final sequencing.
 
 ## Presidential Daily Diary pass
 

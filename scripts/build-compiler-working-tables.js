@@ -9,6 +9,7 @@ const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
 const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
 const selectionCaptureReportPath = path.join(repoRoot, "reports", "frus-selection-capture-worksheet.md");
 const naraFileUnitReportPath = path.join(repoRoot, "reports", "nara-file-unit-resolution-queue.md");
+const publicBacktraceReportPath = path.join(repoRoot, "reports", "public-statement-backtrace-queue.md");
 const libraryRequestReportPath = path.join(repoRoot, "reports", "clinton-library-oaid-request-queue.md");
 
 const dataFiles = [
@@ -85,6 +86,7 @@ const selectionCaptureWorksheet = selectionReadinessQueue.map((item) => ({
   selectionGate: classifySelectionGate(item)
 }));
 const naraFileUnitResolutionQueue = potentialDocuments.filter(isNaraFileUnitLead).sort(compareNaraFileUnitRows);
+const publicStatementBacktraceQueue = clintonPublicStatements.map(buildPublicBacktraceRow).sort(comparePublicBacktraceRows);
 const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows).sort(compareLibraryRequestRows);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 
@@ -95,6 +97,7 @@ writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadiness
 writeCsv("frus-selection-capture-worksheet.csv", selectionCaptureColumns(), selectionCaptureWorksheet);
 writeCsv("nara-file-unit-resolution-queue.csv", naraFileUnitColumns(), naraFileUnitResolutionQueue);
 writeCsv("declassified-chronology.csv", chronologyColumns(), declassifiedChronology);
+writeCsv("public-statement-backtrace-queue.csv", publicBacktraceColumns(), publicStatementBacktraceQueue);
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
 writeCsv("clinton-library-oaid-request-queue.csv", libraryRequestColumns(), libraryRequestQueue);
 writeCsv("presidential-daily-diary-follow-up.csv", diaryColumns(), dailyDiaryReferences.slice().sort(compareDiaryRows));
@@ -106,6 +109,7 @@ writeDossierReport();
 writeReadinessReport();
 writeSelectionCaptureReport();
 writeNaraFileUnitReport();
+writePublicBacktraceReport();
 writeLibraryRequestReport();
 
 console.log(
@@ -115,6 +119,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "frus-selection-capture-worksheet.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "nara-file-unit-resolution-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "declassified-chronology.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "public-statement-backtrace-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-oaid-request-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "presidential-daily-diary-follow-up.csv"))}`,
@@ -126,6 +131,7 @@ console.log(
     `Generated ${path.relative(repoRoot, readinessReportPath)}`,
     `Generated ${path.relative(repoRoot, selectionCaptureReportPath)}`,
     `Generated ${path.relative(repoRoot, naraFileUnitReportPath)}`,
+    `Generated ${path.relative(repoRoot, publicBacktraceReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestReportPath)}`
   ].join("\n")
 );
@@ -266,6 +272,39 @@ function naraFileUnitColumns() {
     column("replacement_candidate_date", () => ""),
     column("disposition", () => ""),
     column("final_source_note", () => ""),
+    column("compiler_notes", () => "")
+  ];
+}
+
+function publicBacktraceColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("date", (row) => row.date),
+    column("chapter", (row) => row.chapterTitle || row.chapterId),
+    column("priority", (row) => row.priority),
+    column("public_anchor_title", (row) => row.title),
+    column("identifier", (row) => row.identifier),
+    column("pages", (row) => row.pages),
+    column("source_url", (row) => row.sourceUrl),
+    column("digital_object_url", (row) => row.digitalObjectUrl),
+    column("source_note", (row) => formatFrusSourceNote(row)),
+    column("public_claim_or_use", (row) => row.summary || row.sourceNote),
+    column("internal_counterpart_needed", () => "Yes: use as locator until paired with internal policy, clearance, negotiation, implementation, telcon, memcon, PC/DC, or agency record."),
+    column("likely_internal_record_types", (row) => likelyInternalRecordTypes(row)),
+    column("backtrace_action", (row) => row.backtraceAction),
+    column("nearest_diary_controls", (row) => titleList(row.nearestDiaries, diaryBacktraceLabel, 3)),
+    column("clinton_library_pull_clusters", (row) => titleList(row.libraryPulls, pullOrPacketLabel, 3)),
+    column("related_candidate_leads", (row) => titleList(row.relatedCandidates, documentLabel, 4)),
+    column("target_terms", (row) => row.targetTerms),
+    column("capture_internal_counterpart_title", () => ""),
+    column("capture_internal_counterpart_date", () => ""),
+    column("capture_source_path", () => ""),
+    column("capture_record_type", () => ""),
+    column("capture_author_recipient", () => ""),
+    column("capture_classification_markings", () => ""),
+    column("capture_page_range", () => ""),
+    column("capture_relationship_to_public_statement", () => ""),
+    column("disposition", () => ""),
     column("compiler_notes", () => "")
   ];
 }
@@ -434,6 +473,7 @@ function writeReport() {
     `- \`exports/frus-selection-capture-worksheet.csv\`: ${selectionCaptureWorksheet.length} staged leads with final-selection, citation, document-description, and source-note capture fields.`,
     `- \`exports/nara-file-unit-resolution-queue.csv\`: ${naraFileUnitResolutionQueue.length} NARA Scout or file-unit leads isolated for item-boundary resolution.`,
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
+    `- \`exports/public-statement-backtrace-queue.csv\`: ${publicStatementBacktraceQueue.length} Clinton public statements paired with internal-counterpart search paths.`,
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
     `- \`exports/clinton-library-oaid-request-queue.csv\`: ${libraryRequestQueue.length} exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.`,
     `- \`exports/presidential-daily-diary-follow-up.csv\`: ${dailyDiaryReferences.length} calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.`,
@@ -449,9 +489,10 @@ function writeReport() {
     "4. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
     "5. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
     "6. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "7. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
-    "8. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
-    "9. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "7. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
+    "8. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
+    "9. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
+    "10. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -632,6 +673,42 @@ function writeNaraFileUnitReport() {
   fs.writeFileSync(naraFileUnitReportPath, lines.join("\n"));
 }
 
+function writePublicBacktraceReport() {
+  const chapters = [...new Set(publicStatementBacktraceQueue.map((item) => item.chapterTitle || item.chapterId))];
+  const lines = [
+    "# Public Statement Backtrace Queue",
+    "",
+    "Generated from the Clinton Public Papers statement index. This report treats public statements as locators and pairs each one with the nearest diary controls, Clinton Library pull clusters, candidate document leads, and blank fields for the internal counterpart that should carry the FRUS sequence.",
+    "",
+    "## Use Rule",
+    "",
+    "Do not let a public statement stand alone for internal policy substance unless the compiler deliberately selects the statement text. Backtrace each public anchor to a memcon, telcon, decision memorandum, clearance file, treaty file, PC/DC record, cable, or agency implementation record.",
+    "",
+    "## Queue Counts",
+    "",
+    `- Public statement anchors: ${publicStatementBacktraceQueue.length}`,
+    `- With diary controls: ${publicStatementBacktraceQueue.filter((item) => item.nearestDiaries.length).length}`,
+    `- With Clinton Library pulls: ${publicStatementBacktraceQueue.filter((item) => item.libraryPulls.length).length}`,
+    "",
+    "## By Chapter",
+    ""
+  ];
+
+  for (const chapter of chapters) {
+    const rows = publicStatementBacktraceQueue.filter((item) => (item.chapterTitle || item.chapterId) === chapter);
+    lines.push(`### ${chapter}`, "", `- Public anchors: ${rows.length}`, "", "Rows:");
+    appendBulletList(
+      lines,
+      rows,
+      (item) => `${item.date || "date pending"} / ${item.title} / Backtrace: ${item.backtraceAction}`,
+      "No public statements staged."
+    );
+    lines.push("");
+  }
+
+  fs.writeFileSync(publicBacktraceReportPath, lines.join("\n"));
+}
+
 function writeLibraryRequestReport() {
   const visitDays = [...new Set(libraryRequestQueue.map((item) => item.visitDay))].sort(
     (a, b) => libraryVisitDayRank(a) - libraryVisitDayRank(b)
@@ -790,6 +867,132 @@ function naraDisplayIdentifier(item) {
   return normalizeIdentifier(item.identifier) || "identifier pending";
 }
 
+function buildPublicBacktraceRow(statement) {
+  const nearestDiaries = dailyDiaryReferences
+    .filter((item) => item.chapterId === statement.chapterId && dateDistanceDays(statement.date, item.date) <= 180)
+    .sort((a, b) => compareBacktraceMatches(statement, a, b))
+    .slice(0, 3);
+  const libraryPulls = libraryResearchPlan
+    .filter((item) => item.chapterId === statement.chapterId)
+    .sort((a, b) => compareBacktraceMatches(statement, a, b))
+    .slice(0, 3);
+  const relatedCandidates = potentialDocuments
+    .filter((item) => item.chapterId === statement.chapterId && item.sourceType !== "Public Papers" && item.title !== statement.title)
+    .sort((a, b) => compareBacktraceMatches(statement, a, b))
+    .slice(0, 4);
+  const targetTerms = publicBacktraceTargetTerms(statement);
+  const backtraceAction = publicBacktraceAction(statement, nearestDiaries, libraryPulls, relatedCandidates);
+
+  return { ...statement, nearestDiaries, libraryPulls, relatedCandidates, targetTerms, backtraceAction };
+}
+
+function publicBacktraceAction(statement, nearestDiaries, libraryPulls, relatedCandidates) {
+  const diary = nearestDiaries[0] ? `check diary control "${nearestDiaries[0].title}"` : "";
+  const pull = libraryPulls[0] ? `pull "${libraryPulls[0].title}"` : "";
+  const candidate = relatedCandidates[0] ? `screen "${relatedCandidates[0].title}"` : "";
+  const actions = [diary, pull, candidate].filter(Boolean);
+  if (actions.length) return `${actions.join("; ")}; record the internal counterpart before using "${statement.title}" as sequence evidence.`;
+  return `Search internal files for ${targetPhrase(statement)} before using "${statement.title}" as sequence evidence.`;
+}
+
+function publicBacktraceTargetTerms(statement) {
+  const genericTerms = new Set([
+    `${statement.chapterTitle || ""}`.toLowerCase(),
+    `${statement.chapterId || ""}`.toLowerCase(),
+    "public papers",
+    "clinton statement"
+  ]);
+  return [...new Set([...(statement.topics || []), ...titleKeywords(statement.title)])]
+    .filter((term) => {
+      const normalized = String(term).toLowerCase();
+      return normalized && !normalized.startsWith("pp.") && !genericTerms.has(normalized);
+    })
+    .slice(0, 12);
+}
+
+function titleKeywords(title = "") {
+  const stopwords = new Set([
+    "with",
+    "from",
+    "that",
+    "this",
+    "and",
+    "the",
+    "statement",
+    "remarks",
+    "joint",
+    "exchange",
+    "reporters",
+    "president",
+    "united",
+    "states"
+  ]);
+  return String(title)
+    .replace(/[^A-Za-z0-9\s-]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 3 && !stopwords.has(word.toLowerCase()))
+    .slice(0, 8);
+}
+
+function targetPhrase(statement) {
+  const terms = publicBacktraceTargetTerms(statement);
+  return terms.length ? terms.slice(0, 5).join(", ") : statement.chapterTitle || statement.chapterId || "internal counterpart records";
+}
+
+function likelyInternalRecordTypes(statement) {
+  const typesByChapter = {
+    ctbt: ["NSC/ACDA negotiation record", "State or ACDA cable", "PRD/PDD policy file", "speech or statement clearance"],
+    "strategic-arms": ["summit memcon", "joint-statement clearance file", "NSC Russia arms-control file", "State cable"],
+    "start-ii": ["telcon or memcon", "Senate ratification file", "Robert Bell arms-control file", "Duma/ABM implementation note"],
+    "ctr-heu": ["leader memcon", "DOE/USEC/Minatom implementation file", "Nunn-Lugar certification record", "NSC Ukraine/Russia file"],
+    nonproliferation: ["summit memcon", "State/ACDA nonproliferation file", "treaty or export-control clearance", "agency implementation record"],
+    counterproliferation: ["DOD/NSC initiative paper", "PDD/NSC file", "JCS or IC threat-assessment record", "speech clearance"],
+    regional: ["telcon or memcon", "PC/DC meeting record", "NSC regional policy file", "State cable"],
+    "cbw-conventional": ["CWC/BWC treaty file", "ACDA/State ratification strategy", "NSC staff file", "Senate or legal implementation record"],
+    "conventional-landmines": ["PDD/NSC policy file", "NSC landmine working paper", "DOD/State implementation record", "speech or fact-sheet clearance"]
+  };
+  return typesByChapter[statement.chapterId] || ["internal policy file", "clearance record", "meeting record", "agency implementation record"];
+}
+
+function diaryBacktraceLabel(item) {
+  return `${item.date || "date pending"}: ${item.title}`;
+}
+
+function compareBacktraceMatches(statement, a, b) {
+  const terms = publicBacktraceTargetTerms(statement);
+  return (
+    backtraceOverlapScore(terms, b) - backtraceOverlapScore(terms, a) ||
+    dateDistanceDays(statement.date, a.date) - dateDistanceDays(statement.date, b.date) ||
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    libraryPriorityRank(a.priority) - libraryPriorityRank(b.priority) ||
+    (a.title || "").localeCompare(b.title || "")
+  );
+}
+
+function backtraceOverlapScore(terms, row) {
+  const strongText = [row.title, ...(row.targetTerms || []), ...(row.topics || [])]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const contextText = [
+    row.title,
+    row.chapterTitle,
+    row.visitGoal,
+    row.whyItMatters,
+    row.relevance,
+    row.summary,
+    ...(row.targetTerms || []),
+    ...(row.topics || [])
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return terms.reduce((score, term) => {
+    const normalized = String(term).toLowerCase();
+    return score + (strongText.includes(normalized) ? 3 : 0) + (contextText.includes(normalized) ? 1 : 0);
+  }, 0);
+}
+
 function classifySelectionReadiness(item) {
   const level = `${item.level || ""}`.toLowerCase();
   const type = `${item.sourceType || ""}`.toLowerCase();
@@ -911,6 +1114,15 @@ function compareNaraFileUnitRows(a, b) {
     priorityRank(a.priority) - priorityRank(b.priority) ||
     chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
     requestIdentifierRank(a.naid || a.identifier) - requestIdentifierRank(b.naid || b.identifier) ||
+    a.title.localeCompare(b.title)
+  );
+}
+
+function comparePublicBacktraceRows(a, b) {
+  return (
+    chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
+    chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
+    priorityRank(a.priority) - priorityRank(b.priority) ||
     a.title.localeCompare(b.title)
   );
 }
@@ -1040,6 +1252,13 @@ function normalizeIdentifier(value) {
 
 function compareByDateThenTitle(a, b) {
   return `${a.date || "9999"}`.localeCompare(`${b.date || "9999"}`) || a.title.localeCompare(b.title);
+}
+
+function dateDistanceDays(a, b) {
+  const aTime = Date.parse(a || "");
+  const bTime = Date.parse(b || "");
+  if (Number.isNaN(aTime) || Number.isNaN(bTime)) return 999999;
+  return Math.abs(aTime - bTime) / 86400000;
 }
 
 function compareDiaryRows(a, b) {
