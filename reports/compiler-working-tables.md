@@ -11,6 +11,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 - `exports/declassified-chronology.csv`: 13 dated released/declassified archival leads promoted to the first page section.
 - `exports/public-statement-backtrace-queue.csv`: 15 Clinton public statements paired with internal-counterpart search paths.
 - `exports/clinton-library-call-slips.csv`: 13 Clinton Library pull clusters from the 2013-0185-M folder-title lists.
+- `exports/clinton-library-request-packets.csv`: 83 de-duplicated Clinton Library request packets for reading-room call slips.
 - `exports/clinton-library-oaid-request-queue.csv`: 99 exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.
 - `exports/presidential-daily-diary-follow-up.csv`: 22 calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.
 - `exports/daily-diary-counterpart-queue.csv`: 22 diary events converted into substantive-counterpart searches and capture fields.
@@ -29,7 +30,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 6. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
 7. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
 8. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.
-9. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.
+9. Use `clinton-library-call-slips.csv` for pull-cluster strategy, `clinton-library-request-packets.csv` for de-duplicated reading-room requests, then `clinton-library-oaid-request-queue.csv` for item-level capture.
 10. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.
 11. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 

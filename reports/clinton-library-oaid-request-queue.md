@@ -4,7 +4,7 @@ Generated from the 2013-0185-M folder-title research plan. This report explodes 
 
 ## Use Rule
 
-Use the CSV as an on-site worksheet. Request folders from the Day 1 rows first, then fill the blank capture columns for exact folder title, box or container, item title, date, sender/recipient, document type, classification markings, page range, attachments, withdrawal notes, volume boundary, disposition, and final source note.
+Use `clinton-library-request-packets.csv` for de-duplicated reading-room call slips, then use this CSV as the on-site item-review worksheet. Request folders from the Day 1 packet rows first, then fill the blank capture columns here for exact folder title, box or container, item title, date, sender/recipient, document type, classification markings, page range, attachments, withdrawal notes, volume boundary, disposition, and final source note.
 
 ## Queue Counts
 

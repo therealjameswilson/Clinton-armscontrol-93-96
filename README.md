@@ -27,6 +27,7 @@ currently lists the volume as planned rather than published. It gathers:
 - Presidential Daily Diary call and meeting references from the 2010-0083-F hardcopy scans and Clinton Library foreign-leader index
 - structured compiler-risk gaps with pull lists and verification actions
 - a Clinton Library on-site research plan built from the local `2013-0185-M` folder-title PDFs
+- a de-duplicated Clinton Library request packet list for reading-room call slips
 - an exploded Clinton Library OA/ID request queue with item-level capture columns for on-site review
 - a dedicated Clinton Public Papers statement index for arms-control and nonproliferation items
 
@@ -55,6 +56,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/chapter-readiness-scorecard.md`: generated per-chapter triage scorecard for launch status and blockers
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
+- `reports/clinton-library-request-packets.md`: generated de-duplicated reading-room request packets
 - `reports/clinton-library-oaid-request-queue.md`: generated request-slip queue from the Clinton Library OA/ID clusters
 - `reports/frus-source-note-audit.md`: check of source-note formatting against FRUS conventions
 - `reports/presidential-daily-diary-references.md`: diary search method and calls/meetings added to the page
@@ -157,12 +159,12 @@ The tables section links generated CSV packets for offline use: the full
 potential-document triage sheet, the selection-readiness queue, the FRUS
 selection capture worksheet, the NARA file-unit resolver, the declassified
 chronology, Clinton Library call-slip clusters, the exploded Clinton Library
-OA/ID request queue, Presidential Daily Diary follow-up, the Daily Diary
-counterpart queue, the risk register, Clinton public statements, the
-public-statement backtrace queue, the chapter readiness scorecard, and chapter
-dossiers. The tables are regenerated from the same staged data files as the
-page, so a compiler can sort and annotate them without creating a separate
-hand-maintained index.
+request packets, the exploded Clinton Library OA/ID request queue,
+Presidential Daily Diary follow-up, the Daily Diary counterpart queue, the risk
+register, Clinton public statements, the public-statement backtrace queue, the
+chapter readiness scorecard, and chapter dossiers. The tables are regenerated
+from the same staged data files as the page, so a compiler can sort and annotate
+them without creating a separate hand-maintained index.
 
 The generated `exports/frus-selection-capture-worksheet.csv` is the compilation
 handoff sheet. It preserves the current lead, readiness queue, action, required
@@ -235,9 +237,14 @@ counterproliferation intelligence files, landmines, and Legal Advisor treaty
 folders. Speechwriting folders are staged as public-statement backtrace
 material after policy files are reviewed.
 
-The generated `exports/clinton-library-oaid-request-queue.csv` explodes those
-clusters into one row per staged OA/ID or folder-list control reference. Its
-blank capture columns are meant for the archive table: exact folder title, box
-or container, item title, date, sender/recipient, document type,
-classification markings, page range, attachments, withdrawal/redaction notes,
-volume boundary, disposition, and final source note.
+The generated `exports/clinton-library-request-packets.csv` collapses those
+clusters into one row per unique OA/ID or folder-list control reference. It
+preserves every chapter rationale and related request wave, so a researcher can
+request shared identifiers once and still capture all uses.
+
+The generated `exports/clinton-library-oaid-request-queue.csv` remains the
+expanded item-review sheet. Its blank capture columns are meant for the archive
+table: exact folder title, box or container, item title, date,
+sender/recipient, document type, classification markings, page range,
+attachments, withdrawal/redaction notes, volume boundary, disposition, and
+final source note.

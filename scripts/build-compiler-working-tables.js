@@ -12,6 +12,7 @@ const selectionCaptureReportPath = path.join(repoRoot, "reports", "frus-selectio
 const naraFileUnitReportPath = path.join(repoRoot, "reports", "nara-file-unit-resolution-queue.md");
 const publicBacktraceReportPath = path.join(repoRoot, "reports", "public-statement-backtrace-queue.md");
 const diaryCounterpartReportPath = path.join(repoRoot, "reports", "daily-diary-counterpart-queue.md");
+const libraryRequestPacketReportPath = path.join(repoRoot, "reports", "clinton-library-request-packets.md");
 const libraryRequestReportPath = path.join(repoRoot, "reports", "clinton-library-oaid-request-queue.md");
 
 const dataFiles = [
@@ -91,6 +92,7 @@ const naraFileUnitResolutionQueue = potentialDocuments.filter(isNaraFileUnitLead
 const publicStatementBacktraceQueue = clintonPublicStatements.map(buildPublicBacktraceRow).sort(comparePublicBacktraceRows);
 const dailyDiaryCounterpartQueue = dailyDiaryReferences.map(buildDiaryCounterpartRow).sort(compareDiaryCounterpartRows);
 const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows).sort(compareLibraryRequestRows);
+const libraryRequestPackets = buildLibraryRequestPackets(libraryRequestQueue);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 const chapterReadinessScorecard = chapterDefinitions.map(buildChapterReadinessRow);
 
@@ -104,6 +106,7 @@ writeCsv("declassified-chronology.csv", chronologyColumns(), declassifiedChronol
 writeCsv("public-statement-backtrace-queue.csv", publicBacktraceColumns(), publicStatementBacktraceQueue);
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
 writeCsv("clinton-library-oaid-request-queue.csv", libraryRequestColumns(), libraryRequestQueue);
+writeCsv("clinton-library-request-packets.csv", libraryRequestPacketColumns(), libraryRequestPackets);
 writeCsv("presidential-daily-diary-follow-up.csv", diaryColumns(), dailyDiaryReferences.slice().sort(compareDiaryRows));
 writeCsv("daily-diary-counterpart-queue.csv", diaryCounterpartColumns(), dailyDiaryCounterpartQueue);
 writeCsv("compiler-risk-register.csv", gapColumns(), compilerGaps.slice().sort(compareGapRows));
@@ -118,6 +121,7 @@ writeSelectionCaptureReport();
 writeNaraFileUnitReport();
 writePublicBacktraceReport();
 writeDiaryCounterpartReport();
+writeLibraryRequestPacketReport();
 writeLibraryRequestReport();
 
 console.log(
@@ -130,6 +134,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "public-statement-backtrace-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-oaid-request-queue.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-request-packets.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "presidential-daily-diary-follow-up.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "daily-diary-counterpart-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-risk-register.csv"))}`,
@@ -144,6 +149,7 @@ console.log(
     `Generated ${path.relative(repoRoot, naraFileUnitReportPath)}`,
     `Generated ${path.relative(repoRoot, publicBacktraceReportPath)}`,
     `Generated ${path.relative(repoRoot, diaryCounterpartReportPath)}`,
+    `Generated ${path.relative(repoRoot, libraryRequestPacketReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestReportPath)}`
   ].join("\n")
 );
@@ -392,6 +398,45 @@ function libraryRequestColumns() {
   ];
 }
 
+function libraryRequestPacketColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("visit_day", (row) => row.visitDay),
+    column("packet_wave", (row) => row.packetWave),
+    column("priority", (row) => row.priority),
+    column("request_identifier", (row) => row.requestIdentifier),
+    column("request_type", (row) => row.requestType),
+    column("duplicate_rows_collapsed", (row) => row.duplicateRowsCollapsed),
+    column("chapters", (row) => row.chapters),
+    column("cluster_titles", (row) => row.clusterTitles),
+    column("source_parts", (row) => row.sourceParts),
+    column("offices", (row) => row.offices),
+    column("related_request_waves", (row) => row.relatedRequestWaves),
+    column("request_reason", (row) => row.requestReason),
+    column("first_onsite_action", (row) => row.firstOnsiteAction),
+    column("onsite_actions", (row) => row.onsiteActions),
+    column("target_terms", (row) => row.targetTerms),
+    column("combined_why_it_matters", (row) => row.combinedWhyItMatters),
+    column("dedupe_note", (row) => row.dedupeNote),
+    column("capture_exact_folder_title", () => ""),
+    column("capture_box_or_container", () => ""),
+    column("capture_folder_date_span", () => ""),
+    column("capture_withdrawal_sheet", () => ""),
+    column("capture_item_title", () => ""),
+    column("capture_item_date", () => ""),
+    column("capture_sender_recipient", () => ""),
+    column("capture_document_type", () => ""),
+    column("capture_classification_markings", () => ""),
+    column("capture_page_range", () => ""),
+    column("capture_attachments", () => ""),
+    column("capture_volume_boundary", () => ""),
+    column("candidate_disposition", () => ""),
+    column("final_source_note", () => ""),
+    column("compiler_notes", () => ""),
+    column("packet_source_note", (row) => formatLibraryPacketSourceNote(row))
+  ];
+}
+
 function diaryColumns() {
   return [
     column("sequence", (_row, index) => index + 1),
@@ -556,6 +601,7 @@ function writeReport() {
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/public-statement-backtrace-queue.csv\`: ${publicStatementBacktraceQueue.length} Clinton public statements paired with internal-counterpart search paths.`,
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
+    `- \`exports/clinton-library-request-packets.csv\`: ${libraryRequestPackets.length} de-duplicated Clinton Library request packets for reading-room call slips.`,
     `- \`exports/clinton-library-oaid-request-queue.csv\`: ${libraryRequestQueue.length} exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.`,
     `- \`exports/presidential-daily-diary-follow-up.csv\`: ${dailyDiaryReferences.length} calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.`,
     `- \`exports/daily-diary-counterpart-queue.csv\`: ${dailyDiaryCounterpartQueue.length} diary events converted into substantive-counterpart searches and capture fields.`,
@@ -574,7 +620,7 @@ function writeReport() {
     "6. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
     "7. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
     "8. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
-    "9. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
+    "9. Use `clinton-library-call-slips.csv` for pull-cluster strategy, `clinton-library-request-packets.csv` for de-duplicated reading-room requests, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
     "10. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
     "11. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
@@ -893,6 +939,67 @@ function writeDiaryCounterpartReport() {
   fs.writeFileSync(diaryCounterpartReportPath, lines.join("\n"));
 }
 
+function writeLibraryRequestPacketReport() {
+  const visitDays = [...new Set(libraryRequestPackets.map((item) => item.visitDay))].sort(
+    (a, b) => libraryVisitDayRank(a) - libraryVisitDayRank(b)
+  );
+  const duplicatedPackets = libraryRequestPackets.filter((item) => item.duplicateRowsCollapsed > 1);
+  const lines = [
+    "# Clinton Library Request Packets",
+    "",
+    "Generated from the exploded OA/ID request queue. This report collapses duplicate request identifiers so the compiler can request each OA/ID or folder-list control once while preserving every chapter rationale attached to it.",
+    "",
+    "## Use Rule",
+    "",
+    "Use this packet list for reading-room call slips and request sequencing. After a packet is pulled, use the exploded OA/ID request queue or FRUS selection capture worksheet for item-level candidates, markings, pagination, withdrawal sheets, volume boundary, and final source notes.",
+    "",
+    "## Packet Counts",
+    "",
+    `- Exploded request rows: ${libraryRequestQueue.length}`,
+    `- De-duplicated request packets: ${libraryRequestPackets.length}`,
+    `- Rows collapsed by de-duplication: ${libraryRequestQueue.length - libraryRequestPackets.length}`,
+    `- Identifiers with multiple chapter or cluster rationales: ${duplicatedPackets.length}`,
+    "",
+    "## By Visit Day",
+    ""
+  ];
+
+  for (const day of visitDays) {
+    const rows = libraryRequestPackets.filter((item) => item.visitDay === day);
+    const duplicateRows = rows.filter((item) => item.duplicateRowsCollapsed > 1);
+    lines.push(
+      `### ${day}`,
+      "",
+      `- Packets: ${rows.length}`,
+      `- Multi-rationale packets: ${duplicateRows.length}`,
+      "",
+      "Requests:"
+    );
+    appendBulletList(
+      lines,
+      rows,
+      (item) =>
+        `${item.packetWave} / ${item.requestIdentifier} / ${item.chapters.join("; ")} / ${item.clusterTitles
+          .slice(0, 2)
+          .join("; ")}${item.clusterTitles.length > 2 ? ` / plus ${item.clusterTitles.length - 2} more clusters` : ""}`,
+      "No request packets staged."
+    );
+    lines.push("");
+  }
+
+  lines.push("## Duplicate Identifiers To Request Once", "");
+  appendBulletList(
+    lines,
+    duplicatedPackets.sort((a, b) => b.duplicateRowsCollapsed - a.duplicateRowsCollapsed || compareLibraryPacketRows(a, b)),
+    (item) =>
+      `${item.requestIdentifier}: ${item.duplicateRowsCollapsed} rows collapsed; chapters: ${item.chapters.join("; ")}; waves: ${item.relatedRequestWaves.join("; ")}`,
+    "No duplicate identifiers found."
+  );
+  lines.push("");
+
+  fs.writeFileSync(libraryRequestPacketReportPath, lines.join("\n"));
+}
+
 function writeLibraryRequestReport() {
   const visitDays = [...new Set(libraryRequestQueue.map((item) => item.visitDay))].sort(
     (a, b) => libraryVisitDayRank(a) - libraryVisitDayRank(b)
@@ -904,7 +1011,7 @@ function writeLibraryRequestReport() {
     "",
     "## Use Rule",
     "",
-    "Use the CSV as an on-site worksheet. Request folders from the Day 1 rows first, then fill the blank capture columns for exact folder title, box or container, item title, date, sender/recipient, document type, classification markings, page range, attachments, withdrawal notes, volume boundary, disposition, and final source note.",
+    "Use `clinton-library-request-packets.csv` for de-duplicated reading-room call slips, then use this CSV as the on-site item-review worksheet. Request folders from the Day 1 packet rows first, then fill the blank capture columns here for exact folder title, box or container, item title, date, sender/recipient, document type, classification markings, page range, attachments, withdrawal notes, volume boundary, disposition, and final source note.",
     "",
     "## Queue Counts",
     ""
@@ -963,6 +1070,84 @@ function expandLibraryRequestRows(item, clusterIndex) {
   });
 }
 
+function buildLibraryRequestPackets(rows) {
+  const groups = new Map();
+  for (const row of rows) {
+    const key = row.requestIdentifier || row.rawIdentifier || "request identifier pending";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+
+  const packets = [...groups.values()]
+    .map(buildLibraryRequestPacket)
+    .sort(compareLibraryPacketRows);
+  const dayCounts = {};
+  return packets.map((packet) => {
+    dayCounts[packet.visitDay] = (dayCounts[packet.visitDay] || 0) + 1;
+    return {
+      ...packet,
+      packetWave: `${packet.visitDay} / Packet ${String(dayCounts[packet.visitDay]).padStart(2, "0")}`
+    };
+  });
+}
+
+function buildLibraryRequestPacket(rows) {
+  const sortedRows = rows.slice().sort(compareLibraryRequestRows);
+  const representative = sortedRows[0];
+  const visitDay = bestVisitDay(sortedRows);
+  const priority = bestLibraryPriority(sortedRows);
+  const chapters = sortChapters(uniqueFlat([sortedRows.map((row) => row.chapterTitle || row.chapterId)]));
+  const clusterTitles = uniqueSorted(sortedRows.map((row) => row.clusterTitle));
+  const sourceParts = uniqueSorted(sortedRows.map((row) => row.sourcePart));
+  const offices = uniqueSorted(sortedRows.map((row) => row.office));
+  const onsiteActions = uniqueSorted(sortedRows.flatMap((row) => row.onsiteActions || []));
+  const targetTerms = uniqueSorted(sortedRows.flatMap((row) => row.targetTerms || []));
+  const relatedRequestWaves = uniqueSorted(sortedRows.map((row) => row.requestWave));
+  const combinedWhyItMatters = uniqueSorted(sortedRows.map((row) => row.whyItMatters));
+  const requestReason =
+    sortedRows.length > 1
+      ? `Request once; supports ${chapters.join(", ")} across ${clusterTitles.length} staged clusters.`
+      : `Request for ${chapters[0] || "chapter pending"}: ${clusterTitles[0] || "cluster pending"}.`;
+  const dedupeNote =
+    sortedRows.length > 1
+      ? `Collapsed ${sortedRows.length} queue rows into one reading-room request for ${representative.requestIdentifier}.`
+      : "Single-rationale request packet.";
+
+  return {
+    requestIdentifier: representative.requestIdentifier,
+    rawIdentifier: representative.rawIdentifier,
+    requestType: representative.requestType,
+    visitDay,
+    priority,
+    duplicateRowsCollapsed: sortedRows.length,
+    chapters,
+    clusterTitles,
+    sourceParts,
+    offices,
+    relatedRequestWaves,
+    requestReason,
+    firstOnsiteAction: onsiteActions[0] || representative.firstOnsiteAction || representative.visitGoal,
+    onsiteActions,
+    targetTerms,
+    combinedWhyItMatters,
+    dedupeNote
+  };
+}
+
+function bestVisitDay(rows) {
+  return rows
+    .map((row) => row.visitDay)
+    .filter(Boolean)
+    .sort((a, b) => libraryVisitDayRank(a) - libraryVisitDayRank(b))[0] || "Review";
+}
+
+function bestLibraryPriority(rows) {
+  return rows
+    .map((row) => row.priority)
+    .filter(Boolean)
+    .sort((a, b) => libraryPriorityRank(a) - libraryPriorityRank(b))[0] || "Review";
+}
+
 function libraryVisitDay(priority) {
   return { Control: "Pre-visit", A: "Day 1", B: "Day 2", C: "Defer" }[priority] || "Review";
 }
@@ -984,6 +1169,11 @@ function formatLibraryRequestSourceNote(row) {
   return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${
     row.sourcePart || "part pending"
   }, ${row.requestIdentifier}. Folder-title request lead; verify exact box, folder title, item date, classification, and pagination on site.`;
+}
+
+function formatLibraryPacketSourceNote(row) {
+  const parts = row.sourceParts?.length ? row.sourceParts.join(", ") : "part pending";
+  return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${parts}, ${row.requestIdentifier}. De-duplicated request packet; verify exact box, folder title, item date, classification, and pagination on site.`;
 }
 
 function classifySelectionGate(item) {
@@ -1716,6 +1906,16 @@ function uniqueFlat(groups) {
   return [...new Set(groups.flat().filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 
+function uniqueSorted(values) {
+  return [...new Set(values.map(normalizeCell).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function sortChapters(chapters) {
+  return chapters
+    .filter(Boolean)
+    .sort((a, b) => chapterTitleRank(a) - chapterTitleRank(b) || a.localeCompare(b));
+}
+
 function appendBulletList(lines, rows, mapper, emptyText) {
   if (!rows.length) {
     lines.push(`- ${emptyText}`);
@@ -1785,6 +1985,15 @@ function compareLibraryRequestRows(a, b) {
     a.clusterOrder - b.clusterOrder ||
     a.identifierOrder - b.identifierOrder ||
     requestIdentifierRank(a.rawIdentifier) - requestIdentifierRank(b.rawIdentifier)
+  );
+}
+
+function compareLibraryPacketRows(a, b) {
+  return (
+    libraryVisitDayRank(a.visitDay) - libraryVisitDayRank(b.visitDay) ||
+    libraryPriorityRank(a.priority) - libraryPriorityRank(b.priority) ||
+    requestIdentifierRank(a.rawIdentifier || a.requestIdentifier) - requestIdentifierRank(b.rawIdentifier || b.requestIdentifier) ||
+    (a.requestIdentifier || "").localeCompare(b.requestIdentifier || "")
   );
 }
 

@@ -6,7 +6,7 @@ Source finding aids: local PDFs `2013-0185-M_Part1.pdf` through `2013-0185-M_Par
 
 The four PDFs are OCR-readable folder-title lists for Clinton Library NSC records. They are best used as an on-site pull map, not as final document selections. The new site section translates the folder-title lists into a practical visit plan: pull the highest-yield OA/ID clusters first, capture item-level metadata, and defer public-language/speechwriting files until the core policy files are reviewed.
 
-The generated `exports/clinton-library-oaid-request-queue.csv` and `reports/clinton-library-oaid-request-queue.md` now turn these clusters into one row per staged OA/ID or folder-list control reference. Use that queue at the table for request slips and item-level capture.
+The generated `exports/clinton-library-request-packets.csv` and `reports/clinton-library-request-packets.md` collapse duplicate OA/ID references into one reading-room request packet while preserving every chapter rationale. Use those packets for call slips, then use `exports/clinton-library-oaid-request-queue.csv` and `reports/clinton-library-oaid-request-queue.md` for item-level capture.
 
 ## First-Day Pulls
 
@@ -41,7 +41,7 @@ Speechwriting folders are useful for public-statement backtracing, but they shou
 
 ## OA/ID Request Queue
 
-Use the request queue as the working capture sheet. It carries the visit day, request wave, chapter, cluster title, OA/ID or folder-list reference, source part, office, first on-site action, target terms, and blank capture columns for exact folder title, box/container, item title, item date, sender/recipient, document type, classification markings, page range, attachments, withdrawal/redaction notes, volume boundary, disposition, and final source note.
+Use the request packets as the call-slip list and the OA/ID request queue as the working capture sheet. The packet list carries one row per unique OA/ID or folder-list reference; the expanded queue carries the visit day, request wave, chapter, cluster title, source part, office, first on-site action, target terms, and blank capture columns for exact folder title, box/container, item title, item date, sender/recipient, document type, classification markings, page range, attachments, withdrawal/redaction notes, volume boundary, disposition, and final source note.
 
 ## Immediate Gaps This Plan Addresses
 
