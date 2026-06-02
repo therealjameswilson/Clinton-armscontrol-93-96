@@ -15,6 +15,7 @@ currently lists the volume as planned rather than published. It gathers:
 - a NARA file-unit resolver that isolates Scout hits needing item-boundary verification
 - a public-statement backtrace queue that pairs Clinton statements with internal-counterpart search paths
 - a Daily Diary counterpart queue that converts schedule evidence into substantive-record searches
+- a chapter readiness scorecard that ranks launch status, blockers, and next actions
 - CSV working tables for sorting potential documents, chronology items, archive pulls, OA/ID requests, diary follow-up, public statements, and source risks
 - chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
@@ -51,6 +52,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/public-statement-backtrace-queue.md`: generated queue for pairing public statements with internal records
 - `reports/daily-diary-counterpart-queue.md`: generated queue for finding substantive records behind Diary entries
 - `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
+- `reports/chapter-readiness-scorecard.md`: generated per-chapter triage scorecard for launch status and blockers
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
 - `reports/clinton-library-oaid-request-queue.md`: generated request-slip queue from the Clinton Library OA/ID clusters
@@ -142,6 +144,13 @@ single next move. The matching `exports/chapter-dossiers.csv` and
 `reports/chapter-dossiers.md` files are regenerated from the same staged data as
 the page.
 
+The generated `exports/chapter-readiness-scorecard.csv` sits one level above
+the dossiers. It ranks the nine compiler chapters by close-read material,
+packet and file-unit blockers, source-path work, A-priority Clinton Library
+pulls, Daily Diary counterparts, public-statement backtraces, active risks, and
+the next chapter-specific action. The score is a triage aid, not a claim that a
+chapter is ready for final FRUS selection.
+
 ## Compiler working tables
 
 The tables section links generated CSV packets for offline use: the full
@@ -150,9 +159,10 @@ selection capture worksheet, the NARA file-unit resolver, the declassified
 chronology, Clinton Library call-slip clusters, the exploded Clinton Library
 OA/ID request queue, Presidential Daily Diary follow-up, the Daily Diary
 counterpart queue, the risk register, Clinton public statements, the
-public-statement backtrace queue, and chapter dossiers. The tables are
-regenerated from the same staged data files as the page, so a compiler can sort
-and annotate them without creating a separate hand-maintained index.
+public-statement backtrace queue, the chapter readiness scorecard, and chapter
+dossiers. The tables are regenerated from the same staged data files as the
+page, so a compiler can sort and annotate them without creating a separate
+hand-maintained index.
 
 The generated `exports/frus-selection-capture-worksheet.csv` is the compilation
 handoff sheet. It preserves the current lead, readiness queue, action, required

@@ -6,6 +6,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const exportDir = path.join(repoRoot, "exports");
 const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
+const chapterReadinessReportPath = path.join(repoRoot, "reports", "chapter-readiness-scorecard.md");
 const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
 const selectionCaptureReportPath = path.join(repoRoot, "reports", "frus-selection-capture-worksheet.md");
 const naraFileUnitReportPath = path.join(repoRoot, "reports", "nara-file-unit-resolution-queue.md");
@@ -91,6 +92,7 @@ const publicStatementBacktraceQueue = clintonPublicStatements.map(buildPublicBac
 const dailyDiaryCounterpartQueue = dailyDiaryReferences.map(buildDiaryCounterpartRow).sort(compareDiaryCounterpartRows);
 const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows).sort(compareLibraryRequestRows);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
+const chapterReadinessScorecard = chapterDefinitions.map(buildChapterReadinessRow);
 
 fs.mkdirSync(exportDir, { recursive: true });
 
@@ -107,8 +109,10 @@ writeCsv("daily-diary-counterpart-queue.csv", diaryCounterpartColumns(), dailyDi
 writeCsv("compiler-risk-register.csv", gapColumns(), compilerGaps.slice().sort(compareGapRows));
 writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicStatements);
 writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
+writeCsv("chapter-readiness-scorecard.csv", chapterReadinessColumns(), chapterReadinessScorecard);
 writeReport();
 writeDossierReport();
+writeChapterReadinessReport();
 writeReadinessReport();
 writeSelectionCaptureReport();
 writeNaraFileUnitReport();
@@ -131,8 +135,10 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-risk-register.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-public-statements.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-readiness-scorecard.csv"))}`,
     `Generated ${path.relative(repoRoot, workingTablesReportPath)}`,
     `Generated ${path.relative(repoRoot, dossierReportPath)}`,
+    `Generated ${path.relative(repoRoot, chapterReadinessReportPath)}`,
     `Generated ${path.relative(repoRoot, readinessReportPath)}`,
     `Generated ${path.relative(repoRoot, selectionCaptureReportPath)}`,
     `Generated ${path.relative(repoRoot, naraFileUnitReportPath)}`,
@@ -502,6 +508,39 @@ function dossierColumns() {
   ];
 }
 
+function chapterReadinessColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("chapter_number", (row) => row.chapter.number),
+    column("chapter", (row) => row.chapter.title),
+    column("readiness_band", (row) => row.readinessBand),
+    column("readiness_score", (row) => row.readinessScore),
+    column("compiler_focus", (row) => row.compilerFocus),
+    column("next_action", (row) => row.nextAction),
+    column("top_risk", (row) => row.topRisk),
+    column("candidate_leads", (row) => row.candidateLeads),
+    column("declassified_chronology_leads", (row) => row.declassifiedChronologyLeads),
+    column("close_read_now_count", (row) => row.closeReadNowCount),
+    column("screen_packet_count", (row) => row.screenPacketCount),
+    column("resolve_file_unit_count", (row) => row.resolveFileUnitCount),
+    column("pull_source_path_count", (row) => row.pullSourcePathCount),
+    column("date_control_anchor_count", (row) => row.dateControlAnchorCount),
+    column("clinton_library_pull_count", (row) => row.clintonLibraryPullCount),
+    column("a_priority_pull_count", (row) => row.aPriorityPullCount),
+    column("daily_diary_counterpart_count", (row) => row.dailyDiaryCounterpartCount),
+    column("public_statement_backtrace_count", (row) => row.publicStatementBacktraceCount),
+    column("active_risk_count", (row) => row.activeRiskCount),
+    column("critical_risk_count", (row) => row.criticalRiskCount),
+    column("high_risk_count", (row) => row.highRiskCount),
+    column("blockers", (row) => row.blockers),
+    column("first_reads", (row) => titleList(row.firstReads, documentLabel, 3)),
+    column("first_pull", (row) => row.firstPull ? pullOrPacketLabel(row.firstPull) : ""),
+    column("date_controls", (row) => titleList(row.dateControls, documentLabel, 4)),
+    column("risk_controls", (row) => titleList(row.riskControls, (gap) => `${gap.priority}: ${gap.title}`, 4)),
+    column("notes", (row) => row.notes)
+  ];
+}
+
 function writeReport() {
   const lines = [
     "# Compiler Working Tables",
@@ -523,6 +562,7 @@ function writeReport() {
     `- \`exports/compiler-risk-register.csv\`: ${compilerGaps.length} source-risk controls with next actions, target records, and source pools.`,
     `- \`exports/clinton-public-statements.csv\`: ${clintonPublicStatements.length} Clinton Public Papers anchors for public chronology and speech-clearance backtracking.`,
     `- \`exports/chapter-dossiers.csv\`: ${chapterDossiers.length} chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.`,
+    `- \`exports/chapter-readiness-scorecard.csv\`: ${chapterReadinessScorecard.length} chapter-level readiness rows with counts, blockers, top risks, and next actions.`,
     "",
     "## Compiler Use",
     "",
@@ -530,12 +570,13 @@ function writeReport() {
     "2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
     "3. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.",
     "4. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
-    "5. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
-    "6. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "7. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
-    "8. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
-    "9. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
-    "10. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "5. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.",
+    "6. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "7. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "8. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
+    "9. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
+    "10. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
+    "11. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -592,6 +633,66 @@ function writeDossierReport() {
   }
 
   fs.writeFileSync(dossierReportPath, lines.join("\n"));
+}
+
+function writeChapterReadinessReport() {
+  const sortedRows = chapterReadinessScorecard.slice().sort(
+    (a, b) =>
+      b.readinessScore - a.readinessScore ||
+      a.criticalRiskCount - b.criticalRiskCount ||
+      chapterRank(a.chapter.id) - chapterRank(b.chapter.id)
+  );
+  const lines = [
+    "# Chapter Readiness Scorecard",
+    "",
+    "Generated from the chapter dossiers, selection-readiness queue, file-unit resolver, Daily Diary counterpart queue, public-statement backtrace queue, Clinton Library pull plan, and compiler-risk register.",
+    "",
+    "## Use Rule",
+    "",
+    "Treat the score as a triage aid, not a final selection claim. A high score means the chapter has enough visible material to launch close reading or archive pulls. A low score means the compiler should first resolve item boundaries, backtrace public/date controls, or add stronger primary-source leads.",
+    "",
+    "## Scorecard",
+    "",
+    "| Chapter | Band | Score | Focus | Next action | Blockers |",
+    "| --- | --- | ---: | --- | --- | --- |"
+  ];
+
+  for (const row of sortedRows) {
+    lines.push(
+      `| ${mdCell(`${row.chapter.number}: ${row.chapter.title}`)} | ${mdCell(row.readinessBand)} | ${row.readinessScore} | ${mdCell(row.compilerFocus)} | ${mdCell(row.nextAction)} | ${mdCell(row.blockers.join("; "))} |`
+    );
+  }
+
+  lines.push("", "## Counts By Chapter", "");
+
+  for (const row of sortedRows) {
+    lines.push(
+      `### ${row.chapter.number}: ${row.chapter.title}`,
+      "",
+      `- Readiness: ${row.readinessBand} (${row.readinessScore})`,
+      `- Candidate leads: ${row.candidateLeads}`,
+      `- Close-read now: ${row.closeReadNowCount}`,
+      `- Screen packet: ${row.screenPacketCount}`,
+      `- Resolve file unit: ${row.resolveFileUnitCount}`,
+      `- Pull source path: ${row.pullSourcePathCount}`,
+      `- Date/control anchors: ${row.dateControlAnchorCount}`,
+      `- Clinton Library pulls: ${row.clintonLibraryPullCount} (${row.aPriorityPullCount} A-priority)`,
+      `- Diary counterparts: ${row.dailyDiaryCounterpartCount}`,
+      `- Public-statement backtraces: ${row.publicStatementBacktraceCount}`,
+      `- Active risks: ${row.activeRiskCount} (${row.criticalRiskCount} critical, ${row.highRiskCount} high)`,
+      `- Focus: ${row.compilerFocus}`,
+      `- Next action: ${row.nextAction}`,
+      `- Top risk: ${row.topRisk || "No specific risk staged."}`,
+      "",
+      "First reads:"
+    );
+    appendBulletList(lines, row.firstReads, documentLabel, "No first reads staged.");
+    lines.push("", "Blockers:");
+    appendBulletList(lines, row.blockers, (item) => item, "No major blocker surfaced by the scorecard.");
+    lines.push("");
+  }
+
+  fs.writeFileSync(chapterReadinessReportPath, lines.join("\n"));
 }
 
 function writeReadinessReport() {
@@ -1394,6 +1495,164 @@ function buildChapterDossier(chapter) {
   return { chapter, documents, chronology, firstReads, packetScreens, pulls, diaries, statements, risks, nextMove };
 }
 
+function buildChapterReadinessRow(chapter) {
+  const dossier = chapterDossiers.find((item) => item.chapter.id === chapter.id) || buildChapterDossier(chapter);
+  const readinessRows = selectionReadinessQueue.filter((item) => item.chapterId === chapter.id);
+  const risks = chapterRiskControls(chapter);
+  const closeReadNow = readinessRows.filter((item) => item.readiness.queue === "Close-read now");
+  const screenPacket = readinessRows.filter((item) => item.readiness.queue === "Screen packet");
+  const resolveFileUnit = readinessRows.filter((item) => item.readiness.queue === "Resolve file unit");
+  const pullSourcePath = readinessRows.filter((item) => item.readiness.queue === "Pull source path");
+  const dateControlAnchors = readinessRows.filter((item) => item.readiness.queue === "Date/control anchor");
+  const publicBacktraces = publicStatementBacktraceQueue.filter((item) => item.chapterId === chapter.id);
+  const diaryCounterparts = dailyDiaryCounterpartQueue.filter((item) => item.chapterId === chapter.id);
+  const aPriorityPulls = dossier.pulls.filter((item) => item.priority === "A");
+  const criticalRisks = risks.filter((gap) => gap.priority === "Critical");
+  const highRisks = risks.filter((gap) => gap.priority === "High");
+  const topRisk = preferredChapterRisk(chapter, risks);
+  const firstPull = aPriorityPulls[0] || dossier.pulls[0] || null;
+  const dateControls = [...dossier.diaries.filter((item) => item.priority === "High"), ...dossier.statements]
+    .sort(compareDossierRows)
+    .slice(0, 4);
+  const blockers = chapterReadinessBlockers({
+    closeReadNow,
+    screenPacket,
+    resolveFileUnit,
+    pullSourcePath,
+    dateControlAnchors,
+    publicBacktraces,
+    diaryCounterparts,
+    criticalRisks,
+    highRisks,
+    aPriorityPulls,
+    dossier
+  });
+  const readinessScore = chapterReadinessScore({
+    closeReadNow,
+    chronology: dossier.chronology,
+    screenPacket,
+    resolveFileUnit,
+    pullSourcePath,
+    dateControlAnchors,
+    publicBacktraces,
+    diaryCounterparts,
+    aPriorityPulls,
+    criticalRisks,
+    highRisks
+  });
+  const readinessBand = chapterReadinessBand(readinessScore);
+  const compilerFocus = chapterCompilerFocus({
+    readinessScore,
+    closeReadNow,
+    screenPacket,
+    resolveFileUnit,
+    pullSourcePath,
+    dateControlAnchors,
+    publicBacktraces,
+    diaryCounterparts,
+    aPriorityPulls,
+    dossier
+  });
+  const nextAction =
+    topRisk?.nextActions?.[0] ||
+    firstPull?.onsiteActions?.[0] ||
+    closeReadNow[0]?.readiness?.nextAction ||
+    dossier.nextMove;
+
+  return {
+    chapter,
+    readinessBand,
+    readinessScore,
+    compilerFocus,
+    nextAction,
+    topRisk: topRisk ? `${topRisk.priority}: ${topRisk.title}` : "",
+    candidateLeads: dossier.documents.length,
+    declassifiedChronologyLeads: dossier.chronology.length,
+    closeReadNowCount: closeReadNow.length,
+    screenPacketCount: screenPacket.length,
+    resolveFileUnitCount: resolveFileUnit.length,
+    pullSourcePathCount: pullSourcePath.length,
+    dateControlAnchorCount: dateControlAnchors.length,
+    clintonLibraryPullCount: dossier.pulls.length,
+    aPriorityPullCount: aPriorityPulls.length,
+    dailyDiaryCounterpartCount: diaryCounterparts.length,
+    publicStatementBacktraceCount: publicBacktraces.length,
+    activeRiskCount: risks.length,
+    criticalRiskCount: criticalRisks.length,
+    highRiskCount: highRisks.length,
+    blockers,
+    firstReads: dossier.firstReads,
+    firstPull,
+    dateControls,
+    riskControls: risks.slice(0, 4),
+    notes: "Readiness score is a triage aid; final FRUS selection still requires item-level source notes, markings, pagination, and declassification status."
+  };
+}
+
+function chapterRiskControls(chapter) {
+  const specificRisks = compilerGaps.filter((gap) => gapMatchesChapter(gap, chapter));
+  const globalRisks = compilerGaps.filter((gap) =>
+    isGlobalRisk(gap)
+  );
+  return uniqueDossierRows([...specificRisks, ...globalRisks]).sort(compareGapRows);
+}
+
+function preferredChapterRisk(chapter, risks) {
+  const specific = risks.filter((gap) => gapMatchesChapter(gap, chapter) && !isGlobalRisk(gap)).sort(compareGapRows);
+  return specific[0] || risks.slice().sort(compareGapRows)[0];
+}
+
+function isGlobalRisk(gap) {
+  return ["gap-source-base-diversity", "gap-nara-file-unit-quality", "gap-public-statements-as-locators"].includes(gap.id);
+}
+
+function chapterReadinessScore(parts) {
+  const positive =
+    Math.min(parts.closeReadNow.length * 9, 27) +
+    Math.min(parts.chronology.length * 7, 21) +
+    Math.min(parts.aPriorityPulls.length * 7, 21) +
+    Math.min(parts.diaryCounterparts.length * 2, 10) +
+    Math.min(parts.publicBacktraces.length * 2, 8);
+  const negative =
+    Math.min(parts.resolveFileUnit.length * 3, 18) +
+    Math.min(parts.pullSourcePath.length * 2, 12) +
+    Math.min(parts.dateControlAnchors.length, 10) +
+    parts.criticalRisks.length * 8 +
+    parts.highRisks.length * 4;
+  return clamp(20 + positive - negative, 0, 100);
+}
+
+function chapterReadinessBand(score) {
+  if (score >= 70) return "Close-read launch ready";
+  if (score >= 50) return "Archive-pull ready";
+  if (score >= 30) return "Item-boundary work first";
+  return "Discovery first";
+}
+
+function chapterCompilerFocus(parts) {
+  if (parts.closeReadNow.length >= 2 && parts.resolveFileUnit.length <= 3) return "Close-read available texts";
+  if (parts.aPriorityPulls.length) return "Pull priority Clinton Library folders";
+  if (parts.resolveFileUnit.length || parts.screenPacket.length) return "Resolve packets and file units";
+  if (parts.diaryCounterparts.length || parts.publicBacktraces.length || parts.dateControlAnchors.length) {
+    return "Backtrace date and public controls";
+  }
+  if (parts.pullSourcePath.length) return "Turn source paths into item leads";
+  return "Add stronger primary-source leads";
+}
+
+function chapterReadinessBlockers(parts) {
+  const blockers = [];
+  if (parts.criticalRisks.length) blockers.push(`${parts.criticalRisks.length} critical risk controls open`);
+  if (parts.resolveFileUnit.length) blockers.push(`Resolve ${parts.resolveFileUnit.length} file-unit leads`);
+  if (parts.screenPacket.length) blockers.push(`Screen ${parts.screenPacket.length} packet leads`);
+  if (parts.pullSourcePath.length) blockers.push(`Convert ${parts.pullSourcePath.length} source paths into item leads`);
+  if (!parts.closeReadNow.length && !parts.dossier.chronology.length) blockers.push("No declassified close-read lead staged");
+  if (parts.diaryCounterparts.length) blockers.push(`Find counterparts for ${parts.diaryCounterparts.length} diary controls`);
+  if (parts.publicBacktraces.length) blockers.push(`Backtrace ${parts.publicBacktraces.length} public statements`);
+  if (!parts.aPriorityPulls.length && parts.dossier.pulls.length) blockers.push("No A-priority Clinton Library pull in chapter");
+  return blockers.slice(0, 5);
+}
+
 function compareDossierRows(a, b) {
   return (
     priorityRank(a.priority) - priorityRank(b.priority) ||
@@ -1465,6 +1724,10 @@ function appendBulletList(lines, rows, mapper, emptyText) {
   for (const row of rows) lines.push(`- ${mapper(row)}`);
 }
 
+function mdCell(value) {
+  return normalizeCell(value).replace(/\|/g, "\\|");
+}
+
 function column(label, value) {
   return { label, value };
 }
@@ -1483,6 +1746,10 @@ function normalizeCell(value) {
 
 function normalizeIdentifier(value) {
   return normalizeCell(value);
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, Math.round(value)));
 }
 
 function compareByDateThenTitle(a, b) {

@@ -17,6 +17,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 - `exports/compiler-risk-register.csv`: 10 source-risk controls with next actions, target records, and source pools.
 - `exports/clinton-public-statements.csv`: 15 Clinton Public Papers anchors for public chronology and speech-clearance backtracking.
 - `exports/chapter-dossiers.csv`: 9 chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.
+- `exports/chapter-readiness-scorecard.csv`: 9 chapter-level readiness rows with counts, blockers, top risks, and next actions.
 
 ## Compiler Use
 
@@ -24,12 +25,13 @@ Generated from the site's staged data files. These CSVs are meant as working she
 2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.
 3. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.
 4. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.
-5. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
-6. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
-7. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.
-8. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.
-9. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.
-10. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
+5. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.
+6. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
+7. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
+8. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.
+9. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.
+10. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.
+11. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 
 Regenerate with:
 
