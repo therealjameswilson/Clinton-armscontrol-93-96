@@ -11,6 +11,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const exportDir = path.join(repoRoot, "exports");
 const generatedDataDir = path.join(repoRoot, "data");
 const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
+const compilerRequirementsAuditReportPath = path.join(repoRoot, "reports", "compiler-requirements-audit.md");
 const compilerActionQueueReportPath = path.join(repoRoot, "reports", "compiler-action-queue.md");
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
 const chapterReadinessReportPath = path.join(repoRoot, "reports", "chapter-readiness-scorecard.md");
@@ -107,11 +108,13 @@ const chapterReadinessScorecard = chapterDefinitions.map(buildChapterReadinessRo
 const naraScoutQueryPacketQueue = buildNaraScoutQueryPacketQueue();
 const compilerActionQueue = buildCompilerActionQueue();
 const libraryVisitRunSheet = buildLibraryVisitRunSheet();
+const compilerRequirementsAudit = buildCompilerRequirementsAudit();
 
 fs.mkdirSync(exportDir, { recursive: true });
 
 writeCsv("compiler-action-queue.csv", compilerActionColumns(), compilerActionQueue);
 writeJsonData("compiler-action-queue.js", "ARMSCONTROL_COMPILER_ACTION_QUEUE", compilerActionQueue);
+writeCsv("compiler-requirements-audit.csv", compilerRequirementsAuditColumns(), compilerRequirementsAudit);
 writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potentialDocuments);
 writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
 writeCsv("frus-selection-capture-worksheet.csv", selectionCaptureColumns(), selectionCaptureWorksheet);
@@ -130,6 +133,7 @@ writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicState
 writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
 writeCsv("chapter-readiness-scorecard.csv", chapterReadinessColumns(), chapterReadinessScorecard);
 writeReport();
+writeCompilerRequirementsAuditReport();
 writeCompilerActionReport();
 writeDossierReport();
 writeChapterReadinessReport();
@@ -147,6 +151,7 @@ console.log(
   [
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-action-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(generatedDataDir, "compiler-action-queue.js"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-requirements-audit.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "potential-documents-triage.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "frus-selection-capture-worksheet.csv"))}`,
@@ -165,6 +170,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-readiness-scorecard.csv"))}`,
     `Generated ${path.relative(repoRoot, workingTablesReportPath)}`,
+    `Generated ${path.relative(repoRoot, compilerRequirementsAuditReportPath)}`,
     `Generated ${path.relative(repoRoot, compilerActionQueueReportPath)}`,
     `Generated ${path.relative(repoRoot, dossierReportPath)}`,
     `Generated ${path.relative(repoRoot, chapterReadinessReportPath)}`,
@@ -215,6 +221,21 @@ function compilerActionColumns() {
     column("sort_weight", (row) => row.sortWeight),
     column("disposition", () => ""),
     column("compiler_notes", () => "")
+  ];
+}
+
+function compilerRequirementsAuditColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("requirement_area", (row) => row.requirementArea),
+    column("requirement", (row) => row.requirement),
+    column("status", (row) => row.status),
+    column("evidence", (row) => row.evidence),
+    column("count_or_scope", (row) => row.countOrScope),
+    column("primary_artifact", (row) => row.primaryArtifact),
+    column("supporting_artifacts", (row) => row.supportingArtifacts),
+    column("next_compiler_action", (row) => row.nextCompilerAction),
+    column("risk_control", (row) => row.riskControl)
   ];
 }
 
@@ -715,6 +736,7 @@ function writeReport() {
     "## Tables",
     "",
     `- \`exports/compiler-action-queue.csv\`: ${compilerActionQueue.length} ordered compiler actions spanning close reads, archive requests, item-boundary work, counterpart searches, Scout reruns, and risk controls.`,
+    `- \`exports/compiler-requirements-audit.csv\`: ${compilerRequirementsAudit.length} requirement-to-evidence rows proving what is covered, what remains controlled open work, and where the compiler should verify each claim.`,
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/potential-documents-triage.csv\`: ${potentialDocuments.length} staged document or source-path leads with FRUS-style source notes and risk fields.`,
     `- \`exports/selection-readiness-queue.csv\`: ${selectionReadinessQueue.length} staged leads normalized into readiness gates, next actions, and verification fields.`,
@@ -735,19 +757,20 @@ function writeReport() {
     "",
     "## Compiler Use",
     "",
-    "1. Start with `compiler-action-queue.csv` when deciding what to do next across all workstreams.",
-    "2. Use `declassified-chronology.csv` for the first read-through of available or released records.",
-    "3. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
-    "4. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.",
-    "5. Use `nara-scout-query-packets.csv` when re-running Scout or filling source gaps so query/scope work is tracked and reproducible.",
-    "6. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
-    "7. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.",
-    "8. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
-    "9. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "10. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
-    "11. Use `clinton-library-visit-run-sheet.csv` as the reading-room day plan, `clinton-library-request-packets.csv` for de-duplicated call slips, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
-    "12. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
-    "13. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "1. Start with `compiler-requirements-audit.csv` to see which explicit requirements are covered, which remain controlled open work, and which artifact proves each claim.",
+    "2. Use `compiler-action-queue.csv` when deciding what to do next across all workstreams.",
+    "3. Use `declassified-chronology.csv` for the first read-through of available or released records.",
+    "4. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
+    "5. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.",
+    "6. Use `nara-scout-query-packets.csv` when re-running Scout or filling source gaps so query/scope work is tracked and reproducible.",
+    "7. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
+    "8. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.",
+    "9. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "10. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "11. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
+    "12. Use `clinton-library-visit-run-sheet.csv` as the reading-room day plan, `clinton-library-request-packets.csv` for de-duplicated call slips, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
+    "13. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
+    "14. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -757,6 +780,62 @@ function writeReport() {
     ""
   ];
   fs.writeFileSync(workingTablesReportPath, lines.join("\n"));
+}
+
+function writeCompilerRequirementsAuditReport() {
+  const statusGroups = [...new Set(compilerRequirementsAudit.map((item) => item.status))].sort(
+    (a, b) => auditStatusRank(a) - auditStatusRank(b) || a.localeCompare(b)
+  );
+  const controlledOpen = compilerRequirementsAudit.filter((item) => /controlled|open/i.test(item.status));
+  const lines = [
+    "# Compiler Requirements Audit",
+    "",
+    "Generated from the current page scaffolding, chapter dossiers, working tables, Clinton Library queues, Daily Diary rows, public-statement backtrace queue, NARA Scout packet queue, and compiler-risk register.",
+    "",
+    "## Use Rule",
+    "",
+    "Use this as the handoff proof map. It shows which explicit requirements are already represented in public artifacts and which requirements are deliberately controlled open work rather than hidden gaps. It does not claim that final FRUS document selection is complete.",
+    "",
+    "## Audit Counts",
+    "",
+    `- Requirement rows: ${compilerRequirementsAudit.length}`,
+    `- Proved in current artifacts: ${compilerRequirementsAudit.filter((item) => item.status === "Proved in current artifacts").length}`,
+    `- Ready for compiler use: ${compilerRequirementsAudit.filter((item) => item.status === "Ready for compiler use").length}`,
+    `- Controlled open work: ${controlledOpen.length}`,
+    `- Potential-document leads: ${potentialDocuments.length}`,
+    `- Declassified chronology rows: ${declassifiedChronology.length}`,
+    `- Compiler action rows: ${compilerActionQueue.length}`,
+    `- Clinton Library run-sheet rows: ${libraryVisitRunSheet.length}`,
+    "",
+    "## Requirement Evidence",
+    "",
+    "| Area | Requirement | Status | Evidence | Primary artifact | Next action |",
+    "| --- | --- | --- | --- | --- | --- |"
+  ];
+
+  for (const row of compilerRequirementsAudit) {
+    lines.push(
+      `| ${mdCell(row.requirementArea)} | ${mdCell(row.requirement)} | ${mdCell(row.status)} | ${mdCell(row.evidence)} | ${mdCell(row.primaryArtifact)} | ${mdCell(row.nextCompilerAction)} |`
+    );
+  }
+
+  lines.push("", "## Open Work That Is Controlled", "");
+  appendBulletList(
+    lines,
+    controlledOpen,
+    (item) => `${item.requirementArea}: ${item.nextCompilerAction} Evidence trail: ${item.supportingArtifacts.join("; ")}`,
+    "No controlled-open requirements remain in this audit."
+  );
+  lines.push("", "## By Status", "");
+
+  for (const status of statusGroups) {
+    const rows = compilerRequirementsAudit.filter((item) => item.status === status);
+    lines.push(`### ${status}`, "", `- Rows: ${rows.length}`, "");
+    appendBulletList(lines, rows, (item) => `${item.requirementArea}: ${item.requirement}`, "No rows in this status.");
+    lines.push("");
+  }
+
+  fs.writeFileSync(compilerRequirementsAuditReportPath, lines.join("\n"));
 }
 
 function writeCompilerActionReport() {
@@ -1642,6 +1721,187 @@ function buildLibraryVisitRunSheet() {
         packetSourceNote: formatLibraryPacketSourceNote(packet)
       };
     });
+}
+
+function buildCompilerRequirementsAudit() {
+  const sourceNoteRows = potentialDocuments.filter((item) => formatFrusSourceNote(item).startsWith("Source:")).length;
+  const requiredChapterIds = ["ctbt", "start-ii", "ctr-heu", "counterproliferation", "cbw-conventional"];
+  const rows = [
+    requirementAuditRow({
+      requirementArea: "Public page and official frame",
+      requirement: "Create a public page for FRUS 1993-2000, Volume VII, Arms Control and Nonproliferation, 1993-1996.",
+      status: "Proved in current artifacts",
+      evidence:
+        "index.html renders the compiler page, README records the official FRUS volume anchor, and the page keeps the planned-volume status visible.",
+      countOrScope: "1 public page; official FRUS volume URL staged in README and page links",
+      primaryArtifact: "index.html",
+      supportingArtifacts: ["README.md", "reports/compiler-working-tables.md"],
+      nextCompilerAction: "Re-check the official Office of the Historian status before final publication or citation freeze.",
+      riskControl: "Volume is still planned, not published."
+    }),
+    requirementAuditRow({
+      requirementArea: "Declassified chronology",
+      requirement: "Prioritize the chronology of declassified documents as the first section of the page.",
+      status: "Proved in current artifacts",
+      evidence: `The first <main> section is #chronology and the declassified chronology contains ${declassifiedChronology.length} dated released/declassified leads.`,
+      countOrScope: `${declassifiedChronology.length} chronology rows`,
+      primaryArtifact: "exports/declassified-chronology.csv",
+      supportingArtifacts: ["reports/declassified-document-chronology.md", "index.html"],
+      nextCompilerAction: "Close-read visible texts first, then fill the final selection capture worksheet for any row promoted into the FRUS sequence.",
+      riskControl: "Chronology excludes public statements, diary-only rows, broad finding aids, and undated Scout hits until item-level support exists."
+    }),
+    requirementAuditRow({
+      requirementArea: "Chapter arrangement",
+      requirement: "Include the requested compiler chapters and keep them separated for selection work.",
+      status: "Proved in current artifacts",
+      evidence: `Chapter definitions include ${chapterDefinitions.length} chapters, including ${requiredChapterIds
+        .map((id) => chapterTitleFromId(id))
+        .join(", ")}.`,
+      countOrScope: `${chapterDefinitions.length} chapter dossiers`,
+      primaryArtifact: "exports/chapter-dossiers.csv",
+      supportingArtifacts: ["reports/chapter-dossiers.md", "exports/chapter-readiness-scorecard.csv"],
+      nextCompilerAction: "Use the readiness scorecard before deciding whether a chapter should start with close reading, archive pulls, or discovery.",
+      riskControl: "Some chapters are launch-ready only as research lanes; final selection still requires item-level verification."
+    }),
+    chapterRequirementAuditRow("ctbt", "Include a chapter on NPT and CTBT."),
+    chapterRequirementAuditRow("start-ii", "Include a chapter on START II ratification."),
+    chapterRequirementAuditRow("ctr-heu", "Include a chapter on Cooperative Threat Reduction and the HEU Agreement covering 1995-1996."),
+    chapterRequirementAuditRow("counterproliferation", "Create a chapter on Counterproliferation."),
+    chapterRequirementAuditRow("cbw-conventional", "Include a chapter on Chemical and Biological Weapons."),
+    requirementAuditRow({
+      requirementArea: "NARA Scout and primary-source leads",
+      requirement: "Populate chapters with potential documents drawn from primary sources and NARA Scout discovery.",
+      status: "Controlled open work",
+      evidence: `${potentialDocuments.length} potential-document leads are staged; ${naraScoutQueryPacketQueue.length} Scout query packets make reruns reproducible; ${naraFileUnitResolutionQueue.length} NARA/file-unit rows are isolated for item-boundary resolution.`,
+      countOrScope: `${potentialDocuments.length} leads; ${naraScoutQueryPacketQueue.length} Scout query packets; ${naraFileUnitResolutionQueue.length} file-unit resolver rows`,
+      primaryArtifact: "exports/potential-documents-triage.csv",
+      supportingArtifacts: [
+        "exports/nara-scout-query-packets.csv",
+        "exports/nara-file-unit-resolution-queue.csv",
+        "reports/nara-scout-potential-documents.md"
+      ],
+      nextCompilerAction: "Run high-priority Scout query packets, then replace file-unit leads with item-level candidates or mark them context-only.",
+      riskControl: "NARA file-unit quality remains the largest controlled source risk."
+    }),
+    requirementAuditRow({
+      requirementArea: "Clinton public statements",
+      requirement: "Incorporate Clinton public statements without letting them overframe archival selection.",
+      status: "Ready for compiler use",
+      evidence: `${clintonPublicStatements.length} Public Papers anchors are staged and ${publicStatementBacktraceQueue.length} backtrace rows pair them with internal-counterpart searches.`,
+      countOrScope: `${clintonPublicStatements.length} statements; ${publicStatementBacktraceQueue.length} backtrace rows`,
+      primaryArtifact: "exports/clinton-public-statements.csv",
+      supportingArtifacts: ["exports/public-statement-backtrace-queue.csv", "reports/public-statement-backtrace-queue.md"],
+      nextCompilerAction: "Use public statements as date/public-policy locators until a memcon, telcon, clearance file, cable, or policy paper is captured.",
+      riskControl: "Public statements are locator evidence unless deliberately selected as public text."
+    }),
+    requirementAuditRow({
+      requirementArea: "Clinton Library research",
+      requirement: "Incorporate Clinton Library finding aids and maximize time at the Clinton Library.",
+      status: "Ready for compiler use",
+      evidence: `${libraryVisitRunSheet.length} run-sheet rows, ${libraryRequestPackets.length} de-duplicated request packets, and ${libraryRequestQueue.length} OA/ID queue rows convert the local finding-aid PDFs into a reading-room workflow.`,
+      countOrScope: `${libraryVisitRunSheet.length} run-sheet rows; ${libraryRequestPackets.length} request packets; ${libraryRequestQueue.length} OA/ID rows`,
+      primaryArtifact: "exports/clinton-library-visit-run-sheet.csv",
+      supportingArtifacts: [
+        "exports/clinton-library-request-packets.csv",
+        "exports/clinton-library-oaid-request-queue.csv",
+        "reports/clinton-library-visit-run-sheet.md"
+      ],
+      nextCompilerAction: "Use the run sheet at the archive table, fill pull status and best-item fields, and promote only item-level records into the capture worksheet.",
+      riskControl: "Folder-title lists are not final document selections."
+    }),
+    requirementAuditRow({
+      requirementArea: "Presidential Daily Diary",
+      requirement: "Search the Presidential Daily Diary and include pertinent calls or meetings.",
+      status: "Proved in current artifacts",
+      evidence: `${dailyDiaryReferences.length} diary or foreign-leader-index occurrence controls are staged and ${dailyDiaryCounterpartQueue.length} counterpart-search rows prevent schedule evidence from being mistaken for substantive records.`,
+      countOrScope: `${dailyDiaryReferences.length} diary references; ${dailyDiaryCounterpartQueue.length} counterpart rows`,
+      primaryArtifact: "exports/presidential-daily-diary-follow-up.csv",
+      supportingArtifacts: ["exports/daily-diary-counterpart-queue.csv", "reports/daily-diary-counterpart-queue.md"],
+      nextCompilerAction: "Locate the substantive telcon, memcon, PC/DC minutes, NSC note, cable, or agency file for each high-value occurrence.",
+      riskControl: "Diary rows prove occurrence, not policy substance."
+    }),
+    requirementAuditRow({
+      requirementArea: "FRUS source notes",
+      requirement: "Check source notes against FRUS-style expectations.",
+      status: "Ready for compiler use",
+      evidence: `${sourceNoteRows} of ${potentialDocuments.length} potential-document leads render a Source: note; capture worksheets preserve current notes and add final source-note fields.`,
+      countOrScope: `${sourceNoteRows}/${potentialDocuments.length} generated Source: notes`,
+      primaryArtifact: "reports/frus-source-note-audit.md",
+      supportingArtifacts: ["exports/frus-selection-capture-worksheet.csv", "reports/frus-selection-capture-worksheet.md"],
+      nextCompilerAction: "Replace generated pending notes with final repository, collection, folder, markings, pagination, and declassification details only after item-level verification.",
+      riskControl: "Generated source notes are triage notes, not final FRUS citations."
+    }),
+    requirementAuditRow({
+      requirementArea: "Compiler risks and gaps",
+      requirement: "Assume compiler risk, identify gaps, and address them with controlled workflows.",
+      status: "Controlled open work",
+      evidence: `${compilerGaps.length} structured risks, ${compilerActionQueue.length} action rows, ${selectionReadinessQueue.length} readiness rows, and ${selectionCaptureWorksheet.length} capture rows keep remaining gaps visible and actionable.`,
+      countOrScope: `${compilerGaps.length} risks; ${compilerActionQueue.length} actions; ${selectionReadinessQueue.length} readiness rows`,
+      primaryArtifact: "exports/compiler-risk-register.csv",
+      supportingArtifacts: [
+        "reports/compiler-gap-analysis.md",
+        "exports/compiler-action-queue.csv",
+        "exports/selection-readiness-queue.csv"
+      ],
+      nextCompilerAction: "Work the action queue by priority band, closing risks only when item-level evidence or explicit editorial limitation supports closure.",
+      riskControl: "The site controls open risks; it does not hide them."
+    }),
+    requirementAuditRow({
+      requirementArea: "Compiler handoff",
+      requirement: "Make the project easy for a FRUS compiler to pick up and use.",
+      status: "Ready for compiler use",
+      evidence: `${compilerActionQueue.length} ordered actions, ${chapterDossiers.length} chapter dossiers, ${chapterReadinessScorecard.length} readiness rows, and this requirements audit provide the handoff path.`,
+      countOrScope: `${compilerActionQueue.length} actions; ${chapterDossiers.length} dossiers; ${chapterReadinessScorecard.length} scorecard rows; generated audit rows`,
+      primaryArtifact: "exports/compiler-requirements-audit.csv",
+      supportingArtifacts: ["exports/compiler-action-queue.csv", "exports/chapter-dossiers.csv", "reports/compiler-working-tables.md"],
+      nextCompilerAction: "Start each session with this audit, then the action queue, then the chapter dossier for the selected chapter.",
+      riskControl: "Final FRUS selection remains a compiler decision after source verification."
+    })
+  ];
+
+  return rows;
+}
+
+function chapterRequirementAuditRow(chapterId, requirement) {
+  const chapter = chapterDefinitions.find((item) => item.id === chapterId);
+  const dossier = chapterDossiers.find((item) => item.chapter.id === chapterId);
+  const scorecard = chapterReadinessScorecard.find((item) => item.chapter.id === chapterId);
+  const actions = compilerActionQueue.filter((item) => item.chapterId === chapterId);
+  const topAction = actions[0]?.immediateAction || dossier?.nextMove || "Open the chapter dossier.";
+  const topRisk = scorecard?.topRisk || "No chapter-specific top risk surfaced.";
+  const status =
+    chapter && (dossier?.documents.length || 0) > 0 && actions.length > 0
+      ? "Ready for compiler use"
+      : "Controlled open work";
+  return requirementAuditRow({
+    requirementArea: chapter?.title || chapterId,
+    requirement,
+    status,
+    evidence: `${chapter?.number || "Chapter"} has ${dossier?.documents.length || 0} candidate leads, ${
+      dossier?.chronology.length || 0
+    } declassified chronology leads, ${dossier?.pulls.length || 0} Clinton Library pull clusters, ${
+      dossier?.diaries.length || 0
+    } diary controls, ${dossier?.statements.length || 0} public anchors, and ${actions.length} action-queue rows.`,
+    countOrScope: `${scorecard?.readinessBand || "Readiness pending"}; score ${scorecard?.readinessScore ?? 0}`,
+    primaryArtifact: "exports/chapter-dossiers.csv",
+    supportingArtifacts: ["exports/chapter-readiness-scorecard.csv", "exports/compiler-action-queue.csv"],
+    nextCompilerAction: topAction,
+    riskControl: topRisk
+  });
+}
+
+function requirementAuditRow(row) {
+  return {
+    requirementArea: row.requirementArea,
+    requirement: row.requirement,
+    status: row.status,
+    evidence: row.evidence,
+    countOrScope: row.countOrScope,
+    primaryArtifact: row.primaryArtifact,
+    supportingArtifacts: row.supportingArtifacts || [],
+    nextCompilerAction: row.nextCompilerAction,
+    riskControl: row.riskControl
+  };
 }
 
 function libraryVisitCaptureGoal() {
@@ -2824,6 +3084,10 @@ function compareGapRows(a, b) {
 
 function priorityRank(priority) {
   return { Critical: 0, High: 1, A: 1, Medium: 2, B: 2, Low: 3, C: 3, Review: 4, Control: 4 }[priority] ?? 5;
+}
+
+function auditStatusRank(status) {
+  return { "Proved in current artifacts": 0, "Ready for compiler use": 1, "Controlled open work": 2 }[status] ?? 3;
 }
 
 function libraryPriorityRank(priority) {

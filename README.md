@@ -9,6 +9,7 @@ currently lists the volume as planned rather than published. It gathers:
 
 - official FRUS status and volume-boundary links
 - an opening chronology of dated released or declassified document leads
+- a compiler requirements audit that maps each requested deliverable to evidence, open work, and next action
 - a generated compiler action queue that gives the next daily worklist across all source workstreams
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
 - a selection-readiness queue that assigns every potential-document lead to an immediate verification action
@@ -50,6 +51,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `data/clinton-public-statements.js`: generated Clinton Public Papers statement data
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
 - `reports/declassified-document-chronology.md`: dated released/declassified leads promoted to the first page section
+- `reports/compiler-requirements-audit.md`: generated requirement-to-evidence map for the compiler handoff
 - `reports/compiler-action-queue.md`: generated ordered worklist spanning close reads, archive requests, item-boundary work, counterpart searches, Scout reruns, and risk controls
 - `reports/compiler-working-tables.md`: explanation of the CSV exports and suggested compiler workflow
 - `reports/selection-readiness-queue.md`: generated readiness gates and verification fields for every staged document lead
@@ -137,6 +139,11 @@ before a sequence is treated as compiler-ready.
 
 ## Compiler action queue
 
+The generated `exports/compiler-requirements-audit.csv` is the handoff proof
+map. It records each explicit compiler-facing requirement, the evidence that
+currently proves it, the artifacts to inspect, the next action, and any
+controlled-open risk that remains.
+
 The generated `exports/compiler-action-queue.csv` is the first daily worklist.
 It merges close reads, Clinton Library request packets, packet screening, NARA
 file-unit resolution, source-path pulls, Presidential Daily Diary counterpart
@@ -173,16 +180,16 @@ chapter is ready for final FRUS selection.
 ## Compiler working tables
 
 The tables section links generated CSV packets for offline use: the compiler
-action queue, declassified chronology, the full potential-document triage sheet,
-the selection-readiness queue, the FRUS selection capture worksheet, the NARA
-file-unit resolver, NARA Scout query packets, Clinton Library call-slip
-clusters, the request packets, the visit run sheet, the exploded Clinton
-Library OA/ID request queue, Presidential Daily Diary follow-up, the Daily
-Diary counterpart queue, the risk register, Clinton public statements, the
-public-statement backtrace queue, the chapter readiness scorecard, and chapter
-dossiers. The tables are regenerated from the same staged data files as the
-page, so a compiler can sort and annotate them without creating a separate
-hand-maintained index.
+requirements audit, action queue, declassified chronology, the full
+potential-document triage sheet, the selection-readiness queue, the FRUS
+selection capture worksheet, the NARA file-unit resolver, NARA Scout query
+packets, Clinton Library call-slip clusters, the request packets, the visit run
+sheet, the exploded Clinton Library OA/ID request queue, Presidential Daily
+Diary follow-up, the Daily Diary counterpart queue, the risk register, Clinton
+public statements, the public-statement backtrace queue, the chapter readiness
+scorecard, and chapter dossiers. The tables are regenerated from the same
+staged data files as the page, so a compiler can sort and annotate them without
+creating a separate hand-maintained index.
 
 The generated `exports/frus-selection-capture-worksheet.csv` is the compilation
 handoff sheet. It preserves the current lead, readiness queue, action, required
