@@ -1,4 +1,23 @@
 const workbenchRoot = document.querySelector("#workbench-root");
+const workbenchLaneById = window.laneById instanceof Map ? window.laneById : new Map();
+
+function formatWorkbenchDate(value) {
+  if (typeof window.formatDate === "function") return window.formatDate(value);
+  return value || "Date pending";
+}
+
+function makeWorkbenchLink(url, label) {
+  if (typeof window.makeLink === "function") return window.makeLink(url, label);
+  const link = document.createElement("a");
+  link.href = url;
+  link.textContent = label;
+  link.rel = "noreferrer";
+  return link;
+}
+
+function workbenchGapPriorityRank(priority) {
+  return { Critical: 0, High: 1, Medium: 2, Review: 3 }[priority] ?? 4;
+}
 
 function isCloseReadCandidate(item) {
   const level = `${item.level || ""}`.toLowerCase();
@@ -26,13 +45,15 @@ function makeWorkbenchDocumentItem(item) {
   const title = document.createElement("strong");
   title.textContent = item.title;
   const meta = document.createElement("span");
-  meta.textContent = `${formatDate(item.date)} / ${item.chapterTitle || laneById.get(item.chapterId)?.title || item.chapterId}`;
+  meta.textContent = `${formatWorkbenchDate(item.date)} / ${
+    item.chapterTitle || workbenchLaneById.get(item.chapterId)?.title || item.chapterId
+  }`;
   listItem.append(title, meta);
   if (item.sourceUrl || item.digitalObjectUrl) {
     const links = document.createElement("span");
     links.className = "workbench-links";
-    if (item.digitalObjectUrl) links.append(makeLink(item.digitalObjectUrl, "review copy"));
-    if (item.sourceUrl) links.append(makeLink(item.sourceUrl, "source"));
+    if (item.digitalObjectUrl) links.append(makeWorkbenchLink(item.digitalObjectUrl, "review copy"));
+    if (item.sourceUrl) links.append(makeWorkbenchLink(item.sourceUrl, "source"));
     listItem.append(links);
   }
   return listItem;
@@ -63,12 +84,15 @@ function makeWorkbenchGapItem(item) {
 function renderCompilerWorkbench() {
   if (!workbenchRoot) return;
 
-  const closeRead = declassifiedChronology.filter(isCloseReadCandidate).slice(0, 6);
-  const screenNext = declassifiedChronology.filter((item) => !isCloseReadCandidate(item)).slice(0, 6);
-  const pullNext = libraryResearchPlan.filter((item) => item.priority === "A").slice(0, 6);
-  const riskNext = compilerGaps
+  const chronology = window.declassifiedChronology || [];
+  const pullPlan = window.libraryResearchPlan || [];
+  const gaps = window.compilerGaps || [];
+  const closeRead = chronology.filter(isCloseReadCandidate).slice(0, 6);
+  const screenNext = chronology.filter((item) => !isCloseReadCandidate(item)).slice(0, 6);
+  const pullNext = pullPlan.filter((item) => item.priority === "A").slice(0, 6);
+  const riskNext = gaps
     .filter((gap) => ["Critical", "High"].includes(gap.priority))
-    .sort((a, b) => gapPriorityRank(a.priority) - gapPriorityRank(b.priority) || a.title.localeCompare(b.title))
+    .sort((a, b) => workbenchGapPriorityRank(a.priority) - workbenchGapPriorityRank(b.priority) || a.title.localeCompare(b.title))
     .slice(0, 6);
 
   const panels = [

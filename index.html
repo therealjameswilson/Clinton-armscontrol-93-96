@@ -16,8 +16,8 @@
     <script defer src="data/presidential-daily-diary-references.js"></script>
     <script defer src="data/clinton-public-statements.js"></script>
     <script defer src="data/compiler-action-queue.js"></script>
-    <script defer src="app.js?v=20260602-action-queue-render"></script>
-    <script defer src="compiler-workbench.js?v=20260602-diary-counterpart"></script>
+    <script defer src="app.js?v=20260602-visit-run-sheet"></script>
+    <script defer src="compiler-workbench.js?v=20260602-visit-run-sheet"></script>
     <style id="compiler-network-style">
       .compiler-network {
         border-bottom: 1px solid rgba(31, 41, 51, 0.14);
@@ -353,6 +353,12 @@
             <a href="exports/clinton-library-request-packets.csv">Download CSV</a>
           </article>
           <article class="export-card">
+            <span class="export-meta">83 rows</span>
+            <h3>Clinton Library Visit Run Sheet</h3>
+            <p>Reading-room day plan with request order, stop rules, capture gates, and linked action-queue context.</p>
+            <a href="exports/clinton-library-visit-run-sheet.csv">Download CSV</a>
+          </article>
+          <article class="export-card">
             <span class="export-meta">99 rows</span>
             <h3>Clinton Library OA/ID Queue</h3>
             <p>One row per staged OA/ID or folder-list control reference, with blank capture fields for on-site item review.</p>
@@ -537,11 +543,17 @@
         <p class="section-note">
           The four local `2013-0185-M` PDFs are folder-title lists, not finished document selections.
           This section turns them into a pull sequence for a Clinton Library visit. Use the
+          <a href="reports/clinton-library-visit-run-sheet.md">visit run sheet</a>
+          as the reading-room day plan, the
           <a href="reports/clinton-library-request-packets.md">request packets</a>
-          for de-duplicated reading-room call slips and the
+          for de-duplicated reading-room call slips, and the
           <a href="reports/clinton-library-oaid-request-queue.md">OA/ID request queue</a>
           when moving from cluster strategy to request slips and item-level capture.
         </p>
+        <div class="hero-actions" aria-label="Clinton Library visit run sheet downloads">
+          <a class="button primary" href="exports/clinton-library-visit-run-sheet.csv">Download Visit Run Sheet</a>
+          <a class="button secondary" href="reports/clinton-library-visit-run-sheet.md">Read Run Sheet Report</a>
+        </div>
         <div id="library-root" class="library-root" aria-live="polite">
           <p class="loading">Loading Clinton Library research plan...</p>
         </div>

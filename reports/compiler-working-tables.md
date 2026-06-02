@@ -14,6 +14,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 - `exports/public-statement-backtrace-queue.csv`: 15 Clinton public statements paired with internal-counterpart search paths.
 - `exports/clinton-library-call-slips.csv`: 13 Clinton Library pull clusters from the 2013-0185-M folder-title lists.
 - `exports/clinton-library-request-packets.csv`: 83 de-duplicated Clinton Library request packets for reading-room call slips.
+- `exports/clinton-library-visit-run-sheet.csv`: 83 Clinton Library run-sheet rows with request order, stop rules, capture gates, and linked action-queue context.
 - `exports/clinton-library-oaid-request-queue.csv`: 99 exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.
 - `exports/presidential-daily-diary-follow-up.csv`: 22 calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.
 - `exports/daily-diary-counterpart-queue.csv`: 22 diary events converted into substantive-counterpart searches and capture fields.
@@ -34,7 +35,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 8. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.
 9. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
 10. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.
-11. Use `clinton-library-call-slips.csv` for pull-cluster strategy, `clinton-library-request-packets.csv` for de-duplicated reading-room requests, then `clinton-library-oaid-request-queue.csv` for item-level capture.
+11. Use `clinton-library-visit-run-sheet.csv` as the reading-room day plan, `clinton-library-request-packets.csv` for de-duplicated call slips, then `clinton-library-oaid-request-queue.csv` for item-level capture.
 12. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.
 13. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 
