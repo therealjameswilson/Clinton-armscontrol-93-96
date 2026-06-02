@@ -8,14 +8,15 @@
       name="description"
       content="A compiler-facing source map for FRUS 1993-2000, Volume VII, Arms Control and Nonproliferation, 1993-1996."
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260602-action-queue-render" />
     <script defer src="data/potential-documents.js"></script>
     <script defer src="data/source-gap-leads.js"></script>
     <script defer src="data/compiler-gaps.js"></script>
     <script defer src="data/clinton-library-research-plan.js"></script>
     <script defer src="data/presidential-daily-diary-references.js"></script>
     <script defer src="data/clinton-public-statements.js"></script>
-    <script defer src="app.js?v=20260602-diary-counterpart"></script>
+    <script defer src="data/compiler-action-queue.js"></script>
+    <script defer src="app.js?v=20260602-action-queue-render"></script>
     <script defer src="compiler-workbench.js?v=20260602-diary-counterpart"></script>
     <style id="compiler-network-style">
       .compiler-network {
@@ -224,6 +225,29 @@
         <div class="hero-actions" aria-label="Compiler action queue downloads">
           <a class="button primary" href="exports/compiler-action-queue.csv">Download Action Queue CSV</a>
           <a class="button secondary" href="reports/compiler-action-queue.md">Read Action Queue Report</a>
+        </div>
+        <div class="action-tools" aria-label="Action queue filters">
+          <label>
+            <span>Search</span>
+            <input id="action-search" type="search" placeholder="Search actions, titles, terms" />
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="action-band-filter"></select>
+          </label>
+          <label>
+            <span>Workstream</span>
+            <select id="action-workstream-filter"></select>
+          </label>
+          <label>
+            <span>Chapter</span>
+            <select id="action-chapter-filter"></select>
+          </label>
+          <button id="clear-action-filters" type="button">Clear</button>
+          <p id="action-summary" class="action-summary">Loading action queue...</p>
+        </div>
+        <div id="action-queue-root" class="action-queue-root" aria-live="polite">
+          <p class="loading">Loading compiler action queue...</p>
         </div>
       </section>
 

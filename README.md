@@ -40,6 +40,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `app.js`: data model, filters, chapter cards, source leads, public statements, and milestones
 - `compiler-workbench.js`: second-section decision board for close reads, packet screening, pulls, and risks
 - `exports/*.csv`: generated compiler working tables for archive and source-note workflows
+- `data/compiler-action-queue.js`: generated action-queue data rendered in the Actions section
 - `data/potential-documents.js`: generated potential-document data loaded by the page
 - `data/source-gap-leads.js`: manual source-gap leads added after compiler-risk review
 - `data/compiler-gaps.js`: structured gap analysis rendered on the page

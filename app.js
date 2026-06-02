@@ -3,6 +3,13 @@ const sourceGapLeads = window.ARMSCONTROL_SOURCE_GAP_LEADS || [];
 const compilerGaps = window.ARMSCONTROL_COMPILER_GAPS || [];
 const libraryResearchPlan = window.ARMSCONTROL_LIBRARY_RESEARCH_PLAN || [];
 const dailyDiaryReferences = window.ARMSCONTROL_DAILY_DIARY_REFERENCES || [];
+const compilerActionQueue = (window.ARMSCONTROL_COMPILER_ACTION_QUEUE || []).slice().sort((a, b) => {
+  return (
+    (a.sortWeight || 999) - (b.sortWeight || 999) ||
+    `${a.actionRank || a.action_rank || ""}`.localeCompare(`${b.actionRank || b.action_rank || ""}`) ||
+    (a.targetTitle || "").localeCompare(b.targetTitle || "")
+  );
+});
 const chapterSequence = [
   "ctbt",
   "strategic-arms",
@@ -714,6 +721,7 @@ const gapCount = document.querySelector("#gap-count");
 const diaryCount = document.querySelector("#diary-count");
 const lanesRoot = document.querySelector("#lanes-root");
 const chronologyRoot = document.querySelector("#chronology-root");
+const actionQueueRoot = document.querySelector("#action-queue-root");
 const readinessRoot = document.querySelector("#readiness-root");
 const leadsRoot = document.querySelector("#leads-root");
 const documentsRoot = document.querySelector("#documents-root");
@@ -737,6 +745,12 @@ const statementSearch = document.querySelector("#statement-search");
 const statementChapterFilter = document.querySelector("#statement-chapter-filter");
 const statementYearFilter = document.querySelector("#statement-year-filter");
 const clearStatementFilters = document.querySelector("#clear-statement-filters");
+const actionSearch = document.querySelector("#action-search");
+const actionBandFilter = document.querySelector("#action-band-filter");
+const actionWorkstreamFilter = document.querySelector("#action-workstream-filter");
+const actionChapterFilter = document.querySelector("#action-chapter-filter");
+const clearActionFilters = document.querySelector("#clear-action-filters");
+const actionSummary = document.querySelector("#action-summary");
 const statementSummary = document.querySelector("#statement-summary");
 
 function formatDate(value) {
@@ -1278,6 +1292,27 @@ function populateFilters() {
   for (const year of unique(clintonPublicStatements.map((item) => (item.date || "").slice(0, 4)))) {
     statementYearFilter.append(option(year, year));
   }
+
+  if (actionBandFilter) {
+    actionBandFilter.replaceChildren(option("All priorities"));
+    for (const band of unique(compilerActionQueue.map((item) => item.priorityBand))) {
+      actionBandFilter.append(option(band, band));
+    }
+  }
+
+  if (actionWorkstreamFilter) {
+    actionWorkstreamFilter.replaceChildren(option("All workstreams"));
+    for (const workstream of unique(compilerActionQueue.map((item) => item.workstream))) {
+      actionWorkstreamFilter.append(option(workstream, workstream));
+    }
+  }
+
+  if (actionChapterFilter) {
+    actionChapterFilter.replaceChildren(option("All chapters"));
+    for (const chapter of unique(compilerActionQueue.flatMap((item) => `${item.chapterTitle || ""}`.split(";").map((value) => value.trim())))) {
+      actionChapterFilter.append(option(chapter, chapter));
+    }
+  }
 }
 
 function renderLanes() {
@@ -1370,6 +1405,113 @@ function renderDeclassifiedChronology() {
   });
 
   chronologyRoot.replaceChildren(...cards);
+}
+
+function actionSearchText(item) {
+  return [
+    item.priorityBand,
+    item.workstream,
+    item.visitStage,
+    item.chapterTitle,
+    item.date,
+    item.targetTitle,
+    item.immediateAction,
+    item.sourceQueue,
+    item.sourceIdentifier,
+    item.sourceLevel,
+    item.whyItMatters,
+    item.supportingEvidence,
+    item.completionGate,
+    item.captureFields,
+    ...(item.targetTerms || [])
+  ]
+    .join(" ")
+    .toLowerCase();
+}
+
+function filteredActions() {
+  if (!compilerActionQueue.length) return [];
+  const query = actionSearch?.value.trim().toLowerCase() || "";
+  const band = actionBandFilter?.value || "";
+  const workstream = actionWorkstreamFilter?.value || "";
+  const chapter = actionChapterFilter?.value || "";
+
+  return compilerActionQueue.filter((item) => {
+    if (band && item.priorityBand !== band) return false;
+    if (workstream && item.workstream !== workstream) return false;
+    if (chapter && !`${item.chapterTitle || ""}`.split(";").map((value) => value.trim()).includes(chapter)) return false;
+    return !query || actionSearchText(item).includes(query);
+  });
+}
+
+function renderActionQueue() {
+  if (!actionQueueRoot) return;
+
+  if (!compilerActionQueue.length) {
+    const empty = document.createElement("p");
+    empty.className = "loading";
+    empty.textContent = "No compiler actions are currently staged.";
+    actionQueueRoot.replaceChildren(empty);
+    if (actionSummary) actionSummary.textContent = "No compiler actions are currently staged.";
+    return;
+  }
+
+  const items = filteredActions();
+  const visibleItems = items.slice(0, 12);
+  if (actionSummary) {
+    actionSummary.textContent = `${visibleItems.length} of ${items.length} matching actions shown; ${compilerActionQueue.length} total in the CSV`;
+  }
+
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "loading";
+    empty.textContent = "No compiler actions match the current filters.";
+    actionQueueRoot.replaceChildren(empty);
+    return;
+  }
+
+  const cards = visibleItems.map((item, index) => {
+    const card = document.createElement("article");
+    card.className = "action-card";
+
+    const header = document.createElement("div");
+    header.className = "action-card-header";
+    const rank = document.createElement("strong");
+    rank.textContent = `#${String(compilerActionQueue.indexOf(item) + 1).padStart(3, "0")}`;
+    const band = makeChip(item.priorityBand || "Priority pending", "priority-chip");
+    header.append(rank, band);
+
+    const meta = document.createElement("p");
+    meta.className = "record-type";
+    meta.textContent = `${item.workstream || "Workstream pending"} / ${item.visitStage || "Stage pending"}`;
+
+    const title = document.createElement("h3");
+    title.textContent = item.targetTitle || item.immediateAction || `Action ${index + 1}`;
+
+    const action = document.createElement("p");
+    action.className = "action-immediate";
+    action.textContent = item.immediateAction || "Action pending.";
+
+    const gate = document.createElement("p");
+    gate.className = "action-gate";
+    gate.textContent = `Done when: ${item.completionGate || "completion evidence is captured."}`;
+
+    const chips = document.createElement("div");
+    chips.className = "lead-tags";
+    for (const value of [item.chapterTitle, item.sourceQueue, item.sourceIdentifier, item.sourceLevel]) {
+      if (value) chips.append(makeChip(value));
+    }
+
+    const links = document.createElement("div");
+    links.className = "document-links";
+    if (item.openUrl) links.append(makeLink(item.openUrl, "Open source"));
+    if (item.detailReport) links.append(makeLink(item.detailReport, "Open report"));
+
+    card.append(header, meta, title, action, gate, chips, links);
+    return card;
+  });
+
+  actionQueueRoot.replaceChildren(...cards);
 }
 
 function leadSearchText(lead) {
@@ -1958,6 +2100,12 @@ function bindEvents() {
     control.addEventListener("change", renderStatements);
   }
 
+  for (const control of [actionSearch, actionBandFilter, actionWorkstreamFilter, actionChapterFilter]) {
+    if (!control) continue;
+    control.addEventListener("input", renderActionQueue);
+    control.addEventListener("change", renderActionQueue);
+  }
+
   clearFilters.addEventListener("click", () => {
     leadSearch.value = "";
     laneFilter.value = "";
@@ -1981,12 +2129,24 @@ function bindEvents() {
     renderStatements();
     statementSearch.focus();
   });
+
+  if (clearActionFilters) {
+    clearActionFilters.addEventListener("click", () => {
+      actionSearch.value = "";
+      actionBandFilter.value = "";
+      actionWorkstreamFilter.value = "";
+      actionChapterFilter.value = "";
+      renderActionQueue();
+      actionSearch.focus();
+    });
+  }
 }
 
 setStats();
 populateFilters();
 renderLanes();
 renderDeclassifiedChronology();
+renderActionQueue();
 renderSelectionReadiness();
 renderLeads();
 renderDocuments();

@@ -9,6 +9,7 @@ const {
 
 const repoRoot = path.resolve(__dirname, "..");
 const exportDir = path.join(repoRoot, "exports");
+const generatedDataDir = path.join(repoRoot, "data");
 const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
 const compilerActionQueueReportPath = path.join(repoRoot, "reports", "compiler-action-queue.md");
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
@@ -108,6 +109,7 @@ const compilerActionQueue = buildCompilerActionQueue();
 fs.mkdirSync(exportDir, { recursive: true });
 
 writeCsv("compiler-action-queue.csv", compilerActionColumns(), compilerActionQueue);
+writeJsonData("compiler-action-queue.js", "ARMSCONTROL_COMPILER_ACTION_QUEUE", compilerActionQueue);
 writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potentialDocuments);
 writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
 writeCsv("frus-selection-capture-worksheet.csv", selectionCaptureColumns(), selectionCaptureWorksheet);
@@ -140,6 +142,7 @@ writeLibraryRequestReport();
 console.log(
   [
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-action-queue.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(generatedDataDir, "compiler-action-queue.js"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "potential-documents-triage.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "frus-selection-capture-worksheet.csv"))}`,
@@ -177,6 +180,10 @@ function writeCsv(filename, columns, rows) {
     columns.map((column) => csvCell(column.value(row, index))).join(",")
   );
   fs.writeFileSync(path.join(exportDir, filename), `${[header, ...body].join("\n")}\n`);
+}
+
+function writeJsonData(filename, globalName, rows) {
+  fs.writeFileSync(path.join(generatedDataDir, filename), `window.${globalName} = ${JSON.stringify(rows, null, 2)};\n`);
 }
 
 function compilerActionColumns() {

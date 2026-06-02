@@ -178,6 +178,7 @@ h3 {
 }
 
 .button,
+.action-tools button,
 .lead-tools button,
 .document-tools button,
 .statement-tools button {
@@ -201,6 +202,8 @@ h3 {
 
 .button:hover,
 .button:focus-visible,
+.action-tools button:hover,
+.action-tools button:focus-visible,
 .lead-tools button:hover,
 .lead-tools button:focus-visible,
 .document-tools button:hover,
@@ -417,6 +420,7 @@ dd {
 }
 
 .lead-tools,
+.action-tools,
 .document-tools,
 .statement-tools {
   display: grid;
@@ -430,7 +434,13 @@ dd {
   border-radius: 8px;
 }
 
+.action-tools {
+  grid-template-columns: minmax(220px, 1.25fr) repeat(3, minmax(150px, 0.75fr)) auto;
+  margin-top: 24px;
+}
+
 .lead-tools label,
+.action-tools label,
 .document-tools label,
 .statement-tools label {
   display: grid;
@@ -439,6 +449,7 @@ dd {
 }
 
 .lead-tools span,
+.action-tools span,
 .document-tools span,
 .statement-tools span {
   color: var(--muted);
@@ -449,11 +460,15 @@ dd {
 
 .lead-tools input,
 .lead-tools select,
+.action-tools input,
+.action-tools select,
 .document-tools input,
 .document-tools select,
 .statement-tools input,
 .statement-tools select {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 44px;
   padding: 0 12px;
   color: var(--ink);
@@ -463,12 +478,65 @@ dd {
 }
 
 .lead-summary,
+.action-summary,
 .document-summary,
 .statement-summary {
   grid-column: 1 / -1;
   margin: 0;
   color: var(--muted);
   font-weight: 750;
+}
+
+.action-queue-root {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.action-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--green);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(23, 33, 43, 0.07);
+}
+
+.action-card-header {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.action-card-header strong {
+  color: var(--red);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.action-card h3,
+.action-card p {
+  margin: 0;
+}
+
+.action-immediate {
+  color: #3b4853;
+  line-height: 1.5;
+}
+
+.action-gate {
+  padding: 10px 12px;
+  color: #283848;
+  font-size: 0.94rem;
+  line-height: 1.45;
+  background: #f5f7f8;
+  border-left: 3px solid rgba(32, 51, 76, 0.42);
 }
 
 .leads-root,
@@ -1123,6 +1191,7 @@ dd {
   .lane-grid,
   .workbench-grid,
   .readiness-root,
+  .action-queue-root,
   .export-grid,
   .dossiers-root,
   .gap-metrics,
@@ -1132,9 +1201,10 @@ dd {
   }
 
   .lead-tools,
+  .action-tools,
   .document-tools,
   .statement-tools {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1176,16 +1246,18 @@ dd {
   .lane-grid,
   .workbench-grid,
   .readiness-root,
+  .action-queue-root,
   .export-grid,
   .dossiers-root,
   .lead-tools,
+  .action-tools,
   .document-tools,
     .statement-tools,
   .gap-metrics,
   .library-metrics,
   .diary-metrics,
   .source-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .section-heading.with-link {
