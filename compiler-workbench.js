@@ -1,5 +1,6 @@
 const workbenchRoot = document.querySelector("#workbench-root");
 const workbenchLaneById = window.laneById instanceof Map ? window.laneById : new Map();
+const workbenchActionQueue = (window.ARMSCONTROL_COMPILER_ACTION_QUEUE || []).slice().sort(compareWorkbenchActions);
 
 function formatWorkbenchDate(value) {
   if (typeof window.formatDate === "function") return window.formatDate(value);
@@ -17,6 +18,15 @@ function makeWorkbenchLink(url, label) {
 
 function workbenchGapPriorityRank(priority) {
   return { Critical: 0, High: 1, Medium: 2, Review: 3 }[priority] ?? 4;
+}
+
+function compareWorkbenchActions(a, b) {
+  return (
+    (a.sortWeight || 999) - (b.sortWeight || 999) ||
+    `${a.priorityBand || ""}`.localeCompare(`${b.priorityBand || ""}`) ||
+    `${a.workstream || ""}`.localeCompare(`${b.workstream || ""}`) ||
+    `${a.targetTitle || ""}`.localeCompare(`${b.targetTitle || ""}`)
+  );
 }
 
 function isCloseReadCandidate(item) {
@@ -81,6 +91,122 @@ function makeWorkbenchGapItem(item) {
   return listItem;
 }
 
+function firstStartHereActions() {
+  const startHere = workbenchActionQueue.filter((item) => item.priorityBand === "1 - Start here");
+  return (startHere.length ? startHere : workbenchActionQueue).slice(0, 12);
+}
+
+function fallbackWorkbenchCopy(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  document.body.append(area);
+  area.select();
+  try {
+    document.execCommand("copy");
+  } finally {
+    area.remove();
+  }
+}
+
+async function copyWorkbenchPlan(text, button) {
+  try {
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else fallbackWorkbenchCopy(text);
+  } catch (_error) {
+    fallbackWorkbenchCopy(text);
+  }
+
+  button.textContent = "Copied";
+  window.setTimeout(() => {
+    button.textContent = "Copy First 12";
+  }, 1800);
+}
+
+function workbenchActionPlanText(actions) {
+  const lines = [
+    "# FRUS Volume VII First 12 Compiler Actions",
+    "",
+    `Page: ${window.location.href.split("#")[0]}`,
+    "Full queue: exports/compiler-action-queue.csv",
+    "",
+    ...actions.map((item, index) =>
+      [
+        `${String(index + 1).padStart(2, "0")}. ${item.priorityBand || "Action"} / ${item.workstream || "Workstream"} / ${
+          item.chapterTitle || "Volume Control"
+        }`,
+        `Target: ${item.targetTitle || item.sourceIdentifier || "target pending"}`,
+        `Action: ${item.immediateAction || "action pending"}`,
+        `Gate: ${item.completionGate || "completion gate pending"}`
+      ].join("\n")
+    )
+  ];
+  return lines.join("\n\n");
+}
+
+function makeWorkbenchActionItem(item, index) {
+  const listItem = document.createElement("li");
+  const rank = document.createElement("span");
+  rank.className = "workbench-action-rank";
+  rank.textContent = String(index + 1).padStart(2, "0");
+
+  const body = document.createElement("div");
+  body.className = "workbench-action-body";
+
+  const title = document.createElement("strong");
+  title.textContent = item.targetTitle || item.sourceIdentifier || "Untitled action";
+
+  const meta = document.createElement("span");
+  meta.textContent = `${item.workstream || "Workstream pending"} / ${item.chapterTitle || "Volume Control"} / ${
+    item.sourceQueue || "queue pending"
+  }`;
+
+  const action = document.createElement("p");
+  action.textContent = item.immediateAction || "Action pending.";
+
+  body.append(title, meta, action);
+  listItem.append(rank, body);
+  return listItem;
+}
+
+function makeWorkbenchActionConsole(actions) {
+  const consolePanel = document.createElement("article");
+  consolePanel.className = "workbench-action-console";
+
+  const header = document.createElement("div");
+  header.className = "workbench-console-header";
+
+  const copy = document.createElement("button");
+  copy.type = "button";
+  copy.textContent = "Copy First 12";
+  copy.addEventListener("click", () => copyWorkbenchPlan(workbenchActionPlanText(actions), copy));
+
+  const titleWrap = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = "First 12 Compiler Actions";
+  const note = document.createElement("p");
+  note.textContent =
+    "Start here before opening the larger tables: these are the top-ranked actions from the live compiler action queue.";
+  titleWrap.append(title, note);
+
+  const links = document.createElement("div");
+  links.className = "workbench-console-actions";
+  links.append(makeWorkbenchLink("exports/compiler-action-queue.csv", "Action CSV"));
+  links.append(makeWorkbenchLink("reports/compiler-action-queue.md", "Queue Report"));
+  links.append(copy);
+
+  header.append(titleWrap, links);
+
+  const list = document.createElement("ol");
+  list.className = "workbench-action-list";
+  actions.forEach((item, index) => list.append(makeWorkbenchActionItem(item, index)));
+
+  consolePanel.append(header, list);
+  return consolePanel;
+}
+
 function renderCompilerWorkbench() {
   if (!workbenchRoot) return;
 
@@ -139,7 +265,7 @@ function renderCompilerWorkbench() {
     grid.append(card);
   }
 
-  workbenchRoot.replaceChildren(grid);
+  workbenchRoot.replaceChildren(makeWorkbenchActionConsole(firstStartHereActions()), grid);
 }
 
 renderCompilerWorkbench();

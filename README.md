@@ -12,6 +12,7 @@ currently lists the volume as planned rather than published. It gathers:
 - a compiler requirements audit that maps each requested deliverable to evidence, open work, and next action
 - a generated compiler action queue that gives the next daily worklist across all source workstreams
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
+- a copyable first-12 action console in the workbench for starting the next compiler session
 - a selection-readiness queue that assigns every potential-document lead to an immediate verification action
 - a FRUS selection capture worksheet for final document decisions, citation fields, and source-note completion
 - a NARA file-unit resolver that isolates Scout hits needing item-boundary verification
