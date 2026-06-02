@@ -1113,7 +1113,16 @@ async function main() {
   if (errors.length) console.log(`Scout warnings: ${errors.length} failed calls; see report.`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  CHAPTERS,
+  QUERY_PACKS,
+  SCOPES,
+  SCOUT_URL
+};

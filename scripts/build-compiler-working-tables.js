@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const {
+  QUERY_PACKS: naraScoutQueryPacks,
+  SCOPES: naraScoutScopes,
+  SCOUT_URL: naraScoutUrl
+} = require("./harvest-nara-scout-documents");
 
 const repoRoot = path.resolve(__dirname, "..");
 const exportDir = path.join(repoRoot, "exports");
@@ -10,6 +15,7 @@ const chapterReadinessReportPath = path.join(repoRoot, "reports", "chapter-readi
 const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
 const selectionCaptureReportPath = path.join(repoRoot, "reports", "frus-selection-capture-worksheet.md");
 const naraFileUnitReportPath = path.join(repoRoot, "reports", "nara-file-unit-resolution-queue.md");
+const naraScoutQueryPacketReportPath = path.join(repoRoot, "reports", "nara-scout-query-packets.md");
 const publicBacktraceReportPath = path.join(repoRoot, "reports", "public-statement-backtrace-queue.md");
 const diaryCounterpartReportPath = path.join(repoRoot, "reports", "daily-diary-counterpart-queue.md");
 const libraryRequestPacketReportPath = path.join(repoRoot, "reports", "clinton-library-request-packets.md");
@@ -95,6 +101,7 @@ const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows
 const libraryRequestPackets = buildLibraryRequestPackets(libraryRequestQueue);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 const chapterReadinessScorecard = chapterDefinitions.map(buildChapterReadinessRow);
+const naraScoutQueryPacketQueue = buildNaraScoutQueryPacketQueue();
 
 fs.mkdirSync(exportDir, { recursive: true });
 
@@ -102,6 +109,7 @@ writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potential
 writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
 writeCsv("frus-selection-capture-worksheet.csv", selectionCaptureColumns(), selectionCaptureWorksheet);
 writeCsv("nara-file-unit-resolution-queue.csv", naraFileUnitColumns(), naraFileUnitResolutionQueue);
+writeCsv("nara-scout-query-packets.csv", naraScoutQueryPacketColumns(), naraScoutQueryPacketQueue);
 writeCsv("declassified-chronology.csv", chronologyColumns(), declassifiedChronology);
 writeCsv("public-statement-backtrace-queue.csv", publicBacktraceColumns(), publicStatementBacktraceQueue);
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
@@ -119,6 +127,7 @@ writeChapterReadinessReport();
 writeReadinessReport();
 writeSelectionCaptureReport();
 writeNaraFileUnitReport();
+writeNaraScoutQueryPacketReport();
 writePublicBacktraceReport();
 writeDiaryCounterpartReport();
 writeLibraryRequestPacketReport();
@@ -130,6 +139,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "frus-selection-capture-worksheet.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "nara-file-unit-resolution-queue.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "nara-scout-query-packets.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "declassified-chronology.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "public-statement-backtrace-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
@@ -147,6 +157,7 @@ console.log(
     `Generated ${path.relative(repoRoot, readinessReportPath)}`,
     `Generated ${path.relative(repoRoot, selectionCaptureReportPath)}`,
     `Generated ${path.relative(repoRoot, naraFileUnitReportPath)}`,
+    `Generated ${path.relative(repoRoot, naraScoutQueryPacketReportPath)}`,
     `Generated ${path.relative(repoRoot, publicBacktraceReportPath)}`,
     `Generated ${path.relative(repoRoot, diaryCounterpartReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestPacketReportPath)}`,
@@ -290,6 +301,38 @@ function naraFileUnitColumns() {
     column("replacement_candidate_date", () => ""),
     column("disposition", () => ""),
     column("final_source_note", () => ""),
+    column("compiler_notes", () => "")
+  ];
+}
+
+function naraScoutQueryPacketColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("run_priority", (row) => row.runPriority),
+    column("chapter", (row) => row.chapterTitle),
+    column("query", (row) => row.query),
+    column("scope_naid", (row) => row.scopeNaid),
+    column("scope_label", (row) => row.scopeLabel),
+    column("scout_search_url", (row) => row.scoutSearchUrl),
+    column("catalog_search_url", (row) => row.catalogSearchUrl),
+    column("existing_file_unit_leads_in_chapter", (row) => row.existingFileUnitLeadsInChapter),
+    column("high_priority_file_unit_leads_in_chapter", (row) => row.highPriorityFileUnitLeadsInChapter),
+    column("chapter_readiness_band", (row) => row.chapterReadinessBand),
+    column("chapter_readiness_score", (row) => row.chapterReadinessScore),
+    column("top_chapter_risk", (row) => row.topChapterRisk),
+    column("target_record_types", (row) => row.targetRecordTypes),
+    column("why_run_this_query", (row) => row.whyRunThisQuery),
+    column("dedupe_note", (row) => row.dedupeNote),
+    column("harvester_command", (row) => row.harvesterCommand),
+    column("capture_result_count", () => ""),
+    column("capture_top_naids", () => ""),
+    column("capture_item_level_hits", () => ""),
+    column("capture_child_item_urls", () => ""),
+    column("capture_dates_or_date_spans", () => ""),
+    column("capture_source_paths", () => ""),
+    column("capture_candidates_promoted", () => ""),
+    column("capture_context_only_leads", () => ""),
+    column("disposition", () => ""),
     column("compiler_notes", () => "")
   ];
 }
@@ -594,11 +637,12 @@ function writeReport() {
     "",
     "## Tables",
     "",
+    `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/potential-documents-triage.csv\`: ${potentialDocuments.length} staged document or source-path leads with FRUS-style source notes and risk fields.`,
     `- \`exports/selection-readiness-queue.csv\`: ${selectionReadinessQueue.length} staged leads normalized into readiness gates, next actions, and verification fields.`,
     `- \`exports/frus-selection-capture-worksheet.csv\`: ${selectionCaptureWorksheet.length} staged leads with final-selection, citation, document-description, and source-note capture fields.`,
     `- \`exports/nara-file-unit-resolution-queue.csv\`: ${naraFileUnitResolutionQueue.length} NARA Scout or file-unit leads isolated for item-boundary resolution.`,
-    `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
+    `- \`exports/nara-scout-query-packets.csv\`: ${naraScoutQueryPacketQueue.length} NARA Scout query/scope packets for reruns and source-gap discovery.`,
     `- \`exports/public-statement-backtrace-queue.csv\`: ${publicStatementBacktraceQueue.length} Clinton public statements paired with internal-counterpart search paths.`,
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
     `- \`exports/clinton-library-request-packets.csv\`: ${libraryRequestPackets.length} de-duplicated Clinton Library request packets for reading-room call slips.`,
@@ -615,14 +659,15 @@ function writeReport() {
     "1. Start with `declassified-chronology.csv` for the first read-through of available or released records.",
     "2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
     "3. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.",
-    "4. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
-    "5. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.",
-    "6. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
-    "7. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "8. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
-    "9. Use `clinton-library-call-slips.csv` for pull-cluster strategy, `clinton-library-request-packets.csv` for de-duplicated reading-room requests, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
-    "10. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
-    "11. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "4. Use `nara-scout-query-packets.csv` when re-running Scout or filling source gaps so query/scope work is tracked and reproducible.",
+    "5. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
+    "6. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.",
+    "7. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "8. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "9. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
+    "10. Use `clinton-library-call-slips.csv` for pull-cluster strategy, `clinton-library-request-packets.csv` for de-duplicated reading-room requests, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
+    "11. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
+    "12. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -861,6 +906,71 @@ function writeNaraFileUnitReport() {
   }
 
   fs.writeFileSync(naraFileUnitReportPath, lines.join("\n"));
+}
+
+function writeNaraScoutQueryPacketReport() {
+  const runGroups = [...new Set(naraScoutQueryPacketQueue.map((item) => item.runPriority))].sort(
+    (a, b) => naraScoutRunPriorityRank(a) - naraScoutRunPriorityRank(b)
+  );
+  const lines = [
+    "# NARA Scout Query Packets",
+    "",
+    "Generated from the same query packs used by `scripts/harvest-nara-scout-documents.js`, combined with the current file-unit resolver, chapter readiness scorecard, and compiler-risk register.",
+    "",
+    "## Use Rule",
+    "",
+    "Use this sheet when NARA Scout quota is available or when a compiler needs to rerun a chapter-specific search by hand. Record result counts, top NAIDs, child-item URLs, source paths, and disposition so repeated searches do not disappear into ad hoc notes.",
+    "",
+    "## Packet Counts",
+    "",
+    `- Query/scope packets: ${naraScoutQueryPacketQueue.length}`,
+    `- Chapters covered: ${new Set(naraScoutQueryPacketQueue.map((item) => item.chapterId)).size}`,
+    `- Scope records covered: ${new Set(naraScoutQueryPacketQueue.map((item) => item.scopeNaid)).size}`,
+    `- Urgent rerun packets: ${naraScoutQueryPacketQueue.filter((item) => item.runPriority === "Urgent").length}`,
+    `- High priority packets: ${naraScoutQueryPacketQueue.filter((item) => item.runPriority === "High").length}`,
+    "",
+    "## By Run Priority",
+    ""
+  ];
+
+  for (const group of runGroups) {
+    const rows = naraScoutQueryPacketQueue.filter((item) => item.runPriority === group);
+    lines.push(`### ${group}`, "", `- Packets: ${rows.length}`, "", "Top packets:");
+    appendBulletList(
+      lines,
+      rows.slice(0, 18),
+      (item) => `${item.chapterTitle} / ${item.query} / ${item.scopeLabel} / ${item.whyRunThisQuery}`,
+      "No packets in this priority."
+    );
+    lines.push("");
+  }
+
+  lines.push("## By Chapter", "");
+  for (const chapter of chapterDefinitions) {
+    const rows = naraScoutQueryPacketQueue.filter((item) => item.chapterId === chapter.id);
+    const urgent = rows.filter((item) => item.runPriority === "Urgent").length;
+    const high = rows.filter((item) => item.runPriority === "High").length;
+    const fileUnits = naraFileUnitResolutionQueue.filter((item) => item.chapterId === chapter.id).length;
+    lines.push(
+      `### ${chapter.number}: ${chapter.title}`,
+      "",
+      `- Query/scope packets: ${rows.length}`,
+      `- Urgent: ${urgent}`,
+      `- High: ${high}`,
+      `- Existing file-unit leads: ${fileUnits}`,
+      "",
+      "Queries:"
+    );
+    appendBulletList(
+      lines,
+      uniqueSorted(rows.map((item) => item.query)),
+      (query) => query,
+      "No query packets staged."
+    );
+    lines.push("");
+  }
+
+  fs.writeFileSync(naraScoutQueryPacketReportPath, lines.join("\n"));
 }
 
 function writePublicBacktraceReport() {
@@ -1239,6 +1349,88 @@ function naidFromIdentifier(value) {
 function naraDisplayIdentifier(item) {
   if (item.naid) return `NAID ${item.naid}`;
   return normalizeIdentifier(item.identifier) || "identifier pending";
+}
+
+function buildNaraScoutQueryPacketQueue() {
+  return naraScoutQueryPacks
+    .flatMap((pack) =>
+      pack.scopeIds.flatMap((scopeNaid) =>
+        pack.queries.map((query) => buildNaraScoutQueryPacket(pack, scopeNaid, query))
+      )
+    )
+    .sort(compareNaraScoutQueryPackets);
+}
+
+function buildNaraScoutQueryPacket(pack, scopeNaid, query) {
+  const chapter = chapterDefinitions.find((item) => item.id === pack.chapterId) || {
+    id: pack.chapterId,
+    title: pack.chapterId,
+    number: "Chapter"
+  };
+  const chapterFileUnits = naraFileUnitResolutionQueue.filter((item) => item.chapterId === pack.chapterId);
+  const highPriorityFileUnits = chapterFileUnits.filter((item) => item.priority === "High");
+  const scorecard = chapterReadinessScorecard.find((item) => item.chapter.id === pack.chapterId);
+  const risks = chapterRiskControls(chapter);
+  const topRisk = preferredChapterRisk(chapter, risks);
+  const targetRecordTypes = naraScoutTargetRecordTypes(pack.chapterId, query);
+
+  return {
+    chapterId: pack.chapterId,
+    chapterTitle: chapter.title,
+    query,
+    scopeNaid,
+    scopeLabel: naraScoutScopes[scopeNaid] || "Scope pending",
+    scoutSearchUrl: `${naraScoutUrl}?q=${encodeURIComponent(query)}`,
+    catalogSearchUrl: `https://catalog.archives.gov/search?q=${encodeURIComponent(query)}&collectionIdentifier=WJC*`,
+    existingFileUnitLeadsInChapter: chapterFileUnits.length,
+    highPriorityFileUnitLeadsInChapter: highPriorityFileUnits.length,
+    chapterReadinessBand: scorecard?.readinessBand || "",
+    chapterReadinessScore: scorecard?.readinessScore ?? "",
+    topChapterRisk: topRisk ? `${topRisk.priority}: ${topRisk.title}` : "",
+    targetRecordTypes,
+    whyRunThisQuery: naraScoutRunReason(pack.chapterId, query, chapterFileUnits, scorecard, topRisk),
+    dedupeNote: "One row per query/scope pair from the harvester; capture result counts here before promoting records into the file-unit resolver or selection worksheet.",
+    harvesterCommand: "NARA_SCOUT_API_KEY=... node scripts/harvest-nara-scout-documents.js --limit=18 --per-chapter=12",
+    runPriority: naraScoutRunPriority(pack.chapterId, query, chapterFileUnits, scorecard, topRisk)
+  };
+}
+
+function naraScoutRunPriority(chapterId, query, chapterFileUnits, scorecard, topRisk) {
+  const queryText = query.toLowerCase();
+  const highValueTerms = /start ii|ctbt|npt|cwc|bwc|counterproliferation|defense counterproliferation|nunn-lugar|highly enriched|north korea|iran|iraq|china|pdd-18|pdd-34|pdd-48/;
+  if ((scorecard?.readinessScore ?? 100) <= 15 && highValueTerms.test(queryText)) return "Urgent";
+  if (chapterFileUnits.filter((item) => item.priority === "High").length >= 4) return "Urgent";
+  if (topRisk?.priority === "High" || highValueTerms.test(queryText)) return "High";
+  if (chapterFileUnits.length) return "Medium";
+  return "Review";
+}
+
+function naraScoutRunReason(chapterId, query, chapterFileUnits, scorecard, topRisk) {
+  const pieces = [];
+  if (chapterFileUnits.length) pieces.push(`chapter has ${chapterFileUnits.length} unresolved file-unit leads`);
+  if (scorecard?.readinessBand) pieces.push(`scorecard band is ${scorecard.readinessBand}`);
+  if (topRisk?.title) pieces.push(`top chapter risk: ${topRisk.title}`);
+  pieces.push(`query targets ${targetPhrase({ chapterId, title: query, topics: titleKeywords(query) })}`);
+  return pieces.join("; ");
+}
+
+function naraScoutTargetRecordTypes(chapterId, query) {
+  const base = {
+    ctbt: ["ACDA/State negotiation cable", "NSC decision memorandum", "PRD/PDD file", "Geneva negotiating file"],
+    "strategic-arms": ["NSC arms-control memorandum", "summit preparation file", "joint-statement clearance", "working-group record"],
+    "start-ii": ["ratification strategy memorandum", "Senate liaison file", "Duma/ABM linkage note", "telcon or memcon"],
+    "ctr-heu": ["CTR implementation memorandum", "DOE/USEC/Minatom file", "Ukraine denuclearization record", "leader memcon"],
+    nonproliferation: ["State/ACDA policy file", "export-control cable", "legal implementation memorandum", "treaty briefing file"],
+    counterproliferation: ["DOD/NSC initiative paper", "JCS or IC assessment", "PDD/NSC file", "interagency meeting record"],
+    regional: ["PC/DC minutes", "regional NSC policy file", "State cable", "telcon or memcon"],
+    "cbw-conventional": ["CWC/BWC treaty file", "Senate ratification strategy", "ACDA/State implementation record", "CBW threat file"],
+    "conventional-landmines": ["PDD/NSC policy file", "DOD/State implementation record", "CCW treaty file", "landmine decision memorandum"]
+  }[chapterId] || ["item-level archival record", "folder-level lead"];
+  const text = query.toLowerCase();
+  if (/pdd|prd/.test(text)) return ["Presidential decision directive file", ...base].slice(0, 5);
+  if (/speech|statement|radio address/.test(text)) return ["speech clearance file", "policy clearance attachment", ...base].slice(0, 5);
+  if (/meeting|working group|committee/.test(text)) return ["meeting minutes", "briefing book", ...base].slice(0, 5);
+  return base.slice(0, 5);
 }
 
 function buildPublicBacktraceRow(statement) {
@@ -1633,6 +1825,19 @@ function compareNaraFileUnitRows(a, b) {
     requestIdentifierRank(a.naid || a.identifier) - requestIdentifierRank(b.naid || b.identifier) ||
     a.title.localeCompare(b.title)
   );
+}
+
+function compareNaraScoutQueryPackets(a, b) {
+  return (
+    naraScoutRunPriorityRank(a.runPriority) - naraScoutRunPriorityRank(b.runPriority) ||
+    chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
+    requestIdentifierRank(a.scopeNaid) - requestIdentifierRank(b.scopeNaid) ||
+    a.query.localeCompare(b.query)
+  );
+}
+
+function naraScoutRunPriorityRank(priority) {
+  return { Urgent: 0, High: 1, Medium: 2, Review: 3 }[priority] ?? 4;
 }
 
 function comparePublicBacktraceRows(a, b) {

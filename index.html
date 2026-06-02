@@ -140,10 +140,29 @@
     </header>
 
     <main id="top">
-      <div class="hero" aria-labelledby="hero-title">
+      <section class="section chronology-section chronology-priority" id="chronology" aria-labelledby="chronology-title">
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">Declassified Document Chronology</p>
+            <h1 id="chronology-title">Released Records First</h1>
+          </div>
+          <a class="section-link" href="reports/declassified-document-chronology.md">Chronology report</a>
+        </div>
+        <p class="section-note">
+          The opening sequence now starts with dated released or declassified archival
+          leads. Public statements, broad finding aids, diary-only references, and
+          undated Scout hits stay in their own sections until they can support a
+          specific document.
+        </p>
+        <div id="chronology-root" class="chronology-root" aria-live="polite">
+          <p class="loading">Loading declassified document chronology...</p>
+        </div>
+      </section>
+
+      <div class="hero volume-overview" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="kicker">FRUS 1993-2000, Volume VII</p>
-          <h1 id="hero-title">Arms Control and Nonproliferation, 1993-1996</h1>
+          <h2 id="hero-title">Arms Control and Nonproliferation, 1993-1996</h2>
           <p class="lede">
             A public compiler desk for the planned FRUS volume on Clinton-era arms control
             and nonproliferation. The page now opens with a chronology of dated
@@ -186,25 +205,6 @@
           </dl>
         </aside>
       </div>
-
-      <section class="section chronology-section" id="chronology" aria-labelledby="chronology-title">
-        <div class="section-heading with-link">
-          <div>
-            <p class="kicker">Declassified Document Chronology</p>
-            <h2 id="chronology-title">Released Records First</h2>
-          </div>
-          <a class="section-link" href="reports/declassified-document-chronology.md">Chronology report</a>
-        </div>
-        <p class="section-note">
-          The opening sequence now starts with dated released or declassified archival
-          leads. Public statements, broad finding aids, diary-only references, and
-          undated Scout hits stay in their own sections until they can support a
-          specific document.
-        </p>
-        <div id="chronology-root" class="chronology-root" aria-live="polite">
-          <p class="loading">Loading declassified document chronology...</p>
-        </div>
-      </section>
 
       <section class="section workbench-section" id="workbench" aria-labelledby="workbench-title">
         <div class="section-heading">
@@ -254,6 +254,12 @@
         </p>
         <div class="export-grid">
           <article class="export-card">
+            <span class="export-meta">13 rows</span>
+            <h3>Declassified Chronology</h3>
+            <p>The first-read chronology of dated released or declassified archival leads.</p>
+            <a href="exports/declassified-chronology.csv">Download CSV</a>
+          </article>
+          <article class="export-card">
             <span class="export-meta">95 rows</span>
             <h3>Potential Documents Triage</h3>
             <p>All staged document and source-path leads with priority, source level, risk, URLs, and FRUS-style source notes.</p>
@@ -278,10 +284,10 @@
             <a href="exports/nara-file-unit-resolution-queue.csv">Download CSV</a>
           </article>
           <article class="export-card">
-            <span class="export-meta">13 rows</span>
-            <h3>Declassified Chronology</h3>
-            <p>The first-read chronology of dated released or declassified archival leads.</p>
-            <a href="exports/declassified-chronology.csv">Download CSV</a>
+            <span class="export-meta">483 rows</span>
+            <h3>NARA Scout Query Packets</h3>
+            <p>Query/scope rerun packets with run priority, target record types, and capture fields for Scout results.</p>
+            <a href="exports/nara-scout-query-packets.csv">Download CSV</a>
           </article>
           <article class="export-card">
             <span class="export-meta">13 rows</span>
