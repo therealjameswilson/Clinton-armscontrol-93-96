@@ -15,6 +15,7 @@ currently lists the volume as planned rather than published. It gathers:
 - a selection-readiness queue that assigns every potential-document lead to an immediate verification action
 - a FRUS selection capture worksheet for final document decisions, citation fields, and source-note completion
 - a NARA file-unit resolver that isolates Scout hits needing item-boundary verification
+- a NARA item-boundary workbench that orders file-unit checks by batch, Scout pressure, and promotion gate
 - NARA Scout query packets that make reruns and source-gap discovery reproducible
 - a public-statement backtrace queue that pairs Clinton statements with internal-counterpart search paths
 - a Daily Diary counterpart queue that converts schedule evidence into substantive-record searches
@@ -57,6 +58,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/selection-readiness-queue.md`: generated readiness gates and verification fields for every staged document lead
 - `reports/frus-selection-capture-worksheet.md`: generated capture guide for final selection and source-note fields
 - `reports/nara-file-unit-resolution-queue.md`: generated resolver for NARA Scout/file-unit leads
+- `reports/nara-item-boundary-workbench.md`: generated batch-order workbench for resolving NARA/file-unit item boundaries
 - `reports/nara-scout-query-packets.md`: generated Scout query/scope packets for reruns and result capture
 - `reports/public-statement-backtrace-queue.md`: generated queue for pairing public statements with internal records
 - `reports/daily-diary-counterpart-queue.md`: generated queue for finding substantive records behind Diary entries
@@ -182,14 +184,15 @@ chapter is ready for final FRUS selection.
 The tables section links generated CSV packets for offline use: the compiler
 requirements audit, action queue, declassified chronology, the full
 potential-document triage sheet, the selection-readiness queue, the FRUS
-selection capture worksheet, the NARA file-unit resolver, NARA Scout query
-packets, Clinton Library call-slip clusters, the request packets, the visit run
-sheet, the exploded Clinton Library OA/ID request queue, Presidential Daily
-Diary follow-up, the Daily Diary counterpart queue, the risk register, Clinton
-public statements, the public-statement backtrace queue, the chapter readiness
-scorecard, and chapter dossiers. The tables are regenerated from the same
-staged data files as the page, so a compiler can sort and annotate them without
-creating a separate hand-maintained index.
+selection capture worksheet, the NARA file-unit resolver, the NARA
+item-boundary workbench, NARA Scout query packets, Clinton Library call-slip
+clusters, the request packets, the visit run sheet, the exploded Clinton
+Library OA/ID request queue, Presidential Daily Diary follow-up, the Daily
+Diary counterpart queue, the risk register, Clinton public statements, the
+public-statement backtrace queue, the chapter readiness scorecard, and chapter
+dossiers. The tables are regenerated from the same staged data files as the
+page, so a compiler can sort and annotate them without creating a separate
+hand-maintained index.
 
 The generated `exports/frus-selection-capture-worksheet.csv` is the compilation
 handoff sheet. It preserves the current lead, readiness queue, action, required
@@ -204,6 +207,12 @@ NAID, Catalog URL, chapter, current source note, first action, and blank fields
 for child item URL, box/folder path, item title/date, author/recipient,
 classification markings, page range, digital-object status, replacement
 candidate, disposition, final source note, and compiler notes.
+
+The generated `exports/nara-item-boundary-workbench.csv` is the next-session
+NARA work plan. It orders those 42 rows into batches, adds related action-queue
+ranks, Scout query pressure, item-candidate tests, stop rules, and promotion
+gates so file-unit rows can become item-level candidates or context-only
+dispositions without another planning pass.
 
 The generated `exports/nara-scout-query-packets.csv` is the repeatable Scout
 rerun sheet. It combines the harvester's chapter query packs with the relevant
@@ -225,8 +234,9 @@ negotiating records, CTR/HEU implementation, counterproliferation provenance,
 CBW/CWC/BWC depth, regional balance, conventional arms/landmines, and public
 statements as locators. The added source-gap leads address these weak areas
 without pretending every packet or source path is already an item-level FRUS
-candidate. The NARA file-unit resolver now turns the largest remaining open
-risk into a sortable item-boundary worksheet.
+candidate. The NARA file-unit resolver and item-boundary workbench now turn
+the largest remaining open risk into a sortable, batch-ordered item-boundary
+worksheet.
 
 ## Source-note pass
 
