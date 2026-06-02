@@ -10,6 +10,7 @@ const {
 const repoRoot = path.resolve(__dirname, "..");
 const exportDir = path.join(repoRoot, "exports");
 const workingTablesReportPath = path.join(repoRoot, "reports", "compiler-working-tables.md");
+const compilerActionQueueReportPath = path.join(repoRoot, "reports", "compiler-action-queue.md");
 const dossierReportPath = path.join(repoRoot, "reports", "chapter-dossiers.md");
 const chapterReadinessReportPath = path.join(repoRoot, "reports", "chapter-readiness-scorecard.md");
 const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-queue.md");
@@ -102,9 +103,11 @@ const libraryRequestPackets = buildLibraryRequestPackets(libraryRequestQueue);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 const chapterReadinessScorecard = chapterDefinitions.map(buildChapterReadinessRow);
 const naraScoutQueryPacketQueue = buildNaraScoutQueryPacketQueue();
+const compilerActionQueue = buildCompilerActionQueue();
 
 fs.mkdirSync(exportDir, { recursive: true });
 
+writeCsv("compiler-action-queue.csv", compilerActionColumns(), compilerActionQueue);
 writeCsv("potential-documents-triage.csv", potentialDocumentColumns(), potentialDocuments);
 writeCsv("selection-readiness-queue.csv", readinessColumns(), selectionReadinessQueue);
 writeCsv("frus-selection-capture-worksheet.csv", selectionCaptureColumns(), selectionCaptureWorksheet);
@@ -122,6 +125,7 @@ writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicState
 writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
 writeCsv("chapter-readiness-scorecard.csv", chapterReadinessColumns(), chapterReadinessScorecard);
 writeReport();
+writeCompilerActionReport();
 writeDossierReport();
 writeChapterReadinessReport();
 writeReadinessReport();
@@ -135,6 +139,7 @@ writeLibraryRequestReport();
 
 console.log(
   [
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-action-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "potential-documents-triage.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "selection-readiness-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "frus-selection-capture-worksheet.csv"))}`,
@@ -152,6 +157,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-readiness-scorecard.csv"))}`,
     `Generated ${path.relative(repoRoot, workingTablesReportPath)}`,
+    `Generated ${path.relative(repoRoot, compilerActionQueueReportPath)}`,
     `Generated ${path.relative(repoRoot, dossierReportPath)}`,
     `Generated ${path.relative(repoRoot, chapterReadinessReportPath)}`,
     `Generated ${path.relative(repoRoot, readinessReportPath)}`,
@@ -171,6 +177,32 @@ function writeCsv(filename, columns, rows) {
     columns.map((column) => csvCell(column.value(row, index))).join(",")
   );
   fs.writeFileSync(path.join(exportDir, filename), `${[header, ...body].join("\n")}\n`);
+}
+
+function compilerActionColumns() {
+  return [
+    column("action_rank", (_row, index) => index + 1),
+    column("priority_band", (row) => row.priorityBand),
+    column("workstream", (row) => row.workstream),
+    column("visit_stage", (row) => row.visitStage),
+    column("chapter", (row) => row.chapterTitle),
+    column("target_date_or_span", (row) => row.date),
+    column("target_title", (row) => row.targetTitle),
+    column("immediate_action", (row) => row.immediateAction),
+    column("source_queue", (row) => row.sourceQueue),
+    column("source_identifier", (row) => row.sourceIdentifier),
+    column("source_level", (row) => row.sourceLevel),
+    column("why_it_matters", (row) => row.whyItMatters),
+    column("supporting_evidence", (row) => row.supportingEvidence),
+    column("open_url", (row) => row.openUrl),
+    column("detail_report", (row) => row.detailReport),
+    column("completion_gate", (row) => row.completionGate),
+    column("capture_fields", (row) => row.captureFields),
+    column("target_terms", (row) => row.targetTerms),
+    column("sort_weight", (row) => row.sortWeight),
+    column("disposition", () => ""),
+    column("compiler_notes", () => "")
+  ];
 }
 
 function potentialDocumentColumns() {
@@ -637,6 +669,7 @@ function writeReport() {
     "",
     "## Tables",
     "",
+    `- \`exports/compiler-action-queue.csv\`: ${compilerActionQueue.length} ordered compiler actions spanning close reads, archive requests, item-boundary work, counterpart searches, Scout reruns, and risk controls.`,
     `- \`exports/declassified-chronology.csv\`: ${declassifiedChronology.length} dated released/declassified archival leads promoted to the first page section.`,
     `- \`exports/potential-documents-triage.csv\`: ${potentialDocuments.length} staged document or source-path leads with FRUS-style source notes and risk fields.`,
     `- \`exports/selection-readiness-queue.csv\`: ${selectionReadinessQueue.length} staged leads normalized into readiness gates, next actions, and verification fields.`,
@@ -656,18 +689,19 @@ function writeReport() {
     "",
     "## Compiler Use",
     "",
-    "1. Start with `declassified-chronology.csv` for the first read-through of available or released records.",
-    "2. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
-    "3. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.",
-    "4. Use `nara-scout-query-packets.csv` when re-running Scout or filling source gaps so query/scope work is tracked and reproducible.",
-    "5. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
-    "6. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.",
-    "7. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
-    "8. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
-    "9. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
-    "10. Use `clinton-library-call-slips.csv` for pull-cluster strategy, `clinton-library-request-packets.csv` for de-duplicated reading-room requests, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
-    "11. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
-    "12. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "1. Start with `compiler-action-queue.csv` when deciding what to do next across all workstreams.",
+    "2. Use `declassified-chronology.csv` for the first read-through of available or released records.",
+    "3. Use `selection-readiness-queue.csv` to see what each lead is ready for before investing time.",
+    "4. Use `nara-file-unit-resolution-queue.csv` to resolve file-unit rows into item-level candidates or context-only leads.",
+    "5. Use `nara-scout-query-packets.csv` when re-running Scout or filling source gaps so query/scope work is tracked and reproducible.",
+    "6. Use `frus-selection-capture-worksheet.csv` to record final selection decisions, document description fields, and completed FRUS source notes.",
+    "7. Use `chapter-readiness-scorecard.csv` to decide which chapter can move to close reading, which chapter needs item-boundary work, and which chapter needs discovery first.",
+    "8. Use `chapter-dossiers.csv` as the chapter launch sheet before opening the larger tables.",
+    "9. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
+    "10. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
+    "11. Use `clinton-library-call-slips.csv` for pull-cluster strategy, `clinton-library-request-packets.csv` for de-duplicated reading-room requests, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
+    "12. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
+    "13. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -677,6 +711,86 @@ function writeReport() {
     ""
   ];
   fs.writeFileSync(workingTablesReportPath, lines.join("\n"));
+}
+
+function writeCompilerActionReport() {
+  const workstreams = [...new Set(compilerActionQueue.map((item) => item.workstream))];
+  const priorityBands = [...new Set(compilerActionQueue.map((item) => item.priorityBand))];
+  const chapterRows = chapterDefinitions
+    .map((chapter) => ({
+      chapter,
+      rows: compilerActionQueue.filter((item) => item.chapterId === chapter.id)
+    }))
+    .filter((item) => item.rows.length);
+  const lines = [
+    "# Compiler Action Queue",
+    "",
+    "Generated from the chronology, selection-readiness queue, NARA file-unit resolver, Clinton Library request packets, Daily Diary counterpart queue, public-statement backtrace queue, NARA Scout query packets, and compiler-risk register.",
+    "",
+    "## Use Rule",
+    "",
+    "Use this as the first daily worklist. It does not replace the detailed worksheets; it tells the compiler which worksheet to open, what action to take, what evidence should prove completion, and where to record the result.",
+    "",
+    "## Queue Counts",
+    "",
+    `- Total actions: ${compilerActionQueue.length}`,
+    `- First-pass actions: ${compilerActionQueue.filter((item) => item.priorityBand === "1 - Start here").length}`,
+    `- Clinton Library request actions: ${compilerActionQueue.filter((item) => item.workstream === "Clinton Library request").length}`,
+    `- Item-boundary actions: ${compilerActionQueue.filter((item) => /file-unit|packet|source path/i.test(item.workstream)).length}`,
+    `- Counterpart or backtrace actions: ${compilerActionQueue.filter((item) => /counterpart|backtrace/i.test(item.workstream)).length}`,
+    `- Scout rerun batches: ${compilerActionQueue.filter((item) => item.workstream === "NARA Scout rerun").length}`,
+    "",
+    "## First 30 Actions",
+    ""
+  ];
+
+  appendBulletList(
+    lines,
+    compilerActionQueue.slice(0, 30),
+    (item, index) =>
+      `${String(index + 1).padStart(2, "0")}. ${item.priorityBand} / ${item.workstream} / ${item.chapterTitle}: ${item.immediateAction}`,
+    "No compiler actions staged."
+  );
+
+  lines.push("", "## By Priority Band", "");
+  for (const band of priorityBands) {
+    const rows = compilerActionQueue.filter((item) => item.priorityBand === band);
+    lines.push(`### ${band}`, "", `- Actions: ${rows.length}`, "", "Top rows:");
+    appendBulletList(
+      lines,
+      rows.slice(0, 12),
+      (item) => `${item.workstream} / ${item.chapterTitle}: ${item.targetTitle}`,
+      "No actions in this band."
+    );
+    lines.push("");
+  }
+
+  lines.push("## By Workstream", "");
+  for (const workstream of workstreams) {
+    const rows = compilerActionQueue.filter((item) => item.workstream === workstream);
+    lines.push(`### ${workstream}`, "", `- Actions: ${rows.length}`, "", "Top rows:");
+    appendBulletList(
+      lines,
+      rows.slice(0, 10),
+      (item) => `${item.priorityBand} / ${item.chapterTitle}: ${item.immediateAction}`,
+      "No actions in this workstream."
+    );
+    lines.push("");
+  }
+
+  lines.push("## By Chapter", "");
+  for (const { chapter, rows } of chapterRows) {
+    lines.push(`### ${chapter.number}: ${chapter.title}`, "", `- Actions: ${rows.length}`, "", "Top rows:");
+    appendBulletList(
+      lines,
+      rows.slice(0, 12),
+      (item) => `${item.priorityBand} / ${item.workstream}: ${item.targetTitle}`,
+      "No actions staged for this chapter."
+    );
+    lines.push("");
+  }
+
+  fs.writeFileSync(compilerActionQueueReportPath, lines.join("\n"));
 }
 
 function writeDossierReport() {
@@ -1146,6 +1260,274 @@ function writeLibraryRequestReport() {
   }
 
   fs.writeFileSync(libraryRequestReportPath, lines.join("\n"));
+}
+
+function buildCompilerActionQueue() {
+  const rows = [];
+
+  rows.push(
+    ...selectionReadinessQueue
+      .filter((item) => item.readiness.queue === "Close-read now")
+      .map((item) =>
+        compilerActionFromSelection(item, {
+          workstream: "Close read",
+          sortWeight: 10,
+          sourceQueue: "declassified-chronology.csv",
+          detailReport: "reports/declassified-document-chronology.md",
+          immediateAction: `Close-read "${item.title}" and fill final document-description fields before selection.`,
+          completionGate:
+            "FRUS selection capture row has final date, title, document type, author/recipient, markings, pagination, disposition, and final source note.",
+          captureFields:
+            "proposed document number; selection decision; final title/date; author or origin; recipient; markings; pagination; final source note"
+        })
+      )
+  );
+
+  rows.push(
+    ...libraryRequestPackets.map((item) => {
+      const sortWeight = { "Pre-visit": 5, "Day 1": 18, "Day 2": 58, Defer: 82, Review: 86 }[item.visitDay] ?? 88;
+      return {
+        id: `library-packet-${item.requestIdentifier}`,
+        sortWeight,
+        priorityBand: priorityBandForAction(sortWeight),
+        workstream: "Clinton Library request",
+        visitStage: item.visitDay,
+        chapterId: firstChapterIdFromTitles(item.chapters),
+        chapterTitle: item.chapters.join("; "),
+        date: "",
+        targetTitle: item.requestIdentifier,
+        immediateAction: `${item.packetWave}: request ${item.requestIdentifier}; ${item.firstOnsiteAction}`,
+        sourceQueue: "clinton-library-request-packets.csv",
+        sourceIdentifier: item.requestIdentifier,
+        sourceLevel: item.requestType,
+        whyItMatters: item.requestReason,
+        supportingEvidence: formatLibraryPacketSourceNote(item),
+        openUrl: "",
+        detailReport: "reports/clinton-library-request-packets.md",
+        completionGate:
+          "Exact folder title, box/container, item title/date, sender/recipient, markings, page range, volume boundary, disposition, and final source note are captured.",
+        captureFields:
+          "exact folder title; box or container; item title/date; sender/recipient; document type; markings; page range; volume boundary; disposition; final source note",
+        targetTerms: item.targetTerms
+      };
+    })
+  );
+
+  rows.push(
+    ...selectionReadinessQueue
+      .filter((item) => item.readiness.queue === "Screen packet")
+      .map((item) =>
+        compilerActionFromSelection(item, {
+          workstream: "Packet screening",
+          sortWeight: 24,
+          sourceQueue: "selection-readiness-queue.csv",
+          detailReport: "reports/selection-readiness-queue.md",
+          immediateAction: `Screen "${item.title}" for discrete memoranda, cables, telcons, memcons, directives, or action papers.`,
+          completionGate:
+            "Discrete item candidates are promoted to the selection capture worksheet or the packet is marked context-only.",
+          captureFields:
+            "packet page range; exact item title/date; markings; attachments; replacement candidate; disposition; final source note"
+        })
+      )
+  );
+
+  rows.push(
+    ...naraFileUnitResolutionQueue.map((item) => ({
+      id: `nara-file-unit-${sourceIdentifierForItem(item)}`,
+      sortWeight: 30 + priorityRank(item.priority),
+      priorityBand: priorityBandForAction(30 + priorityRank(item.priority)),
+      workstream: "NARA file-unit resolution",
+      visitStage: "Pre-selection",
+      chapterId: item.chapterId,
+      chapterTitle: item.chapterTitle || chapterTitleFromId(item.chapterId),
+      date: item.date || "",
+      targetTitle: item.title,
+      immediateAction: naraFirstAction(item),
+      sourceQueue: "nara-file-unit-resolution-queue.csv",
+      sourceIdentifier: sourceIdentifierForItem(item),
+      sourceLevel: item.level || item.sourceType || "",
+      whyItMatters: item.compilerRisk || item.summary || "File-unit lead must become item-level evidence or context-only.",
+      supportingEvidence: formatFrusSourceNote(item),
+      openUrl: item.sourceUrl || catalogUrl(item),
+      detailReport: "reports/nara-file-unit-resolution-queue.md",
+      completionGate:
+        "Child item, box/folder path, item title/date, author/recipient, markings, page range, digital-object status, disposition, and final source note are captured.",
+      captureFields:
+        "child item URL; box/folder path; item title/date; author/recipient; document type; markings; page range; digital-object status; disposition",
+      targetTerms: actionTargetTerms(item)
+    }))
+  );
+
+  rows.push(
+    ...selectionReadinessQueue
+      .filter((item) => item.readiness.queue === "Pull source path")
+      .map((item) =>
+        compilerActionFromSelection(item, {
+          workstream: "Source path pull",
+          sortWeight: 36,
+          sourceQueue: "selection-readiness-queue.csv",
+          detailReport: "reports/selection-readiness-queue.md",
+          immediateAction: `Turn source path "${item.title}" into a requestable folder or item-level candidate.`,
+          completionGate:
+            "Requestable identifier, box/folder title, item boundary, date span, markings, relevance, and disposition are captured.",
+          captureFields:
+            "requestable identifier; box/folder title; item title/date; date span; markings; selection relevance; final source note"
+        })
+      )
+  );
+
+  rows.push(
+    ...dailyDiaryCounterpartQueue.map((item) => ({
+      id: `diary-counterpart-${item.id || item.date || item.title}`,
+      sortWeight: 44 + priorityRank(item.priority),
+      priorityBand: priorityBandForAction(44 + priorityRank(item.priority)),
+      workstream: "Diary counterpart search",
+      visitStage: "Counterpart search",
+      chapterId: item.chapterId,
+      chapterTitle: item.chapterTitle || chapterTitleFromId(item.chapterId),
+      date: item.date || "",
+      targetTitle: item.title,
+      immediateAction: item.searchAction,
+      sourceQueue: "daily-diary-counterpart-queue.csv",
+      sourceIdentifier: item.sourcePath || item.identifier || item.eventType || "",
+      sourceLevel: item.eventType || "Diary occurrence control",
+      whyItMatters: item.relevance || "Diary proves occurrence only; substantive counterpart still needed.",
+      supportingEvidence: item.sourceNote,
+      openUrl: item.digitalObjectUrl || item.sourceUrl || item.catalogSearchUrl || "",
+      detailReport: "reports/daily-diary-counterpart-queue.md",
+      completionGate:
+        "Substantive telcon, memcon, PC/DC minutes, NSC note, cable, or agency file is captured with markings, page range, relationship to diary entry, disposition, and final source note.",
+      captureFields:
+        "counterpart title/date; record type; source path; author/recipient; markings; page range; relationship to diary entry; disposition; final source note",
+      targetTerms: item.targetTerms
+    }))
+  );
+
+  rows.push(
+    ...publicStatementBacktraceQueue.map((item) => ({
+      id: `public-backtrace-${item.identifier || item.date || item.title}`,
+      sortWeight: 50 + priorityRank(item.priority),
+      priorityBand: priorityBandForAction(50 + priorityRank(item.priority)),
+      workstream: "Public statement backtrace",
+      visitStage: "Counterpart search",
+      chapterId: item.chapterId,
+      chapterTitle: item.chapterTitle || chapterTitleFromId(item.chapterId),
+      date: item.date || "",
+      targetTitle: item.title,
+      immediateAction: item.backtraceAction,
+      sourceQueue: "public-statement-backtrace-queue.csv",
+      sourceIdentifier: item.identifier || "",
+      sourceLevel: "Public anchor",
+      whyItMatters: item.summary || "Public statement should usually locate, not replace, internal policy evidence.",
+      supportingEvidence: formatFrusSourceNote(item),
+      openUrl: item.digitalObjectUrl || item.sourceUrl || "",
+      detailReport: "reports/public-statement-backtrace-queue.md",
+      completionGate:
+        "Internal policy, clearance, negotiation, implementation, telcon, memcon, PC/DC, cable, or agency counterpart is captured and related to the public statement.",
+      captureFields:
+        "internal counterpart title/date; source path; record type; author/recipient; markings; page range; relationship to public statement; disposition",
+      targetTerms: item.targetTerms
+    }))
+  );
+
+  rows.push(...buildNaraScoutActionBatches());
+
+  rows.push(
+    ...compilerGaps.map((item) => {
+      const sortWeight = 76 + gapPriorityRank(item.priority);
+      return {
+        id: `risk-control-${item.id}`,
+        sortWeight,
+        priorityBand: priorityBandForAction(sortWeight),
+        workstream: "Risk control",
+        visitStage: "Selection control",
+        chapterId: firstChapterIdForRisk(item),
+        chapterTitle: riskChapterTitle(item),
+        date: "",
+        targetTitle: item.title,
+        immediateAction: (item.nextActions || [])[0] || item.needed || "Keep this risk visible during selection.",
+        sourceQueue: "compiler-risk-register.csv",
+        sourceIdentifier: item.id,
+        sourceLevel: item.priority,
+        whyItMatters: item.problem || item.evidence || "",
+        supportingEvidence: item.evidence || item.needed || "",
+        openUrl: "",
+        detailReport: "reports/compiler-gap-analysis.md",
+        completionGate:
+          "Risk is either closed by item-level source evidence or explicitly accepted as an editorial limitation in chapter notes.",
+        captureFields: "evidence added; source pool checked; risk status; residual limitation; compiler decision",
+        targetTerms: item.targetTerms || []
+      };
+    })
+  );
+
+  return rows.sort(compareCompilerActionRows);
+}
+
+function compilerActionFromSelection(item, options) {
+  const sortWeight = options.sortWeight + priorityRank(item.priority);
+  return {
+    id: `${options.workstream}-${item.id || sourceIdentifierForItem(item) || item.title}`,
+    sortWeight,
+    priorityBand: priorityBandForAction(sortWeight),
+    workstream: options.workstream,
+    visitStage: options.visitStage || "Pre-selection",
+    chapterId: item.chapterId,
+    chapterTitle: item.chapterTitle || chapterTitleFromId(item.chapterId),
+    date: item.date || "",
+    targetTitle: item.title,
+    immediateAction: options.immediateAction || item.readiness.nextAction,
+    sourceQueue: options.sourceQueue,
+    sourceIdentifier: sourceIdentifierForItem(item),
+    sourceLevel: item.level || item.sourceType || "",
+    whyItMatters: item.compilerRisk || item.summary || item.sourceNote || item.readiness.readiness,
+    supportingEvidence: formatFrusSourceNote(item),
+    openUrl: item.digitalObjectUrl || item.sourceUrl || item.scoutSearchUrl || "",
+    detailReport: options.detailReport,
+    completionGate: options.completionGate,
+    captureFields: options.captureFields,
+    targetTerms: actionTargetTerms(item)
+  };
+}
+
+function buildNaraScoutActionBatches() {
+  const groups = new Map();
+  for (const packet of naraScoutQueryPacketQueue) {
+    const key = `${packet.runPriority}|${packet.chapterId}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(packet);
+  }
+
+  return [...groups.values()].map((rows) => {
+    const first = rows[0];
+    const queries = uniqueSorted(rows.map((item) => item.query));
+    const scopes = uniqueSorted(rows.map((item) => item.scopeLabel));
+    const sortWeight = { Urgent: 60, High: 66, Medium: 72, Review: 84 }[first.runPriority] ?? 86;
+    return {
+      id: `nara-scout-${first.runPriority}-${first.chapterId}`,
+      sortWeight,
+      priorityBand: priorityBandForAction(sortWeight),
+      workstream: "NARA Scout rerun",
+      visitStage: "Discovery",
+      chapterId: first.chapterId,
+      chapterTitle: first.chapterTitle,
+      date: "",
+      targetTitle: `${first.runPriority} Scout rerun batch (${rows.length} query/scope packets)`,
+      immediateAction: `Run ${queries.length} queries across ${scopes.length} Catalog scopes for ${first.chapterTitle}; capture result counts before promoting new item leads.`,
+      sourceQueue: "nara-scout-query-packets.csv",
+      sourceIdentifier: `${rows.length} query/scope packets`,
+      sourceLevel: first.runPriority,
+      whyItMatters: first.whyRunThisQuery,
+      supportingEvidence: `Queries: ${queries.slice(0, 8).join("; ")}${queries.length > 8 ? `; plus ${queries.length - 8} more` : ""}. Scopes: ${scopes.join("; ")}.`,
+      openUrl: first.scoutSearchUrl,
+      detailReport: "reports/nara-scout-query-packets.md",
+      completionGate:
+        "Result counts, top NAIDs, item-level hits, child URLs, date spans, source paths, promoted candidates, context-only leads, and disposition are captured in the Scout query packet sheet.",
+      captureFields:
+        "result count; top NAIDs; item-level hits; child URLs; dates/date spans; source paths; promoted candidates; context-only leads; disposition",
+      targetTerms: queries
+    };
+  });
 }
 
 function expandLibraryRequestRows(item, clusterIndex) {
@@ -2048,6 +2430,57 @@ function chapterReadinessBlockers(parts) {
   return blockers.slice(0, 5);
 }
 
+function priorityBandForAction(sortWeight) {
+  if (sortWeight < 20) return "1 - Start here";
+  if (sortWeight < 40) return "2 - Establish item boundaries";
+  if (sortWeight < 58) return "3 - Backtrace counterparts";
+  if (sortWeight < 76) return "4 - Run discovery";
+  return "5 - Risk controls and deferred pulls";
+}
+
+function priorityBandRank(band) {
+  const match = String(band || "").match(/^(\d+)/);
+  return match ? Number(match[1]) : 99;
+}
+
+function compareCompilerActionRows(a, b) {
+  return (
+    a.sortWeight - b.sortWeight ||
+    priorityBandRank(a.priorityBand) - priorityBandRank(b.priorityBand) ||
+    chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
+    chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
+    (a.targetTitle || "").localeCompare(b.targetTitle || "")
+  );
+}
+
+function firstChapterIdFromTitles(titles = []) {
+  const chapter = chapterDefinitions.find((item) => titles.includes(item.title));
+  return chapter?.id || "";
+}
+
+function firstChapterIdForRisk(gap) {
+  const chapter = chapterDefinitions.find((item) => gapMatchesChapter(gap, item) && !isGlobalRisk(gap));
+  return chapter?.id || "";
+}
+
+function riskChapterTitle(gap) {
+  if (isGlobalRisk(gap)) return "All chapters";
+  const chapter = chapterDefinitions.find((item) => gapMatchesChapter(gap, item));
+  return chapter?.title || gap.lane || "Volume-wide";
+}
+
+function chapterTitleFromId(chapterId) {
+  return chapterDefinitions.find((item) => item.id === chapterId)?.title || chapterId || "Chapter pending";
+}
+
+function sourceIdentifierForItem(item) {
+  return item.identifier || (item.naid ? `NAID ${item.naid}` : "") || item.id || item.sourceUrl || "";
+}
+
+function actionTargetTerms(item) {
+  return uniqueSorted([...(item.topics || []), ...(item.targetTerms || []), ...titleKeywords(item.title)]);
+}
+
 function compareDossierRows(a, b) {
   return (
     priorityRank(a.priority) - priorityRank(b.priority) ||
@@ -2126,7 +2559,7 @@ function appendBulletList(lines, rows, mapper, emptyText) {
     lines.push(`- ${emptyText}`);
     return;
   }
-  for (const row of rows) lines.push(`- ${mapper(row)}`);
+  rows.forEach((row, index) => lines.push(`- ${mapper(row, index)}`));
 }
 
 function mdCell(value) {

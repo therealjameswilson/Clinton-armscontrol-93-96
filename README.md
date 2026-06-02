@@ -9,6 +9,7 @@ currently lists the volume as planned rather than published. It gathers:
 
 - official FRUS status and volume-boundary links
 - an opening chronology of dated released or declassified document leads
+- a generated compiler action queue that gives the next daily worklist across all source workstreams
 - a compiler workbench that separates close-read texts, packet leads, on-site pulls, and source risks
 - a selection-readiness queue that assigns every potential-document lead to an immediate verification action
 - a FRUS selection capture worksheet for final document decisions, citation fields, and source-note completion
@@ -47,6 +48,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `data/clinton-public-statements.js`: generated Clinton Public Papers statement data
 - `reports/nara-scout-potential-documents.md`: NARA Scout query summary and selected candidates
 - `reports/declassified-document-chronology.md`: dated released/declassified leads promoted to the first page section
+- `reports/compiler-action-queue.md`: generated ordered worklist spanning close reads, archive requests, item-boundary work, counterpart searches, Scout reruns, and risk controls
 - `reports/compiler-working-tables.md`: explanation of the CSV exports and suggested compiler workflow
 - `reports/selection-readiness-queue.md`: generated readiness gates and verification fields for every staged document lead
 - `reports/frus-selection-capture-worksheet.md`: generated capture guide for final selection and source-note fields
@@ -124,11 +126,21 @@ plausibly become FRUS-style selections after item-level verification.
 
 ## Compiler workbench
 
-The second section is a practical decision board. It tells the compiler which
-chronology items are ready for close reading, which MDR packets or folder leads
-need item screening, which Clinton Library folders to pull first, and which
-source-risk controls must stay visible before a sequence is treated as
-compiler-ready.
+The workbench follows the opening chronology and volume overview as a practical
+decision board. It tells the compiler which chronology items are ready for close
+reading, which MDR packets or folder leads need item screening, which Clinton
+Library folders to pull first, and which source-risk controls must stay visible
+before a sequence is treated as compiler-ready.
+
+## Compiler action queue
+
+The generated `exports/compiler-action-queue.csv` is the first daily worklist.
+It merges close reads, Clinton Library request packets, packet screening, NARA
+file-unit resolution, source-path pulls, Presidential Daily Diary counterpart
+searches, public-statement backtraces, Scout rerun batches, and risk controls.
+Each row points to the detailed source queue, gives the immediate action, and
+states the completion gate and capture fields that prove the task is actually
+done.
 
 ## Selection readiness
 
@@ -157,9 +169,9 @@ chapter is ready for final FRUS selection.
 
 ## Compiler working tables
 
-The tables section links generated CSV packets for offline use: the
-declassified chronology, the full potential-document triage sheet, the
-selection-readiness queue, the FRUS selection capture worksheet, the NARA
+The tables section links generated CSV packets for offline use: the compiler
+action queue, declassified chronology, the full potential-document triage sheet,
+the selection-readiness queue, the FRUS selection capture worksheet, the NARA
 file-unit resolver, NARA Scout query packets, Clinton Library call-slip
 clusters, the exploded Clinton Library request packets, the exploded Clinton
 Library OA/ID request queue, Presidential Daily Diary follow-up, the Daily

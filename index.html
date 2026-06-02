@@ -122,6 +122,7 @@
       </a>
       <nav aria-label="Primary navigation">
         <a href="#chronology">Chronology</a>
+        <a href="#actions">Actions</a>
         <a href="#workbench">Workbench</a>
         <a href="#readiness">Readiness</a>
         <a href="#tables">Tables</a>
@@ -206,6 +207,26 @@
         </aside>
       </div>
 
+      <section class="section action-queue-section" id="actions" aria-labelledby="actions-title">
+        <div class="section-heading with-link">
+          <div>
+            <p class="kicker">Compiler Action Queue</p>
+            <h2 id="actions-title">Single Ordered Worklist</h2>
+          </div>
+          <a class="section-link" href="reports/compiler-action-queue.md">Action queue report</a>
+        </div>
+        <p class="section-note">
+          This queue merges the chronology, selection-readiness rows, Clinton Library
+          request packets, file-unit resolver, Diary counterparts, public-statement
+          backtraces, Scout rerun batches, and risk controls into one daily worklist
+          with completion gates and capture fields.
+        </p>
+        <div class="hero-actions" aria-label="Compiler action queue downloads">
+          <a class="button primary" href="exports/compiler-action-queue.csv">Download Action Queue CSV</a>
+          <a class="button secondary" href="reports/compiler-action-queue.md">Read Action Queue Report</a>
+        </div>
+      </section>
+
       <section class="section workbench-section" id="workbench" aria-labelledby="workbench-title">
         <div class="section-heading">
           <p class="kicker">Compiler Workbench</p>
@@ -253,6 +274,12 @@
           aids, not final FRUS selections.
         </p>
         <div class="export-grid">
+          <article class="export-card">
+            <span class="export-meta">198 rows</span>
+            <h3>Compiler Action Queue</h3>
+            <p>One ordered worklist spanning close reads, archive requests, item-boundary work, counterpart searches, Scout reruns, and risk controls.</p>
+            <a href="exports/compiler-action-queue.csv">Download CSV</a>
+          </article>
           <article class="export-card">
             <span class="export-meta">13 rows</span>
             <h3>Declassified Chronology</h3>
