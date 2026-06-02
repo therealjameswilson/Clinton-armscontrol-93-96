@@ -44,3 +44,5 @@ The hardcopy scans produced several directly confirmed diary entries. The foreig
 ## Use Rule
 
 Daily Diary references should be used as chronology and pull-list anchors. They do not establish the substantive content of a call or meeting by themselves. Promote an entry only after locating the corresponding telcon, memcon, PC/DC minutes, NSC meeting notes, or agency file.
+
+Use `exports/daily-diary-counterpart-queue.csv` and `reports/daily-diary-counterpart-queue.md` as the working sheet for that second step. The counterpart queue keeps the Diary occurrence citation, then adds likely record types, related candidate leads, Clinton Library pull clusters, public anchors, and blank capture fields for the substantive record and final FRUS source note.

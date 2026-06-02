@@ -13,6 +13,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 - `exports/clinton-library-call-slips.csv`: 13 Clinton Library pull clusters from the 2013-0185-M folder-title lists.
 - `exports/clinton-library-oaid-request-queue.csv`: 99 exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.
 - `exports/presidential-daily-diary-follow-up.csv`: 22 calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.
+- `exports/daily-diary-counterpart-queue.csv`: 22 diary events converted into substantive-counterpart searches and capture fields.
 - `exports/compiler-risk-register.csv`: 10 source-risk controls with next actions, target records, and source pools.
 - `exports/clinton-public-statements.csv`: 15 Clinton Public Papers anchors for public chronology and speech-clearance backtracking.
 - `exports/chapter-dossiers.csv`: 9 chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.
@@ -27,7 +28,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 6. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.
 7. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.
 8. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.
-9. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.
+9. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.
 10. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 
 Regenerate with:

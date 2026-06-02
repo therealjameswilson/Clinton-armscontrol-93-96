@@ -697,6 +697,13 @@ const milestones = [
 
 const laneById = new Map(lanes.map((lane) => [lane.id, lane]));
 
+Object.assign(window, {
+  declassifiedChronology,
+  libraryResearchPlan,
+  compilerGaps,
+  laneById
+});
+
 const leadCount = document.querySelector("#lead-count");
 const laneCount = document.querySelector("#lane-count");
 const milestoneCount = document.querySelector("#milestone-count");

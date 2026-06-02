@@ -10,6 +10,7 @@ const readinessReportPath = path.join(repoRoot, "reports", "selection-readiness-
 const selectionCaptureReportPath = path.join(repoRoot, "reports", "frus-selection-capture-worksheet.md");
 const naraFileUnitReportPath = path.join(repoRoot, "reports", "nara-file-unit-resolution-queue.md");
 const publicBacktraceReportPath = path.join(repoRoot, "reports", "public-statement-backtrace-queue.md");
+const diaryCounterpartReportPath = path.join(repoRoot, "reports", "daily-diary-counterpart-queue.md");
 const libraryRequestReportPath = path.join(repoRoot, "reports", "clinton-library-oaid-request-queue.md");
 
 const dataFiles = [
@@ -87,6 +88,7 @@ const selectionCaptureWorksheet = selectionReadinessQueue.map((item) => ({
 }));
 const naraFileUnitResolutionQueue = potentialDocuments.filter(isNaraFileUnitLead).sort(compareNaraFileUnitRows);
 const publicStatementBacktraceQueue = clintonPublicStatements.map(buildPublicBacktraceRow).sort(comparePublicBacktraceRows);
+const dailyDiaryCounterpartQueue = dailyDiaryReferences.map(buildDiaryCounterpartRow).sort(compareDiaryCounterpartRows);
 const libraryRequestQueue = libraryResearchPlan.flatMap(expandLibraryRequestRows).sort(compareLibraryRequestRows);
 const chapterDossiers = chapterDefinitions.map(buildChapterDossier);
 
@@ -101,6 +103,7 @@ writeCsv("public-statement-backtrace-queue.csv", publicBacktraceColumns(), publi
 writeCsv("clinton-library-call-slips.csv", libraryColumns(), libraryResearchPlan.slice().sort(compareLibraryRows));
 writeCsv("clinton-library-oaid-request-queue.csv", libraryRequestColumns(), libraryRequestQueue);
 writeCsv("presidential-daily-diary-follow-up.csv", diaryColumns(), dailyDiaryReferences.slice().sort(compareDiaryRows));
+writeCsv("daily-diary-counterpart-queue.csv", diaryCounterpartColumns(), dailyDiaryCounterpartQueue);
 writeCsv("compiler-risk-register.csv", gapColumns(), compilerGaps.slice().sort(compareGapRows));
 writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicStatements);
 writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
@@ -110,6 +113,7 @@ writeReadinessReport();
 writeSelectionCaptureReport();
 writeNaraFileUnitReport();
 writePublicBacktraceReport();
+writeDiaryCounterpartReport();
 writeLibraryRequestReport();
 
 console.log(
@@ -123,6 +127,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-call-slips.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-library-oaid-request-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "presidential-daily-diary-follow-up.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "daily-diary-counterpart-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-risk-register.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-public-statements.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
@@ -132,6 +137,7 @@ console.log(
     `Generated ${path.relative(repoRoot, selectionCaptureReportPath)}`,
     `Generated ${path.relative(repoRoot, naraFileUnitReportPath)}`,
     `Generated ${path.relative(repoRoot, publicBacktraceReportPath)}`,
+    `Generated ${path.relative(repoRoot, diaryCounterpartReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestReportPath)}`
   ].join("\n")
 );
@@ -399,6 +405,42 @@ function diaryColumns() {
   ];
 }
 
+function diaryCounterpartColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("date", (row) => row.date),
+    column("priority", (row) => row.priority),
+    column("chapter", (row) => row.chapterTitle || row.chapterId),
+    column("event_type", (row) => row.eventType),
+    column("diary_anchor_title", (row) => row.title),
+    column("participants", (row) => row.participants),
+    column("occurrence_source_path", (row) => row.sourcePath),
+    column("occurrence_source_note", (row) => row.sourceNote),
+    column("occurrence_source_url", (row) => row.sourceUrl),
+    column("occurrence_digital_object_url", (row) => row.digitalObjectUrl),
+    column("catalog_search_url", (row) => row.catalogSearchUrl),
+    column("counterpart_needed", () => "Yes: diary or index entry proves occurrence only; locate the substantive telcon, memcon, PC/DC minutes, NSC note, cable, or agency file before final selection."),
+    column("likely_counterpart_record_types", (row) => row.likelyCounterpartRecordTypes),
+    column("search_action", (row) => row.searchAction),
+    column("related_candidate_leads", (row) => titleList(row.relatedCandidates, documentLabel, 4)),
+    column("clinton_library_pull_clusters", (row) => titleList(row.libraryPulls, pullOrPacketLabel, 3)),
+    column("public_statement_anchors", (row) => titleList(row.publicAnchors, documentLabel, 3)),
+    column("target_terms", (row) => row.targetTerms),
+    column("required_verification", (row) => row.requiredVerification),
+    column("capture_counterpart_title", () => ""),
+    column("capture_counterpart_date", () => ""),
+    column("capture_counterpart_record_type", () => ""),
+    column("capture_source_path", () => ""),
+    column("capture_author_recipient", () => ""),
+    column("capture_classification_markings", () => ""),
+    column("capture_page_range", () => ""),
+    column("capture_relationship_to_diary_entry", () => ""),
+    column("disposition", () => ""),
+    column("final_source_note", () => ""),
+    column("compiler_notes", () => "")
+  ];
+}
+
 function gapColumns() {
   return [
     column("sequence", (_row, index) => index + 1),
@@ -477,6 +519,7 @@ function writeReport() {
     `- \`exports/clinton-library-call-slips.csv\`: ${libraryResearchPlan.length} Clinton Library pull clusters from the 2013-0185-M folder-title lists.`,
     `- \`exports/clinton-library-oaid-request-queue.csv\`: ${libraryRequestQueue.length} exploded Clinton Library request rows, one row per staged OA/ID or folder-list control reference.`,
     `- \`exports/presidential-daily-diary-follow-up.csv\`: ${dailyDiaryReferences.length} calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.`,
+    `- \`exports/daily-diary-counterpart-queue.csv\`: ${dailyDiaryCounterpartQueue.length} diary events converted into substantive-counterpart searches and capture fields.`,
     `- \`exports/compiler-risk-register.csv\`: ${compilerGaps.length} source-risk controls with next actions, target records, and source pools.`,
     `- \`exports/clinton-public-statements.csv\`: ${clintonPublicStatements.length} Clinton Public Papers anchors for public chronology and speech-clearance backtracking.`,
     `- \`exports/chapter-dossiers.csv\`: ${chapterDossiers.length} chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.`,
@@ -491,7 +534,7 @@ function writeReport() {
     "6. Use `potential-documents-triage.csv` to sort by chapter, priority, source type, level, and compiler risk.",
     "7. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
     "8. Use `clinton-library-call-slips.csv` for pull-cluster strategy, then `clinton-library-oaid-request-queue.csv` as the on-site request and capture worksheet.",
-    "9. Use `presidential-daily-diary-follow-up.csv` only as a locator sheet until a substantive telcon, memcon, meeting note, or agency file is found.",
+    "9. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
     "10. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
@@ -707,6 +750,46 @@ function writePublicBacktraceReport() {
   }
 
   fs.writeFileSync(publicBacktraceReportPath, lines.join("\n"));
+}
+
+function writeDiaryCounterpartReport() {
+  const chapters = [...new Set(dailyDiaryCounterpartQueue.map((item) => item.chapterTitle || item.chapterId))].sort(
+    (a, b) => chapterTitleRank(a) - chapterTitleRank(b) || a.localeCompare(b)
+  );
+  const lines = [
+    "# Daily Diary Counterpart Queue",
+    "",
+    "Generated from the Presidential Daily Diary follow-up rows. This report treats diary and foreign-leader index entries as occurrence controls, then points the compiler toward the substantive counterpart record needed for FRUS selection.",
+    "",
+    "## Use Rule",
+    "",
+    "Do not select a diary row by itself unless the editorial decision is to document the President's schedule. For arms-control substance, locate the matching telcon, memcon, PC/DC minutes, NSC meeting note, cable, agency paper, or briefing file, then fill the counterpart capture fields and final source note.",
+    "",
+    "## Queue Counts",
+    "",
+    `- Diary or index occurrence controls: ${dailyDiaryCounterpartQueue.length}`,
+    `- High priority: ${dailyDiaryCounterpartQueue.filter((item) => item.priority === "High").length}`,
+    `- Hardcopy diary digital objects: ${dailyDiaryCounterpartQueue.filter((item) => item.digitalObjectUrl).length}`,
+    `- Foreign-leader index controls: ${dailyDiaryCounterpartQueue.filter((item) => /foreign-leader/i.test(item.eventType || "")).length}`,
+    `- With Clinton Library pull clusters: ${dailyDiaryCounterpartQueue.filter((item) => item.libraryPulls.length).length}`,
+    "",
+    "## By Chapter",
+    ""
+  ];
+
+  for (const chapter of chapters) {
+    const rows = dailyDiaryCounterpartQueue.filter((item) => (item.chapterTitle || item.chapterId) === chapter);
+    lines.push(`### ${chapter}`, "", `- Occurrence controls: ${rows.length}`, "", "Rows:");
+    appendBulletList(
+      lines,
+      rows,
+      (item) => `${item.date || "date pending"} / ${item.title} / ${item.searchAction}`,
+      "No diary counterparts staged."
+    );
+    lines.push("");
+  }
+
+  fs.writeFileSync(diaryCounterpartReportPath, lines.join("\n"));
 }
 
 function writeLibraryRequestReport() {
@@ -954,6 +1037,149 @@ function likelyInternalRecordTypes(statement) {
   return typesByChapter[statement.chapterId] || ["internal policy file", "clearance record", "meeting record", "agency implementation record"];
 }
 
+function buildDiaryCounterpartRow(diary) {
+  const targetTerms = diaryCounterpartTargetTerms(diary);
+  const relatedCandidates = potentialDocuments
+    .filter((item) => item.chapterId === diary.chapterId && !isPublicCounterpartAnchor(item))
+    .sort((a, b) => compareDiaryCounterpartMatches(diary, a, b))
+    .slice(0, 4);
+  const libraryPulls = libraryResearchPlan
+    .filter((item) => item.chapterId === diary.chapterId)
+    .sort((a, b) => compareDiaryCounterpartMatches(diary, a, b))
+    .slice(0, 3);
+  const publicAnchors = clintonPublicStatements
+    .filter((item) => item.chapterId === diary.chapterId && dateDistanceDays(diary.date, item.date) <= 180)
+    .sort((a, b) => compareDiaryCounterpartMatches(diary, a, b))
+    .slice(0, 3);
+  const likelyCounterpartRecordTypes = likelyDiaryCounterpartRecordTypes(diary);
+  const requiredVerification = [
+    "confirm diary date/time and page",
+    "locate substantive counterpart record",
+    "record author, recipient, or principals",
+    "record classification markings and page range",
+    "decide select, cite as context, or discard"
+  ];
+  const searchAction = diaryCounterpartSearchAction(diary, likelyCounterpartRecordTypes, relatedCandidates, libraryPulls);
+
+  return {
+    ...diary,
+    targetTerms,
+    relatedCandidates,
+    libraryPulls,
+    publicAnchors,
+    likelyCounterpartRecordTypes,
+    requiredVerification,
+    searchAction
+  };
+}
+
+function diaryCounterpartTargetTerms(diary) {
+  const genericTerms = new Set([
+    "bill",
+    "clinton",
+    "president",
+    "telephone",
+    "conference",
+    "meeting",
+    "meetings",
+    "call",
+    "calls",
+    "foreign",
+    "leader",
+    "index"
+  ]);
+  const chapterTerms = {
+    ctbt: ["NPT", "CTBT", "test ban"],
+    "strategic-arms": ["Yeltsin", "strategic stability", "nuclear security"],
+    "start-ii": ["START II", "Yeltsin", "Duma"],
+    "ctr-heu": ["CTR", "HEU", "Ukraine", "Nunn-Lugar", "nuclear removal"],
+    nonproliferation: ["NPT", "nonproliferation", "export control"],
+    counterproliferation: ["counterproliferation", "WMD", "PDD-18"],
+    regional: ["North Korea", "Agreed Framework", "Iran", "Iraq"],
+    "cbw-conventional": ["CWC", "BWC", "chemical weapons", "biological weapons"],
+    "conventional-landmines": ["landmines", "CCW", "arms transfer"]
+  };
+  return [
+    ...new Set([
+      ...(diary.participants || []).flatMap(participantTargetTerms),
+      ...titleKeywords(diary.title),
+      ...titleKeywords(diary.relevance),
+      ...(chapterTerms[diary.chapterId] || [])
+    ])
+  ]
+    .filter((term) => {
+      const normalized = String(term).toLowerCase();
+      return normalized && !genericTerms.has(normalized);
+    })
+    .slice(0, 12);
+}
+
+function participantTargetTerms(name = "") {
+  const cleaned = String(name).replace(/[^A-Za-z0-9\s-]/g, " ").replace(/\s+/g, " ").trim();
+  if (!cleaned || /^bill clinton$/i.test(cleaned)) return [];
+  const parts = cleaned.split(" ");
+  const last = parts[parts.length - 1];
+  return [...new Set([cleaned, last].filter((term) => term.length > 2 && !/^clinton$/i.test(term)))];
+}
+
+function likelyDiaryCounterpartRecordTypes(diary) {
+  const text = [diary.eventType, diary.title, diary.relevance].join(" ").toLowerCase();
+  const types = [];
+
+  if (/call|telephone|conference/.test(text)) {
+    types.push("telcon memorandum", "NSC call memorandum", "interpreter or translation record");
+  }
+  if (/meeting|summit|one-on-one|trilateral/.test(text)) {
+    types.push("memorandum of conversation", "NSC meeting note", "briefing book or trip file");
+  }
+  if (/pc\/dc|north korea|haiti|crisis|options/.test(text)) {
+    types.push("PC/DC minutes", "interagency options paper", "agency situation report");
+  }
+
+  const chapterTypes = {
+    ctbt: ["NSC/ACDA negotiation file", "State or ACDA cable"],
+    "strategic-arms": ["NSC Russia arms-control file", "joint-statement clearance record"],
+    "start-ii": ["START II ratification strategy file", "Duma or ABM implementation note"],
+    "ctr-heu": ["CTR or HEU implementation file", "Ukraine/Russia nuclear-removal file", "State cable"],
+    nonproliferation: ["State/ACDA nonproliferation file", "export-control or treaty file"],
+    counterproliferation: ["DOD/NSC initiative paper", "JCS or IC threat-assessment record"],
+    regional: ["NSC regional policy file", "State cable", "PC/DC record"],
+    "cbw-conventional": ["CWC/BWC treaty file", "ACDA/State implementation record"],
+    "conventional-landmines": ["PDD/NSC policy file", "DOD/State implementation record"]
+  };
+
+  return [...new Set([...types, ...(chapterTypes[diary.chapterId] || ["internal policy file"])])];
+}
+
+function diaryCounterpartSearchAction(diary, recordTypes, relatedCandidates, libraryPulls) {
+  const recordPhrase = recordTypes.slice(0, 2).join(" or ");
+  const candidate = relatedCandidates[0] ? `screen "${relatedCandidates[0].title}"` : "";
+  const pull = libraryPulls[0] ? `pull "${libraryPulls[0].title}"` : "";
+  const followUps = [candidate, pull].filter(Boolean);
+  const trail = followUps.length ? `${followUps.join("; ")}; ` : "";
+  return `Locate ${recordPhrase} for "${diary.title}"; ${trail}capture the substantive counterpart before using the diary entry as sequence evidence.`;
+}
+
+function isPublicCounterpartAnchor(item) {
+  const blob = [item.sourceType, item.sourceRepository, item.sourceCollection, item.category, item.level]
+    .filter(Boolean)
+    .join(" ");
+  return /Public Papers|GovInfo|Archived White House|Congress|Senate|OSTI|NRC|FAS|Argonne|Department of Defense text|published primary/i.test(
+    blob
+  );
+}
+
+function compareDiaryCounterpartMatches(diary, a, b) {
+  const terms = diaryCounterpartTargetTerms(diary);
+  return (
+    backtraceOverlapScore(terms, b) - backtraceOverlapScore(terms, a) ||
+    dateDistanceDays(diary.date, a.date) - dateDistanceDays(diary.date, b.date) ||
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    libraryPriorityRank(a.priority) - libraryPriorityRank(b.priority) ||
+    (a.title || "").localeCompare(b.title || "")
+  );
+}
+
 function diaryBacktraceLabel(item) {
   return `${item.date || "date pending"}: ${item.title}`;
 }
@@ -1123,6 +1349,15 @@ function comparePublicBacktraceRows(a, b) {
     chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
     chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
     priorityRank(a.priority) - priorityRank(b.priority) ||
+    a.title.localeCompare(b.title)
+  );
+}
+
+function compareDiaryCounterpartRows(a, b) {
+  return (
+    chronologySortKey(a.date || "").localeCompare(chronologySortKey(b.date || "")) ||
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    chapterRank(a.chapterId) - chapterRank(b.chapterId) ||
     a.title.localeCompare(b.title)
   );
 }
@@ -1310,6 +1545,11 @@ function gapPriorityRank(priority) {
 function chapterRank(chapterId) {
   const index = chapterSequence.indexOf(chapterId);
   return index === -1 ? 99 : index;
+}
+
+function chapterTitleRank(title) {
+  const chapter = chapterDefinitions.find((item) => item.title === title);
+  return chapter ? chapterRank(chapter.id) : 99;
 }
 
 function startYear(value = "") {

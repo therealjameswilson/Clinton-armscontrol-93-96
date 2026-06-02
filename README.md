@@ -14,6 +14,7 @@ currently lists the volume as planned rather than published. It gathers:
 - a FRUS selection capture worksheet for final document decisions, citation fields, and source-note completion
 - a NARA file-unit resolver that isolates Scout hits needing item-boundary verification
 - a public-statement backtrace queue that pairs Clinton statements with internal-counterpart search paths
+- a Daily Diary counterpart queue that converts schedule evidence into substantive-record searches
 - CSV working tables for sorting potential documents, chronology items, archive pulls, OA/ID requests, diary follow-up, public statements, and source risks
 - chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
@@ -48,6 +49,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/frus-selection-capture-worksheet.md`: generated capture guide for final selection and source-note fields
 - `reports/nara-file-unit-resolution-queue.md`: generated resolver for NARA Scout/file-unit leads
 - `reports/public-statement-backtrace-queue.md`: generated queue for pairing public statements with internal records
+- `reports/daily-diary-counterpart-queue.md`: generated queue for finding substantive records behind Diary entries
 - `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
@@ -146,11 +148,11 @@ The tables section links generated CSV packets for offline use: the full
 potential-document triage sheet, the selection-readiness queue, the FRUS
 selection capture worksheet, the NARA file-unit resolver, the declassified
 chronology, Clinton Library call-slip clusters, the exploded Clinton Library
-OA/ID request queue, Presidential Daily Diary follow-up, the risk register,
-Clinton public statements, the public-statement backtrace queue, and chapter
-dossiers. The tables are regenerated from the same staged data files as the
-page, so a compiler can sort and annotate them without creating a separate
-hand-maintained index.
+OA/ID request queue, Presidential Daily Diary follow-up, the Daily Diary
+counterpart queue, the risk register, Clinton public statements, the
+public-statement backtrace queue, and chapter dossiers. The tables are
+regenerated from the same staged data files as the page, so a compiler can sort
+and annotate them without creating a separate hand-maintained index.
 
 The generated `exports/frus-selection-capture-worksheet.csv` is the compilation
 handoff sheet. It preserves the current lead, readiness queue, action, required
@@ -204,6 +206,13 @@ finished document candidate. High-value entries include Yeltsin, Kravchuk,
 Shushkevich, Nazarbayev, Kuchma, and Kim Young-sam calls or meetings that map
 to START II, CTR/HEU, Ukraine denuclearization, nuclear-materials security,
 and North Korea proliferation files.
+
+The generated `exports/daily-diary-counterpart-queue.csv` takes the next
+compiler step. It keeps the Diary or foreign-leader index source note as the
+occurrence control, then adds likely counterpart record types, related
+candidate leads, Clinton Library pull clusters, public anchors, target terms,
+and blank fields for the telcon, memcon, PC/DC minutes, NSC note, cable, agency
+paper, page range, markings, disposition, and final source note.
 
 ## Clinton Library visit plan
 
