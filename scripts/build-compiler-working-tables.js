@@ -22,6 +22,7 @@ const naraItemBoundaryWorkbenchReportPath = path.join(repoRoot, "reports", "nara
 const naraScoutQueryPacketReportPath = path.join(repoRoot, "reports", "nara-scout-query-packets.md");
 const publicBacktraceReportPath = path.join(repoRoot, "reports", "public-statement-backtrace-queue.md");
 const diaryCounterpartReportPath = path.join(repoRoot, "reports", "daily-diary-counterpart-queue.md");
+const compilerRiskClosureMatrixReportPath = path.join(repoRoot, "reports", "compiler-risk-closure-matrix.md");
 const libraryRequestPacketReportPath = path.join(repoRoot, "reports", "clinton-library-request-packets.md");
 const libraryVisitRunSheetReportPath = path.join(repoRoot, "reports", "clinton-library-visit-run-sheet.md");
 const libraryRequestReportPath = path.join(repoRoot, "reports", "clinton-library-oaid-request-queue.md");
@@ -110,6 +111,7 @@ const naraScoutQueryPacketQueue = buildNaraScoutQueryPacketQueue();
 const compilerActionQueue = buildCompilerActionQueue();
 const libraryVisitRunSheet = buildLibraryVisitRunSheet();
 const naraItemBoundaryWorkbench = buildNaraItemBoundaryWorkbench();
+const compilerRiskClosureMatrix = buildCompilerRiskClosureMatrix();
 const compilerRequirementsAudit = buildCompilerRequirementsAudit();
 
 fs.mkdirSync(exportDir, { recursive: true });
@@ -132,6 +134,7 @@ writeCsv("clinton-library-visit-run-sheet.csv", libraryVisitRunSheetColumns(), l
 writeCsv("presidential-daily-diary-follow-up.csv", diaryColumns(), dailyDiaryReferences.slice().sort(compareDiaryRows));
 writeCsv("daily-diary-counterpart-queue.csv", diaryCounterpartColumns(), dailyDiaryCounterpartQueue);
 writeCsv("compiler-risk-register.csv", gapColumns(), compilerGaps.slice().sort(compareGapRows));
+writeCsv("compiler-risk-closure-matrix.csv", compilerRiskClosureMatrixColumns(), compilerRiskClosureMatrix);
 writeCsv("clinton-public-statements.csv", statementColumns(), clintonPublicStatements);
 writeCsv("chapter-dossiers.csv", dossierColumns(), chapterDossiers);
 writeCsv("chapter-readiness-scorecard.csv", chapterReadinessColumns(), chapterReadinessScorecard);
@@ -147,6 +150,7 @@ writeNaraItemBoundaryWorkbenchReport();
 writeNaraScoutQueryPacketReport();
 writePublicBacktraceReport();
 writeDiaryCounterpartReport();
+writeCompilerRiskClosureMatrixReport();
 writeLibraryRequestPacketReport();
 writeLibraryVisitRunSheetReport();
 writeLibraryRequestReport();
@@ -171,6 +175,7 @@ console.log(
     `Generated ${path.relative(repoRoot, path.join(exportDir, "presidential-daily-diary-follow-up.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "daily-diary-counterpart-queue.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-risk-register.csv"))}`,
+    `Generated ${path.relative(repoRoot, path.join(exportDir, "compiler-risk-closure-matrix.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "clinton-public-statements.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-dossiers.csv"))}`,
     `Generated ${path.relative(repoRoot, path.join(exportDir, "chapter-readiness-scorecard.csv"))}`,
@@ -186,6 +191,7 @@ console.log(
     `Generated ${path.relative(repoRoot, naraScoutQueryPacketReportPath)}`,
     `Generated ${path.relative(repoRoot, publicBacktraceReportPath)}`,
     `Generated ${path.relative(repoRoot, diaryCounterpartReportPath)}`,
+    `Generated ${path.relative(repoRoot, compilerRiskClosureMatrixReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestPacketReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryVisitRunSheetReportPath)}`,
     `Generated ${path.relative(repoRoot, libraryRequestReportPath)}`
@@ -698,6 +704,39 @@ function gapColumns() {
   ];
 }
 
+function compilerRiskClosureMatrixColumns() {
+  return [
+    column("sequence", (_row, index) => index + 1),
+    column("priority", (row) => row.priority),
+    column("risk_status", (row) => row.riskStatus),
+    column("lane", (row) => row.lane),
+    column("risk_title", (row) => row.riskTitle),
+    column("closure_stage", (row) => row.closureStage),
+    column("primary_queue", (row) => row.primaryQueue),
+    column("related_action_ranks", (row) => row.relatedActionRanks),
+    column("related_action_bands", (row) => row.relatedActionBands),
+    column("related_chapters", (row) => row.relatedChapters),
+    column("affected_chapter_readiness", (row) => row.affectedChapterReadiness),
+    column("linked_boundary_rows", (row) => row.linkedBoundaryRows),
+    column("linked_public_backtrace_rows", (row) => row.linkedPublicBacktraceRows),
+    column("linked_diary_counterpart_rows", (row) => row.linkedDiaryCounterpartRows),
+    column("linked_library_packets", (row) => row.linkedLibraryPackets),
+    column("linked_scout_packets", (row) => row.linkedScoutPackets),
+    column("closure_gate", (row) => row.closureGate),
+    column("evidence_needed", (row) => row.evidenceNeeded),
+    column("next_action", (row) => row.nextAction),
+    column("accept_limitation_if", (row) => row.acceptLimitationIf),
+    column("target_records", (row) => row.targetRecords),
+    column("target_terms", (row) => row.targetTerms),
+    column("source_pools", (row) => row.sourcePools),
+    column("report_to_update", (row) => row.reportToUpdate),
+    column("closure_decision", () => ""),
+    column("evidence_added", () => ""),
+    column("residual_limitation", () => ""),
+    column("compiler_notes", () => "")
+  ];
+}
+
 function statementColumns() {
   return [
     column("sequence", (_row, index) => index + 1),
@@ -800,6 +839,7 @@ function writeReport() {
     `- \`exports/presidential-daily-diary-follow-up.csv\`: ${dailyDiaryReferences.length} calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.`,
     `- \`exports/daily-diary-counterpart-queue.csv\`: ${dailyDiaryCounterpartQueue.length} diary events converted into substantive-counterpart searches and capture fields.`,
     `- \`exports/compiler-risk-register.csv\`: ${compilerGaps.length} source-risk controls with next actions, target records, and source pools.`,
+    `- \`exports/compiler-risk-closure-matrix.csv\`: ${compilerRiskClosureMatrix.length} risk rows with closure gates, evidence paths, related action ranks, and residual-limitation fields.`,
     `- \`exports/clinton-public-statements.csv\`: ${clintonPublicStatements.length} Clinton Public Papers anchors for public chronology and speech-clearance backtracking.`,
     `- \`exports/chapter-dossiers.csv\`: ${chapterDossiers.length} chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.`,
     `- \`exports/chapter-readiness-scorecard.csv\`: ${chapterReadinessScorecard.length} chapter-level readiness rows with counts, blockers, top risks, and next actions.`,
@@ -820,7 +860,8 @@ function writeReport() {
     "12. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.",
     "13. Use `clinton-library-visit-run-sheet.csv` as the reading-room day plan, `clinton-library-request-packets.csv` for de-duplicated call slips, then `clinton-library-oaid-request-queue.csv` for item-level capture.",
     "14. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.",
-    "15. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
+    "15. Use `compiler-risk-closure-matrix.csv` to decide whether each risk is closed, still open, or accepted as an explicit editorial limitation.",
+    "16. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.",
     "",
     "Regenerate with:",
     "",
@@ -840,7 +881,7 @@ function writeCompilerRequirementsAuditReport() {
   const lines = [
     "# Compiler Requirements Audit",
     "",
-    "Generated from the current page scaffolding, chapter dossiers, working tables, Clinton Library queues, Daily Diary rows, public-statement backtrace queue, NARA Scout packet queue, and compiler-risk register.",
+    "Generated from the current page scaffolding, chapter dossiers, working tables, Clinton Library queues, Daily Diary rows, public-statement backtrace queue, NARA Scout packet queue, compiler-risk register, and compiler-risk closure matrix.",
     "",
     "## Use Rule",
     "",
@@ -1395,6 +1436,72 @@ function writeDiaryCounterpartReport() {
   }
 
   fs.writeFileSync(diaryCounterpartReportPath, lines.join("\n"));
+}
+
+function writeCompilerRiskClosureMatrixReport() {
+  const stages = [...new Set(compilerRiskClosureMatrix.map((item) => item.closureStage))].sort(
+    (a, b) => riskClosureStageRank(a) - riskClosureStageRank(b) || a.localeCompare(b)
+  );
+  const highRows = compilerRiskClosureMatrix.filter((item) => ["Critical", "High"].includes(item.priority));
+  const lines = [
+    "# Compiler Risk Closure Matrix",
+    "",
+    "Generated from the compiler-risk register, action queue, chapter readiness scorecard, NARA item-boundary workbench, public-statement backtrace queue, Daily Diary counterpart queue, Clinton Library request packets, and Scout query packets.",
+    "",
+    "## Use Rule",
+    "",
+    "Use this matrix when deciding whether a risk is closed, still open, or accepted as an explicit editorial limitation. Do not close a risk just because a table exists; close it only after the closure gate is satisfied and the evidence-added field is filled.",
+    "",
+    "## Matrix Counts",
+    "",
+    `- Risk rows: ${compilerRiskClosureMatrix.length}`,
+    `- Critical risks: ${compilerRiskClosureMatrix.filter((item) => item.priority === "Critical").length}`,
+    `- High risks: ${compilerRiskClosureMatrix.filter((item) => item.priority === "High").length}`,
+    `- Rows with linked action ranks: ${compilerRiskClosureMatrix.filter((item) => item.relatedActionRanks.length).length}`,
+    `- Rows with linked boundary checks: ${compilerRiskClosureMatrix.filter((item) => item.linkedBoundaryRows > 0).length}`,
+    "",
+    "## High-Value Closure Gates",
+    ""
+  ];
+
+  appendBulletList(
+    lines,
+    highRows,
+    (item) => `${item.priority} / ${item.riskTitle}: ${item.closureGate}`,
+    "No critical or high risks staged."
+  );
+  lines.push("", "## By Closure Stage", "");
+
+  for (const stage of stages) {
+    const rows = compilerRiskClosureMatrix.filter((item) => item.closureStage === stage);
+    lines.push(`### ${stage}`, "", `- Rows: ${rows.length}`, "", "Risks:");
+    appendBulletList(
+      lines,
+      rows,
+      (item) => `${item.priority} / ${item.lane}: ${item.riskTitle}; next: ${item.nextAction}`,
+      "No risks in this stage."
+    );
+    lines.push("");
+  }
+
+  lines.push("## Risk Rows", "");
+  for (const row of compilerRiskClosureMatrix) {
+    lines.push(
+      `### ${row.priority}: ${row.riskTitle}`,
+      "",
+      `- Stage: ${row.closureStage}`,
+      `- Primary queue: ${row.primaryQueue}`,
+      `- Related actions: ${row.relatedActionRanks.join("; ") || "none"}`,
+      `- Related chapters: ${row.relatedChapters.join("; ") || "all chapters"}`,
+      `- Linked boundary rows: ${row.linkedBoundaryRows}`,
+      `- Linked Scout packets: ${row.linkedScoutPackets}`,
+      `- Closure gate: ${row.closureGate}`,
+      `- Accept limitation if: ${row.acceptLimitationIf}`,
+      ""
+    );
+  }
+
+  fs.writeFileSync(compilerRiskClosureMatrixReportPath, lines.join("\n"));
 }
 
 function writeLibraryRequestPacketReport() {
@@ -2074,15 +2181,16 @@ function buildCompilerRequirementsAudit() {
       requirementArea: "Compiler risks and gaps",
       requirement: "Assume compiler risk, identify gaps, and address them with controlled workflows.",
       status: "Controlled open work",
-      evidence: `${compilerGaps.length} structured risks, ${compilerActionQueue.length} action rows, ${selectionReadinessQueue.length} readiness rows, and ${selectionCaptureWorksheet.length} capture rows keep remaining gaps visible and actionable.`,
-      countOrScope: `${compilerGaps.length} risks; ${compilerActionQueue.length} actions; ${selectionReadinessQueue.length} readiness rows`,
-      primaryArtifact: "exports/compiler-risk-register.csv",
+      evidence: `${compilerGaps.length} structured risks now have ${compilerRiskClosureMatrix.length} closure-matrix rows, linked action ranks, evidence gates, and residual-limitation fields.`,
+      countOrScope: `${compilerGaps.length} risks; ${compilerRiskClosureMatrix.length} closure rows; ${compilerActionQueue.length} actions`,
+      primaryArtifact: "exports/compiler-risk-closure-matrix.csv",
       supportingArtifacts: [
+        "exports/compiler-risk-register.csv",
         "reports/compiler-gap-analysis.md",
         "exports/compiler-action-queue.csv",
         "exports/selection-readiness-queue.csv"
       ],
-      nextCompilerAction: "Work the action queue by priority band, closing risks only when item-level evidence or explicit editorial limitation supports closure.",
+      nextCompilerAction: "Work the risk closure matrix row by row, closing risks only when item-level evidence or explicit editorial limitation supports closure.",
       riskControl: "The site controls open risks; it does not hide them."
     }),
     requirementAuditRow({
@@ -2141,6 +2249,161 @@ function requirementAuditRow(row) {
     nextCompilerAction: row.nextCompilerAction,
     riskControl: row.riskControl
   };
+}
+
+function buildCompilerRiskClosureMatrix() {
+  return compilerGaps.slice().sort(compareGapRows).map(buildCompilerRiskClosureRow);
+}
+
+function buildCompilerRiskClosureRow(gap) {
+  const relatedChapters = riskRelatedChapters(gap);
+  const relatedActions = compilerActionQueue.filter((action) => riskActionMatches(gap, action, relatedChapters));
+  const chapterIds = relatedChapters.map((chapter) => chapter.id);
+  const boundaryRows = naraItemBoundaryWorkbench.filter((row) => riskBoundaryRowMatches(gap, row, chapterIds));
+  const publicRows = publicStatementBacktraceQueue.filter((row) => riskChapterIdMatches(gap, row.chapterId));
+  const diaryRows = dailyDiaryCounterpartQueue.filter((row) => riskChapterIdMatches(gap, row.chapterId));
+  const libraryPackets = libraryRequestPackets.filter((row) =>
+    row.chapters.some((title) => relatedChapters.some((chapter) => chapter.title === title))
+  );
+  const scoutPackets = naraScoutQueryPacketQueue.filter((row) => riskScoutPacketMatches(gap, row, chapterIds));
+  const readinessRows = chapterReadinessScorecard.filter((row) => riskChapterIdMatches(gap, row.chapter.id));
+
+  return {
+    priority: gap.priority,
+    riskStatus: gap.status,
+    lane: gap.lane,
+    riskTitle: gap.title,
+    closureStage: riskClosureStage(gap),
+    primaryQueue: riskPrimaryQueue(gap),
+    relatedActionRanks: relatedActions.map((action) => compilerActionQueue.indexOf(action) + 1),
+    relatedActionBands: uniqueSorted(relatedActions.map((action) => action.priorityBand)),
+    relatedChapters: relatedChapters.map((chapter) => chapter.title),
+    affectedChapterReadiness: readinessRows.map((row) => `${row.chapter.title}: ${row.readinessBand} (${row.readinessScore})`),
+    linkedBoundaryRows: boundaryRows.length,
+    linkedPublicBacktraceRows: publicRows.length,
+    linkedDiaryCounterpartRows: diaryRows.length,
+    linkedLibraryPackets: libraryPackets.length,
+    linkedScoutPackets: scoutPackets.length,
+    closureGate: riskClosureGate(gap),
+    evidenceNeeded: gap.needed,
+    nextAction: (gap.nextActions || [])[0] || relatedActions[0]?.immediateAction || gap.needed,
+    acceptLimitationIf: riskAcceptLimitationIf(gap),
+    targetRecords: gap.targetRecords || [],
+    targetTerms: gap.targetTerms || [],
+    sourcePools: gap.sourcePools || [],
+    reportToUpdate: riskReportsToUpdate(gap)
+  };
+}
+
+function riskRelatedChapters(gap) {
+  if (isGlobalRisk(gap)) return chapterDefinitions;
+  return chapterDefinitions.filter((chapter) => gapMatchesChapter(gap, chapter));
+}
+
+function riskChapterIdMatches(gap, chapterId) {
+  if (isGlobalRisk(gap)) return true;
+  return riskRelatedChapters(gap).some((chapter) => chapter.id === chapterId);
+}
+
+function riskActionMatches(gap, action, relatedChapters) {
+  if (action.sourceIdentifier === gap.id) return true;
+  if (gap.id === "gap-nara-file-unit-quality") {
+    return action.workstream === "NARA file-unit resolution" || action.workstream === "NARA Scout rerun";
+  }
+  if (gap.id === "gap-public-statements-as-locators") {
+    return action.workstream === "Public statement backtrace";
+  }
+  if (isGlobalRisk(gap)) return false;
+  const chapterMatch = relatedChapters.some((chapter) => action.chapterId === chapter.id);
+  if (!chapterMatch) return false;
+  const blob = [action.workstream, action.targetTitle, action.immediateAction, action.whyItMatters, action.supportingEvidence]
+    .join(" ")
+    .toLowerCase();
+  return riskSearchTerms(gap).some((term) => blob.includes(term));
+}
+
+function riskBoundaryRowMatches(gap, row, chapterIds) {
+  if (gap.id === "gap-nara-file-unit-quality") return true;
+  if (!chapterIds.includes(row.chapterId)) return false;
+  const blob = [row.title, row.topChapterRisk, row.firstCheck, row.topMatchingQueries].join(" ").toLowerCase();
+  return riskSearchTerms(gap).some((term) => blob.includes(term));
+}
+
+function riskScoutPacketMatches(gap, row, chapterIds) {
+  if (gap.id === "gap-nara-file-unit-quality") return true;
+  if (!chapterIds.includes(row.chapterId)) return false;
+  const blob = [row.query, row.scopeLabel, row.topChapterRisk, row.whyRunThisQuery, row.targetRecordTypes].join(" ").toLowerCase();
+  return riskSearchTerms(gap).some((term) => blob.includes(term));
+}
+
+function riskSearchTerms(gap) {
+  return uniqueSorted([
+    gap.title,
+    gap.lane,
+    ...(gap.targetTerms || []),
+    ...(gap.targetRecords || []),
+    ...titleKeywords(gap.title)
+  ])
+    .map((term) => term.toLowerCase())
+    .filter((term) => term.length > 2);
+}
+
+function riskPrimaryQueue(gap) {
+  if (gap.id === "gap-nara-file-unit-quality") return "exports/nara-item-boundary-workbench.csv";
+  if (gap.id === "gap-public-statements-as-locators") return "exports/public-statement-backtrace-queue.csv";
+  if (/diary|meeting|call/i.test([gap.title, gap.needed, ...(gap.targetRecords || [])].join(" "))) {
+    return "exports/daily-diary-counterpart-queue.csv";
+  }
+  if (/clinton library|oa\/id|folder|on-site|onsite/i.test([gap.needed, ...(gap.sourcePools || [])].join(" "))) {
+    return "exports/clinton-library-visit-run-sheet.csv";
+  }
+  return "exports/compiler-action-queue.csv";
+}
+
+function riskClosureStage(gap) {
+  if (/^open$/i.test(gap.status || "")) return "Open - evidence required";
+  if (/partly/i.test(gap.status || "")) return "Partly addressed - verify before closure";
+  if (/addressed/i.test(gap.status || "")) return "Addressed - keep control visible";
+  return "Review - decide closure state";
+}
+
+function riskClosureStageRank(stage) {
+  return {
+    "Open - evidence required": 0,
+    "Partly addressed - verify before closure": 1,
+    "Review - decide closure state": 2,
+    "Addressed - keep control visible": 3
+  }[stage] ?? 4;
+}
+
+function riskClosureGate(gap) {
+  if (gap.id === "gap-nara-file-unit-quality") {
+    return "Close when every NARA item-boundary workbench row has a disposition: promoted item-level candidate, context-only, or deferred with explicit on-site request path.";
+  }
+  if (gap.id === "gap-public-statements-as-locators") {
+    return "Close when each public statement used for sequence evidence is paired with an internal counterpart or deliberately marked as selected public text.";
+  }
+  if (/source base/i.test(gap.lane || gap.title || "")) {
+    return "Close when each chapter has at least one non-Public-Papers/non-Scout source path or an explicit note explaining why no stronger primary source was found.";
+  }
+  return `Close when the needed evidence is captured and cited: ${gap.needed}`;
+}
+
+function riskAcceptLimitationIf(gap) {
+  if (gap.id === "gap-nara-file-unit-quality") {
+    return "After Catalog, Scout rerun, and on-site request paths are checked, no item boundary or requestable child record can be identified.";
+  }
+  if (gap.id === "gap-public-statements-as-locators") {
+    return "After diary, library, and candidate-source backtrace checks, no internal counterpart can be located and the compiler intentionally uses or omits the public statement.";
+  }
+  return "After the listed source pools and target records are checked, no stronger item-level evidence is available; document the limitation in the chapter notes.";
+}
+
+function riskReportsToUpdate(gap) {
+  const reports = ["reports/compiler-requirements-audit.md", "reports/compiler-gap-analysis.md"];
+  if (gap.id === "gap-nara-file-unit-quality") reports.push("reports/nara-item-boundary-workbench.md");
+  if (gap.id === "gap-public-statements-as-locators") reports.push("reports/public-statement-backtrace-queue.md");
+  return reports;
 }
 
 function libraryVisitCaptureGoal() {

@@ -1,6 +1,6 @@
 # Compiler Requirements Audit
 
-Generated from the current page scaffolding, chapter dossiers, working tables, Clinton Library queues, Daily Diary rows, public-statement backtrace queue, NARA Scout packet queue, and compiler-risk register.
+Generated from the current page scaffolding, chapter dossiers, working tables, Clinton Library queues, Daily Diary rows, public-statement backtrace queue, NARA Scout packet queue, compiler-risk register, and compiler-risk closure matrix.
 
 ## Use Rule
 
@@ -34,13 +34,13 @@ Use this as the handoff proof map. It shows which explicit requirements are alre
 | Clinton Library research | Incorporate Clinton Library finding aids and maximize time at the Clinton Library. | Ready for compiler use | 83 run-sheet rows, 83 de-duplicated request packets, and 99 OA/ID queue rows convert the local finding-aid PDFs into a reading-room workflow. | exports/clinton-library-visit-run-sheet.csv | Use the run sheet at the archive table, fill pull status and best-item fields, and promote only item-level records into the capture worksheet. |
 | Presidential Daily Diary | Search the Presidential Daily Diary and include pertinent calls or meetings. | Proved in current artifacts | 22 diary or foreign-leader-index occurrence controls are staged and 22 counterpart-search rows prevent schedule evidence from being mistaken for substantive records. | exports/presidential-daily-diary-follow-up.csv | Locate the substantive telcon, memcon, PC/DC minutes, NSC note, cable, or agency file for each high-value occurrence. |
 | FRUS source notes | Check source notes against FRUS-style expectations. | Ready for compiler use | 95 of 95 potential-document leads render a Source: note; capture worksheets preserve current notes and add final source-note fields. | reports/frus-source-note-audit.md | Replace generated pending notes with final repository, collection, folder, markings, pagination, and declassification details only after item-level verification. |
-| Compiler risks and gaps | Assume compiler risk, identify gaps, and address them with controlled workflows. | Controlled open work | 10 structured risks, 198 action rows, 95 readiness rows, and 95 capture rows keep remaining gaps visible and actionable. | exports/compiler-risk-register.csv | Work the action queue by priority band, closing risks only when item-level evidence or explicit editorial limitation supports closure. |
+| Compiler risks and gaps | Assume compiler risk, identify gaps, and address them with controlled workflows. | Controlled open work | 10 structured risks now have 10 closure-matrix rows, linked action ranks, evidence gates, and residual-limitation fields. | exports/compiler-risk-closure-matrix.csv | Work the risk closure matrix row by row, closing risks only when item-level evidence or explicit editorial limitation supports closure. |
 | Compiler handoff | Make the project easy for a FRUS compiler to pick up and use. | Ready for compiler use | 198 ordered actions, 9 chapter dossiers, 9 readiness rows, and this requirements audit provide the handoff path. | exports/compiler-requirements-audit.csv | Start each session with this audit, then the action queue, then the chapter dossier for the selected chapter. |
 
 ## Open Work That Is Controlled
 
 - NARA Scout and primary-source leads: Work the NARA item-boundary workbench in batch order, then rerun the linked Scout packets only when Catalog checks do not expose item boundaries. Evidence trail: exports/nara-item-boundary-workbench.csv; exports/potential-documents-triage.csv; exports/nara-scout-query-packets.csv; exports/nara-file-unit-resolution-queue.csv; reports/nara-scout-potential-documents.md
-- Compiler risks and gaps: Work the action queue by priority band, closing risks only when item-level evidence or explicit editorial limitation supports closure. Evidence trail: exports/compiler-risk-register.csv; reports/compiler-gap-analysis.md; exports/compiler-action-queue.csv; exports/selection-readiness-queue.csv
+- Compiler risks and gaps: Work the risk closure matrix row by row, closing risks only when item-level evidence or explicit editorial limitation supports closure. Evidence trail: exports/compiler-risk-closure-matrix.csv; exports/compiler-risk-register.csv; reports/compiler-gap-analysis.md; exports/compiler-action-queue.csv; exports/selection-readiness-queue.csv
 
 ## By Status
 

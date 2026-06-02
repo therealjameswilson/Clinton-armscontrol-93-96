@@ -14,7 +14,7 @@ Generated for the public FRUS 1993-2000, Volume VII source map.
 | Gap | Status | New coverage |
 | --- | --- | --- |
 | Source base too narrow | Addressed with new lanes | Congress.gov treaty documents and reports; Clinton Digital Library MDR packets and finding aids; DOD annual report; NRC HEU implementation notice; companion Clinton-Russia memcons and telcon |
-| NARA file-unit quality | Open, now isolated | Kept as a visible risk; `exports/nara-file-unit-resolution-queue.csv` isolates 42 file-unit rows for item-boundary resolution before selection |
+| NARA file-unit quality | Open, now isolated | Kept as a visible risk; `exports/nara-item-boundary-workbench.csv` orders 42 file-unit rows with stop rules, promotion gates, and linked Scout pressure before selection |
 | START II ratification too thin | Addressed | Robert Bell START II MDR packet, Senate Executive Report 104-10, December 22, 1995 Congressional Record debate, January 26, 1996 Clinton-Yeltsin telcon |
 | NPT/CTBT negotiation records missing | Partly addressed | CTBT finding aid, CTBT Treaty Document 105-28, NPT Congressional Record reaction; still needs State/ACDA cables and Geneva negotiation files |
 | CTR/HEU implementation weak | Addressed | Nunn-Lugar MDR packet, Vancouver HEU/security memcon, Moscow trilateral Ukraine memcon, DOD Annual Defense Report, NRC HEU transparency notice |
@@ -31,11 +31,13 @@ Generated for the public FRUS 1993-2000, Volume VII source map.
 - The DCI counterproliferation lead currently uses a non-official mirror as a locator and should be replaced before final use.
 - The NARA Scout generated data still contains cached, undated file-unit rows from the earlier API-limited run. These now have a dedicated resolution worksheet but still require Catalog child-item or on-site verification.
 - Clinton public statements still need internal counterparts unless the statement text itself is deliberately selected; the backtrace queue stages the counterpart search but does not complete it.
+- The risk register now has a closure matrix; risks should be closed only after the linked evidence gate is satisfied or a residual editorial limitation is recorded.
 
 ## Next pull list
 
-1. Work `exports/nara-file-unit-resolution-queue.csv` until each NAID is either replaced by item-level candidates or marked context-only.
-2. Re-run the NARA Scout harvester with the expanded query packs once `NARA_SCOUT_API_KEY` quota is available.
-3. Screen `2016-0048-M`, `2014-0644-M`, `2016-0158-F`, `2013-0870-M`, `2013-0865-M`, and `2015-0641-M` for item-level documents.
-4. Replace source-path-only leads for China, South Asia, and the DCI threat-assessment lane with official item pages or stronger primary sources.
-5. Add State/ACDA/DOE/JCS/CIA source records where available, especially for CTBT zero-yield, CWC ratification, HEU transparency, theater missile defense, and BWC protocol negotiations.
+1. Work `exports/compiler-risk-closure-matrix.csv` row by row and update the closure decision, evidence added, and residual limitation fields.
+2. Work `exports/nara-item-boundary-workbench.csv` until each NAID is either replaced by item-level candidates or marked context-only.
+3. Re-run the NARA Scout harvester with the expanded query packs once `NARA_SCOUT_API_KEY` quota is available.
+4. Screen `2016-0048-M`, `2014-0644-M`, `2016-0158-F`, `2013-0870-M`, `2013-0865-M`, and `2015-0641-M` for item-level documents.
+5. Replace source-path-only leads for China, South Asia, and the DCI threat-assessment lane with official item pages or stronger primary sources.
+6. Add State/ACDA/DOE/JCS/CIA source records where available, especially for CTBT zero-yield, CWC ratification, HEU transparency, theater missile defense, and BWC protocol negotiations.

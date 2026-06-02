@@ -396,6 +396,12 @@
             <a href="exports/compiler-risk-register.csv">Download CSV</a>
           </article>
           <article class="export-card">
+            <span class="export-meta">10 rows</span>
+            <h3>Compiler Risk Closure Matrix</h3>
+            <p>Risk closure gates with evidence paths, related action ranks, residual-limitation fields, and decision columns.</p>
+            <a href="exports/compiler-risk-closure-matrix.csv">Download CSV</a>
+          </article>
+          <article class="export-card">
             <span class="export-meta">15 rows</span>
             <h3>Clinton Public Statements</h3>
             <p>Public Papers anchors for public chronology, speechwriting backtrace, and internal-record matching.</p>
@@ -538,8 +544,14 @@
         </div>
         <p class="section-note">
           These are not blockers to using the site. They are the pull-list and verification controls needed before
-          treating the source map as a compiler-ready document sequence.
+          treating the source map as a compiler-ready document sequence. Use the
+          <a href="reports/compiler-risk-closure-matrix.md">risk closure matrix</a>
+          to record whether each risk is closed, still open, or accepted as an explicit editorial limitation.
         </p>
+        <div class="hero-actions" aria-label="Compiler risk closure matrix downloads">
+          <a class="button primary" href="exports/compiler-risk-closure-matrix.csv">Download Risk Closure Matrix</a>
+          <a class="button secondary" href="reports/compiler-risk-closure-matrix.md">Read Closure Report</a>
+        </div>
         <div id="gaps-root" class="gaps-root" aria-live="polite">
           <p class="loading">Loading compiler gaps...</p>
         </div>

@@ -21,6 +21,7 @@ Generated from the site's staged data files. These CSVs are meant as working she
 - `exports/presidential-daily-diary-follow-up.csv`: 22 calls or meetings to verify against telcons, memcons, PC/DC minutes, NSC notes, or agency records.
 - `exports/daily-diary-counterpart-queue.csv`: 22 diary events converted into substantive-counterpart searches and capture fields.
 - `exports/compiler-risk-register.csv`: 10 source-risk controls with next actions, target records, and source pools.
+- `exports/compiler-risk-closure-matrix.csv`: 10 risk rows with closure gates, evidence paths, related action ranks, and residual-limitation fields.
 - `exports/clinton-public-statements.csv`: 15 Clinton Public Papers anchors for public chronology and speech-clearance backtracking.
 - `exports/chapter-dossiers.csv`: 9 chapter-level dashboards bundling first reads, packet screens, archive pulls, diary date controls, public anchors, and risk controls.
 - `exports/chapter-readiness-scorecard.csv`: 9 chapter-level readiness rows with counts, blockers, top risks, and next actions.
@@ -41,7 +42,8 @@ Generated from the site's staged data files. These CSVs are meant as working she
 12. Use `public-statement-backtrace-queue.csv` to pair public anchors with internal records before treating them as sequence evidence.
 13. Use `clinton-library-visit-run-sheet.csv` as the reading-room day plan, `clinton-library-request-packets.csv` for de-duplicated call slips, then `clinton-library-oaid-request-queue.csv` for item-level capture.
 14. Use `presidential-daily-diary-follow-up.csv` for occurrence control, then `daily-diary-counterpart-queue.csv` to locate and capture substantive telcons, memcons, PC/DC minutes, NSC notes, cables, or agency files.
-15. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
+15. Use `compiler-risk-closure-matrix.csv` to decide whether each risk is closed, still open, or accepted as an explicit editorial limitation.
+16. Keep `compiler-risk-register.csv` open while selecting documents so public statements, file-unit rows, and broad finding aids do not masquerade as final item-level evidence.
 
 Regenerate with:
 

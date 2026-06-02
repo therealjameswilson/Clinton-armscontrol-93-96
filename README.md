@@ -30,6 +30,7 @@ currently lists the volume as planned rather than published. It gathers:
 - source-gap leads from Congress.gov, Clinton Digital Library, DOD, NRC, archived White House records, and the companion Clinton-Russia page
 - Presidential Daily Diary call and meeting references from the 2010-0083-F hardcopy scans and Clinton Library foreign-leader index
 - structured compiler-risk gaps with pull lists and verification actions
+- a compiler risk closure matrix with evidence gates, action links, decision fields, and residual-limitation capture
 - a Clinton Library on-site research plan built from the local `2013-0185-M` folder-title PDFs
 - a de-duplicated Clinton Library request packet list for reading-room call slips
 - a Clinton Library visit run sheet with request order, stop rules, and capture gates
@@ -65,6 +66,7 @@ currently lists the volume as planned rather than published. It gathers:
 - `reports/chapter-dossiers.md`: generated per-chapter launch packet for first reads, pulls, date controls, and risks
 - `reports/chapter-readiness-scorecard.md`: generated per-chapter triage scorecard for launch status and blockers
 - `reports/compiler-gap-analysis.md`: source-gap treatment report and next pull list
+- `reports/compiler-risk-closure-matrix.md`: generated closure gates and evidence paths for each compiler risk
 - `reports/clinton-library-research-plan.md`: visit-priority report for Clinton Library research time
 - `reports/clinton-library-request-packets.md`: generated de-duplicated reading-room request packets
 - `reports/clinton-library-visit-run-sheet.md`: generated reading-room day plan with stop rules and action-queue links
@@ -188,11 +190,11 @@ selection capture worksheet, the NARA file-unit resolver, the NARA
 item-boundary workbench, NARA Scout query packets, Clinton Library call-slip
 clusters, the request packets, the visit run sheet, the exploded Clinton
 Library OA/ID request queue, Presidential Daily Diary follow-up, the Daily
-Diary counterpart queue, the risk register, Clinton public statements, the
-public-statement backtrace queue, the chapter readiness scorecard, and chapter
-dossiers. The tables are regenerated from the same staged data files as the
-page, so a compiler can sort and annotate them without creating a separate
-hand-maintained index.
+Diary counterpart queue, the risk register, the risk closure matrix, Clinton
+public statements, the public-statement backtrace queue, the chapter readiness
+scorecard, and chapter dossiers. The tables are regenerated from the same
+staged data files as the page, so a compiler can sort and annotate them without
+creating a separate hand-maintained index.
 
 The generated `exports/frus-selection-capture-worksheet.csv` is the compilation
 handoff sheet. It preserves the current lead, readiness queue, action, required
@@ -237,6 +239,12 @@ without pretending every packet or source path is already an item-level FRUS
 candidate. The NARA file-unit resolver and item-boundary workbench now turn
 the largest remaining open risk into a sortable, batch-ordered item-boundary
 worksheet.
+
+The generated `exports/compiler-risk-closure-matrix.csv` is the closure
+worksheet for the ten structured compiler risks. It links each risk to related
+action ranks, chapter readiness, boundary rows, public-statement backtraces,
+diary counterparts, library packets, Scout packets, closure gates,
+accept-limitation rules, and blank decision fields.
 
 ## Source-note pass
 
