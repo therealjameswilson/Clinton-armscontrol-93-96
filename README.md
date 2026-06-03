@@ -5,7 +5,10 @@ United States, 1993-2000, Volume VII, Arms Control and Nonproliferation,
 1993-1996*.
 
 The site is intentionally source-first because the Office of the Historian
-currently lists the volume as planned rather than published. It gathers:
+currently lists the volume as planned rather than published. It is designed as
+an auditable source trail rather than a black-box selection: generated queues
+remain provisional until a human compiler verifies the item-level record and
+source note. It gathers:
 
 - official FRUS status and volume-boundary links
 - an opening chronology of dated released or declassified document leads
@@ -22,7 +25,7 @@ currently lists the volume as planned rather than published. It gathers:
 - a Daily Diary counterpart queue that converts schedule evidence into substantive-record searches
 - a chapter readiness scorecard that ranks launch status, blockers, and next actions
 - CSV working tables for sorting potential documents, chronology items, archive pulls, OA/ID requests, diary follow-up, public statements, and source risks
-- chapter dossiers that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
+- chapter dossiers with copyable launch briefs that bundle first reads, packet screens, Clinton Library pulls, diary follow-up, public anchors, and risk controls by chapter
 - Clinton Library guide entries for the relevant NSC offices
 - NARA Catalog collection and series leads
 - Clinton Library finding aids for NPT/CTBT and speechwriting/source context
@@ -168,10 +171,12 @@ candidates.
 
 ## Chapter dossiers
 
-The chapter dossier board gives each
-provisional chapter one card with first-read leads, packet or Clinton Library
-pulls, Presidential Daily Diary/Public Papers date controls, source risks, and a
-single next move. The matching `exports/chapter-dossiers.csv` and
+The chapter dossier board gives each provisional chapter one card with
+first-read leads, packet or Clinton Library pulls, Presidential Daily
+Diary/Public Papers date controls, source risks, and a single next move. Each
+card now has a `Copy Launch Brief` control that produces a paste-ready Markdown
+chapter note with metrics, first reads, pull targets, date controls, risks, and
+the final capture gate. The matching `exports/chapter-dossiers.csv` and
 `reports/chapter-dossiers.md` files are regenerated from the same staged data as
 the page.
 

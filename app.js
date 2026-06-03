@@ -1021,6 +1021,87 @@ function makeDossierList(title, items, emptyText, renderItem) {
   return block;
 }
 
+function formatDossierLines(items, emptyText, renderItem) {
+  if (!items.length) return [`- ${emptyText}`];
+  return items.map((item) => `- ${renderItem(item)}`);
+}
+
+function dossierLaunchText(dossier) {
+  const { lane, documents, chronology, firstReads, packetScreens, pulls, diaries, statements, risks, nextMove } = dossier;
+  const packetItems = pulls.length ? pulls.slice(0, 3) : packetScreens;
+  const dateControls = [...diaries.filter((item) => item.priority === "High").slice(0, 2), ...statements.slice(0, 2)].slice(0, 3);
+  const lines = [
+    `# ${lane.number}: ${lane.title}`,
+    "",
+    `Page: ${window.location.href.split("#")[0]}#dossiers`,
+    "Report: reports/chapter-dossiers.md",
+    "Scorecard: reports/chapter-readiness-scorecard.md",
+    "",
+    "## Metrics",
+    `- Candidate leads: ${documents.length}`,
+    `- Declassified chronology leads: ${chronology.length}`,
+    `- Clinton Library pulls: ${pulls.length}`,
+    `- Daily Diary controls: ${diaries.length}`,
+    "",
+    "## Next Move",
+    `- ${nextMove}`,
+    "",
+    "## First Read",
+    ...formatDossierLines(firstReads, "No item-level or released leads staged yet.", (item) => `${formatDate(item.date || "date pending")}: ${item.title}`),
+    "",
+    "## Packet Or Pull",
+    ...formatDossierLines(packetItems, "No packet or library pull staged yet.", (item) =>
+      item.oaIds
+        ? `${item.priority}: ${item.title} (${(item.oaIds || []).slice(0, 4).join(", ")})`
+        : `${item.priority || "Review"}: ${item.title}`
+    ),
+    "",
+    "## Date Controls",
+    ...formatDossierLines(dateControls, "No diary or public-statement date control staged yet.", (item) =>
+      `${formatDate(item.date || "date pending")}: ${item.title}`
+    ),
+    "",
+    "## Risk Controls",
+    ...formatDossierLines(risks, "No specific source risk staged.", (gap) => `${gap.priority}: ${gap.title}`),
+    "",
+    "## Capture Gate",
+    "- Promote a lead only after final title/date, author or origin, recipient, markings, pagination, repository path, disposition, and final FRUS source note are captured."
+  ];
+  return lines.join("\n");
+}
+
+function fallbackCopyText(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  document.body.append(area);
+  area.select();
+  try {
+    document.execCommand("copy");
+  } finally {
+    area.remove();
+  }
+}
+
+async function copyDossierLaunch(dossier, button) {
+  const text = dossierLaunchText(dossier);
+  try {
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else fallbackCopyText(text);
+  } catch (_error) {
+    fallbackCopyText(text);
+  }
+
+  button.textContent = "Copied";
+  button.dataset.copied = "true";
+  window.setTimeout(() => {
+    button.textContent = "Copy Launch Brief";
+    delete button.dataset.copied;
+  }, 1800);
+}
+
 function renderChapterDossiers() {
   if (!dossiersRoot) return;
 
@@ -1034,8 +1115,15 @@ function renderChapterDossiers() {
     header.className = "dossier-card-header";
     const title = document.createElement("h3");
     title.textContent = lane.title;
+    const tools = document.createElement("div");
+    tools.className = "dossier-tools";
     const number = makeChip(lane.number, "priority-chip");
-    header.append(title, number);
+    const copy = document.createElement("button");
+    copy.type = "button";
+    copy.textContent = "Copy Launch Brief";
+    copy.addEventListener("click", () => copyDossierLaunch(dossier, copy));
+    tools.append(number, copy);
+    header.append(title, tools);
 
     const metrics = document.createElement("div");
     metrics.className = "dossier-metrics";

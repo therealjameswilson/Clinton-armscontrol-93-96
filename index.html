@@ -6,9 +6,9 @@
     <title>FRUS 1993-2000 Volume VII Arms Control and Nonproliferation</title>
     <meta
       name="description"
-      content="A compiler-facing source map for FRUS 1993-2000, Volume VII, Arms Control and Nonproliferation, 1993-1996."
+      content="A transparent, compiler-facing source map for FRUS 1993-2000, Volume VII, Arms Control and Nonproliferation, 1993-1996."
     />
-    <link rel="stylesheet" href="styles.css?v=20260602-first-12-workbench" />
+    <link rel="stylesheet" href="styles.css?v=20260602-trust-cues" />
     <script defer src="data/potential-documents.js"></script>
     <script defer src="data/source-gap-leads.js"></script>
     <script defer src="data/compiler-gaps.js"></script>
@@ -16,8 +16,8 @@
     <script defer src="data/presidential-daily-diary-references.js"></script>
     <script defer src="data/clinton-public-statements.js"></script>
     <script defer src="data/compiler-action-queue.js"></script>
-    <script defer src="app.js?v=20260602-first-12-workbench"></script>
-    <script defer src="compiler-workbench.js?v=20260602-first-12-workbench"></script>
+    <script defer src="app.js?v=20260602-trust-cues"></script>
+    <script defer src="compiler-workbench.js?v=20260602-trust-cues"></script>
     <style id="compiler-network-style">
       .compiler-network {
         border-bottom: 1px solid rgba(31, 41, 51, 0.14);
@@ -169,7 +169,9 @@
             A public compiler desk for the planned FRUS volume on Clinton-era arms control
             and nonproliferation. The page now opens with a chronology of dated
             released or declassified archival leads, then keeps source gaps, diary
-            controls, and public statements available for verification.
+            controls, and public statements available for verification. It is a
+            source trail, not a black-box selection: every queue is meant to be
+            checked, revised, or rejected by a human compiler.
           </p>
           <div class="hero-actions" aria-label="Primary actions">
             <a class="button primary" href="#chronology">Review Chronology</a>
@@ -177,6 +179,11 @@
             <a class="button secondary" href="https://history.state.gov/historicaldocuments/frus1993-00v07" rel="noreferrer">
               Official Volume Page
             </a>
+          </div>
+          <div class="trust-strip" aria-label="Verification posture">
+            <span>Primary-source trail exposed</span>
+            <span>Generated queues stay provisional</span>
+            <span>Human selection remains the standard</span>
           </div>
         </div>
 
@@ -203,6 +210,10 @@
             <div>
               <dt>Boundary</dt>
               <dd>Volume VIII continues the subject for 1997-2000</dd>
+            </div>
+            <div>
+              <dt>Review Posture</dt>
+              <dd>Use the tables as auditable leads; promote only after source-note and item-level checks.</dd>
             </div>
           </dl>
         </aside>
@@ -440,8 +451,8 @@
         <p class="section-note">
           Each dossier consolidates the staged chronology, document leads, Clinton
           Library pulls, Presidential Daily Diary follow-up, public anchors, and
-          active source risks for a chapter. Use it as the chapter-level start page
-          before opening the larger tables, or open the
+          active source risks for a chapter. Use the copy button on a dossier card
+          to create a paste-ready chapter launch brief, or open the
           <a href="reports/chapter-readiness-scorecard.md">readiness scorecard</a>
           to pick the next chapter by blocker and launch status.
         </p>

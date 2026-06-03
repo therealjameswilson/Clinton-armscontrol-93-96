@@ -177,6 +177,26 @@ h3 {
   margin-top: 26px;
 }
 
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.trust-strip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  color: #394752;
+  font-size: 0.82rem;
+  font-weight: 820;
+  background: rgba(255, 254, 250, 0.68);
+  border: 1px solid rgba(32, 51, 76, 0.16);
+  border-radius: 999px;
+}
+
 .button,
 .action-tools button,
 .lead-tools button,
@@ -898,10 +918,45 @@ dd {
   justify-content: space-between;
 }
 
+.dossier-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.dossier-tools button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 4px 10px;
+  color: var(--navy);
+  font-size: 0.78rem;
+  font-weight: 850;
+  cursor: pointer;
+  background: rgba(32, 51, 76, 0.07);
+  border: 1px solid rgba(32, 51, 76, 0.22);
+  border-radius: 999px;
+}
+
+.dossier-tools button:hover,
+.dossier-tools button:focus-visible,
+.dossier-tools button[data-copied="true"] {
+  color: white;
+  background: var(--navy);
+  outline: none;
+}
+
 .dossier-card h3,
 .dossier-card h4,
 .dossier-card p {
   margin: 0;
+}
+
+.dossier-card h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .dossier-metrics {
@@ -1399,6 +1454,11 @@ dd {
   }
 
   .workbench-console-actions {
+    justify-content: flex-start;
+  }
+
+  .dossier-card-header,
+  .dossier-tools {
     justify-content: flex-start;
   }
 
