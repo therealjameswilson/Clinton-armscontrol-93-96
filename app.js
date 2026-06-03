@@ -854,37 +854,49 @@ function sourceNoteStatus(item) {
   const category = `${item.category || ""}`.toLowerCase();
 
   if (type.includes("public papers") || item.sourceRepository === "GovInfo") {
-    return "Published primary source.";
+    return "Provenance status: published Public Papers citation; final FRUS use should either select the public text itself or pair it with internal policy records that document the decision process.";
   }
   if (type.includes("congressional") || type.includes("senate")) {
-    return "Published primary-source record; use with internal policy files before final document selection.";
+    return "Provenance status: published congressional or treaty-text record; cite for the public action or treaty text and pair with internal policy files before final document sequencing.";
   }
   if (type.includes("nara scout") || level.includes("fileunit")) {
-    return "File-unit lead surfaced for research triage; item-level document text, classification, date, and pagination pending.";
+    return "Provenance status: file-unit lead only; final FRUS source note still needs item title/date, author or origin, recipient/audience when applicable, classification markings, box/folder or file path, page range, attachments, and declassification/withholding details.";
   }
   if (level.includes("packet")) {
-    return "Packet lead; exact item title, classification, and pagination pending.";
+    return "Provenance status: release-packet lead; final FRUS source note still needs exact item title/date, author or origin, recipient/audience, classification markings, page range, attachments, and declassification/withholding details.";
   }
   if (level.includes("collection") || type.includes("finding aid") || category.includes("finding aid")) {
-    return "Collection-level lead; exact folder, item title, classification, and pagination pending.";
+    return "Provenance status: collection-level locator; final FRUS source note still needs the requestable folder/item path, item title/date, markings, page range, and declassification/withholding details before selection.";
   }
   if (level.includes("source-path") || category.includes("source path")) {
-    return "Source-path lead; replace with an item-level archival citation before final FRUS selection.";
+    return "Provenance status: source-path locator; replace with an item-level archival citation before final FRUS selection.";
   }
   if (level.includes("published")) {
-    return "Published primary source.";
+    return "Provenance status: published or released primary-source locator; verify original repository path, classification/status line where applicable, and pagination before final selection.";
   }
-  return "Research lead; verify item-level source details before final FRUS selection.";
+  return "Provenance status: research lead; verify repository, collection/file path, item title/date, author or origin, recipient/audience, markings, pagination, attachments, and declassification/withholding notes before final FRUS selection.";
+}
+
+function appendProvenanceStatus(note, item) {
+  const cleaned = note.replace(/\s+/g, " ").trim();
+  if (!cleaned || cleaned.includes("Provenance status:")) return cleaned;
+  const base = cleaned.endsWith(".") ? cleaned : `${cleaned}.`;
+  return `${base} ${sourceNoteStatus(item)}`;
 }
 
 function formatFrusSourceNote(item) {
   const existing = `${item.sourceNote || ""}`.trim();
-  if (existing.startsWith("Source:") && !existing.includes("NARA Scout harvest")) return existing;
+  if (existing.startsWith("Source:") && !existing.includes("NARA Scout harvest")) {
+    return appendProvenanceStatus(existing, item);
+  }
 
   if (item.sourceType === "Public Papers" || item.sourceRepository === "GovInfo") {
     const book = publicPapersBook(item.identifier, item.date);
     const pages = item.pages ? `, ${item.pages}` : "";
-    return `Source: Public Papers of the Presidents of the United States: William J. Clinton, ${book}${pages}, "${item.title}"; GovInfo. Published primary source.`;
+    return appendProvenanceStatus(
+      `Source: Public Papers of the Presidents of the United States: William J. Clinton, ${book}${pages}, "${item.title}"; GovInfo.`,
+      item
+    );
   }
 
   const repository =
@@ -898,7 +910,7 @@ function formatFrusSourceNote(item) {
   const title = item.title ? ` ${leadTitleLabel(item)}: "${item.title}".` : "";
   const reviewCopy =
     item.sourceRepository === "Clinton-Russia-High-Level"
-      ? " Review copy available through the companion Clinton-Russia page; verify the final citation against the owning release packet."
+      ? " Review-copy caution: cite the owning repository or release packet, not the companion page, in the final FRUS note."
       : "";
 
   return `Source: ${path || "source path pending"}.${title} ${sourceNoteStatus(item)}${reviewCopy}`.replace(/\s+/g, " ");
@@ -910,7 +922,7 @@ function formatLibrarySourceNote(item) {
   const shownIds = ids.slice(0, 6).join(", ");
   const extra = ids.length > 6 ? `, plus ${ids.length - 6} more` : "";
   const oaText = ids.length ? `, ${idLabel} ${shownIds}${extra}` : "";
-  return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${item.sourcePart || "part pending"}${oaText}. Folder-title lead; verify exact box, folder title, item date, classification, and pagination on site.`;
+  return `Source: Clinton Presidential Library, 2013-0185-M folder-title lists, ${item.sourcePart || "part pending"}${oaText}. Provenance status: folder-title/request lead; final FRUS source note still needs exact box/container, folder title, item title/date, author or origin, recipient/audience, classification markings, page range, attachments, and declassification/withholding details.`;
 }
 
 function priorityRank(priority) {

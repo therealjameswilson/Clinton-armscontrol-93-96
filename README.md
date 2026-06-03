@@ -254,15 +254,18 @@ accept-limitation rules, and blank decision fields.
 
 ## Source-note pass
 
-The rendered source notes now follow the FRUS pattern: `Source:` plus
-repository, collection or identifier, title trail, and a clear status note.
-Existing published-source notes are preserved; generic NARA Scout recovery
-notes and prose summaries are converted on the page into source notes that
-flag file-unit, packet, collection, and source-path leads as pending item-level
-verification. The selection capture worksheet gives those generated notes a
-place to become final FRUS source notes only after the compiler verifies the
-item-level fields, and the public-statement backtrace queue keeps published
-statements paired with internal records before final sequencing.
+The rendered source notes now follow the published FRUS provenance pattern:
+`Source:` plus repository, collection or file path, box/folder or identifier,
+document/status details, and an honest provenance boundary. Existing Public
+Papers citations are preserved and given a provenance-status sentence; generic
+NARA Scout recovery notes and prose summaries are converted on the page into
+source notes that flag file-unit, packet, collection, and source-path leads as
+pending item-level verification. The selection capture worksheet gives those
+generated notes a place to become final FRUS source notes only after the
+compiler verifies the item title/date, author or origin, recipient/audience,
+classification markings, page range, attachments, cross-references, and
+declassification or withholding details. The public-statement backtrace queue
+keeps published statements paired with internal records before final sequencing.
 
 ## Presidential Daily Diary pass
 

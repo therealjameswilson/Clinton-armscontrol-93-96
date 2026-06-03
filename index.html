@@ -16,8 +16,8 @@
     <script defer src="data/presidential-daily-diary-references.js"></script>
     <script defer src="data/clinton-public-statements.js"></script>
     <script defer src="data/compiler-action-queue.js"></script>
-    <script defer src="app.js?v=20260602-trust-cues"></script>
-    <script defer src="compiler-workbench.js?v=20260602-trust-cues"></script>
+    <script defer src="app.js?v=20260603-source-provenance"></script>
+    <script defer src="compiler-workbench.js?v=20260603-source-provenance"></script>
     <style id="compiler-network-style">
       .compiler-network {
         border-bottom: 1px solid rgba(31, 41, 51, 0.14);
@@ -521,9 +521,9 @@
           <article class="desk-panel">
             <h3>Source Note Path</h3>
             <p>
-              Every document lead now renders a FRUS-style source note: repository,
-              collection or identifier, title trail, and a verification status for
-              folder-level or packet-level material.
+              Every document lead now renders a FRUS-style source note with repository,
+              collection or file path, identifier, document-status details, and a
+              provenance boundary for provisional folder-level or packet-level material.
             </p>
           </article>
           <article class="desk-panel">
@@ -668,10 +668,12 @@
           <p id="document-summary" class="document-summary">Loading potential documents...</p>
         </div>
         <p class="section-note">
-          Source notes follow the FRUS pattern of <code>Source:</code> plus repository, collection,
-          identifier, and document-status details. File-unit, packet, and source-path
-          leads are marked pending until item-level review confirms title, markings, date,
-          and pagination. Use the
+          Source notes follow the published FRUS pattern of <code>Source:</code> plus repository,
+          collection or file path, box/folder or identifier, markings/status, and editorial
+          facts such as attachments, cross-references, or withholding notes. File-unit,
+          packet, and source-path leads stay provisional until item-level review confirms
+          title/date, author or origin, recipient/audience, markings, pagination, and
+          declassification status. Use the
           <a href="reports/nara-item-boundary-workbench.md">item boundary workbench</a>
           before promoting Scout/file-unit leads into the selection capture worksheet.
         </p>

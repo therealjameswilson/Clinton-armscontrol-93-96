@@ -1,41 +1,77 @@
-# FRUS Source Note Audit
+# FRUS Source Note Provenance Audit
 
-Checked: May 25, 2026
+Checked: June 3, 2026
 
-## Style model
+## Published FRUS Model
 
-The planned Volume VII page should not present research annotations as source notes. FRUS document notes normally begin with `Source:` and then give the repository, collection or file path, box/folder or identifier when available, and document-status details such as classification, action status, marginalia, attachments, or cross-references. Official examples include:
+The planned Volume VII page should not present research annotations as final
+source notes. Published FRUS document notes begin with `Source:` and then
+establish provenance before editorial interpretation: repository, record group
+or presidential materials, collection/file path, box/folder or identifier,
+classification or handling markings, action/distribution status when present,
+and editorial facts such as attachments, not-printed material, cross-references,
+marginalia, or declassification/withholding notes.
+
+Official comparison points:
 
 - `https://history.state.gov/historicaldocuments/frus1969-76v30/d105`
+  shows a meeting record source note with National Archives repository,
+  presidential materials, NSC institutional file path, box/folder, classification
+  and sensitivity markings, meeting location, and separate attachment/cross-
+  reference notes.
 - `https://history.state.gov/historicaldocuments/frus1969-76v38p2/d181`
+  shows a memorandum source note with repository, presidential materials,
+  NSC/H-Files path, box/folder, classification, action status, and marginalia.
 - `https://history.state.gov/historicaldocuments/frus1969-76ve11p1/d390`
+  shows an electronic-volume note that still preserves repository, collection
+  path, box/folder, classification, follow-on memorandum status, and related
+  telegram cross-references.
+- `https://history.state.gov/historicaldocuments/about-frus`
+  frames the broader standard for a thorough, accurate, reliable documentary
+  record based on records across the White House, NSC, State, Defense, CIA, and
+  other foreign-affairs agencies.
 
-The Office of the Historian's FRUS description also frames the selection standard: the series documents major foreign-policy decisions and significant diplomatic activity from records across the White House, NSC, State, Defense, CIA, and other foreign-affairs agencies.
+## Current Generated State
 
-## Audit result
-
-Before this pass, the rendered data mixed FRUS-style notes with research annotations:
-
-| Area | Finding |
+| Area | Result |
 | --- | --- |
-| Generated potential documents | 52 of 65 stored notes did not begin with `Source:` |
-| NARA Scout candidates | 41 notes only said they were recovered from a Scout harvest |
-| Manual source-gap leads | 30 high-value leads had no `sourceNote` field |
-| Clinton public statements | 2 of 15 notes were prose summaries rather than source notes |
-| Clinton Library visit clusters | 13 clusters had pull-planning detail but no source-note line |
+| Potential-document triage | 95 of 95 `source_note` fields begin with `Source:` and 95 of 95 include `Provenance status:` boundary language. |
+| Selection-readiness queue | 95 of 95 `source_note` fields begin with `Source:` and 95 of 95 include `Provenance status:` boundary language. |
+| FRUS selection capture worksheet | 95 of 95 `current_source_note` fields begin with `Source:` and 95 of 95 include `Provenance status:` boundary language. |
+| Clinton public statements | 15 of 15 `source_note` fields begin with `Source:` and 15 of 15 include `Provenance status:` boundary language. |
+| Public-statement backtrace queue | 15 of 15 `source_note` fields begin with `Source:` and 15 of 15 include `Provenance status:` boundary language. |
+| Clinton Library call slips | 13 of 13 `source_note` fields begin with `Source:` and 13 of 13 include `Provenance status:` boundary language. |
+| Clinton Library OA/ID request queue | 99 of 99 `source_note` fields begin with `Source:` and 99 of 99 include `Provenance status:` boundary language. |
+| Clinton Library request packets | 83 of 83 `packet_source_note` fields begin with `Source:` and 83 of 83 include `Provenance status:` boundary language. |
+| Clinton Library visit run sheet | 83 of 83 `packet_source_note` fields begin with `Source:` and 83 of 83 include `Provenance status:` boundary language. |
 
-## Fix applied
+## Applied Provenance Rules
 
-The page now renders a generated FRUS-style note for every potential document, public statement, source-gap lead, and Clinton Library pull cluster. The generator preserves existing good `Source:` notes, replaces generic Scout recovery prose, and labels evidence level honestly:
+- Public Papers and congressional/treaty-text records are marked as published
+  primary-source anchors and must be paired with internal policy files unless
+  the published text itself is selected.
+- NARA Scout file-unit rows are marked as file-unit leads only until item
+  boundaries, item title/date, origin/recipient, markings, page range,
+  attachments, and declassification/withholding details are verified.
+- Clinton Library MDR packets and release packets are marked as packet leads,
+  not item-level selections, until the exact document and page range are
+  captured.
+- Finding-aid and folder-title rows are marked as collection or request leads
+  until a requestable folder/item path and item-level source evidence are
+  captured.
+- Companion review copies are flagged so the final FRUS note cites the owning
+  repository or release packet, not the companion page.
 
-- Published sources are marked as published primary sources.
-- NARA file-unit leads are marked as file-unit leads pending item-level text, classification, date, and pagination.
-- Clinton Library packets and MDR/finding-aid rows are marked as packet, collection, or source-path leads pending item-level verification.
-- Companion review copies are marked as review copies that still need final citation against the owning release packet.
-- Clinton Library `2013-0185-M` clusters now cite the folder-title lists, source part, and OA/ID trail.
+## Promotion Rule
 
-## Remaining rule
+Do not promote any file-unit, packet, finding-aid, folder-title, or companion
+review-copy lead into a final FRUS chronological document until the archive visit
+or digital release confirms exact repository, collection/file path, box/folder
+or identifier, item title/date, author or origin, recipient/audience,
+classification markings, action/distribution status when present, page range,
+attachments/enclosures, cross-references, and declassification or withholding
+details.
 
-Do not promote any file-unit, packet, or folder-title lead into a final FRUS chronological document until the archive visit or digital release confirms exact item title, date, classification markings, folder path, and page range.
-
-Use `exports/frus-selection-capture-worksheet.csv` as the promotion worksheet. It preserves the generated source note, then leaves final-source-note and document-description fields blank until item-level verification is complete.
+Use `exports/frus-selection-capture-worksheet.csv` as the promotion worksheet.
+It preserves the generated provisional note, then leaves final-source-note and
+document-description fields blank until item-level verification is complete.
